@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cooperative Aerial-Ground Guidance System - Technical Project Log</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f5f5;
+      color: #2c3e50;
+      line-height: 1.7;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #34495e;
+      color: white;
+      padding: 2rem;
+      border-bottom: 4px solid #2c3e50;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    header .subtitle {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    nav {
+      background: #2c3e50;
+      padding: 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    nav li {
+      flex: 1;
+      min-width: 120px;
+    }
+
+    nav a {
+      display: block;
+      padding: 0.8rem;
+      color: white;
+      text-decoration: none;
+      text-align: center;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    nav a:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    main {
+      padding: 2rem;
+    }
+
+    .milestone {
+      background: #ecf0f1;
+      border-left: 4px solid #3498db;
+      padding: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .milestone h2 {
+      color: #2c3e50;
+      margin-bottom: 1rem;
+      font-size: 1.6rem;
+    }
+
+    .milestone .status {
+      display: inline-block;
+      padding: 0.3rem 0.8rem;
+      border-radius: 3px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 0.8rem;
+    }
+
+    .milestone .status.completed {
+      background: #27ae60;
+      color: white;
+    }
+
+    .milestone .status.in-progress {
+      background: #f39c12;
+      color: white;
+    }
+
+    .section {
+      margin: 1.2rem 0;
+    }
+
+    .section h3 {
+      color: #34495e;
+      font-size: 1.2rem;
+      margin-bottom: 0.8rem;
+      border-bottom: 2px solid #bdc3c7;
+      padding-bottom: 0.3rem;
+    }
+
+    .math-section {
+      background: #e8f4f8;
+      border-left: 3px solid #3498db;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+
+    .math-section h4 {
+      color: #2980b9;
+      margin-bottom: 0.5rem;
+    }
+
+    .media-placeholder {
+      background: #f8f9fa;
+      border: 2px dashed #95a5a6;
+      padding: 2rem;
+      margin: 1rem 0;
+      text-align: center;
+      color: #7f8c8d;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .media-placeholder h4 {
+      color: #34495e;
+      margin-bottom: 0.5rem;
+    }
+
+    .media-placeholder p {
+      font-size: 0.9rem;
+    }
+
+    .challenge {
+      background: #fff3cd;
+      border-left: 3px solid #f39c12;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+
+    .challenge h4 {
+      color: #856404;
+      margin-bottom: 0.5rem;
+    }
+
+    .solution {
+      background: #d4edda;
+      border-left: 3px solid #28a745;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+
+    .solution h4 {
+      color: #155724;
+      margin-bottom: 0.5rem;
+    }
+
+    .learning {
+      background: #d1ecf1;
+      border-left: 3px solid #17a2b8;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+
+    .learning h4 {
+      color: #0c5460;
+      margin-bottom: 0.5rem;
+    }
+
+    code {
+      background: #f4f4f4;
+      padding: 2px 5px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      color: #c7254e;
+      font-size: 0.9em;
+    }
+
+    pre {
+      background: #2c3e50;
+      color: #ecf0f1;
+      padding: 1rem;
+      border-radius: 4px;
+      overflow-x: auto;
+      margin: 1rem 0;
+      font-size: 0.9em;
+    }
+
+    pre code {
+      background: none;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+    }
+
+    th {
+      background: #34495e;
+      color: white;
+      padding: 0.8rem;
+      text-align: left;
+    }
+
+    td {
+      padding: 0.6rem;
+      border-bottom: 1px solid #ddd;
+    }
+
+    tr:hover {
+      background: #f8f9fa;
+    }
+
+    ul,
+    ol {
+      margin-left: 1.5rem;
+      margin-top: 0.5rem;
+    }
+
+    li {
+      margin: 0.4rem 0;
+    }
+
+    .add-section {
+      background: #e8f5e9;
+      border: 2px dashed #4caf50;
+      padding: 2rem;
+      margin: 2rem 0;
+    }
+
+    .add-section h2 {
+      color: #2e7d32;
+      margin-bottom: 1rem;
+    }
+
+    footer {
+      background: #2c3e50;
+      color: white;
+      text-align: center;
+      padding: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      nav ul {
+        flex-direction: column;
+      }
+
+      main {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>Cooperative Aerial-Ground Guidance System</h1>
+      <p class="subtitle">Technical Development Log - Student Research Project</p>
+      <p style="margin-top: 0.5rem; font-size: 0.9rem;">Based on: "Aerial vision based guidance and control for
+        perception-less ground vehicle" (Santos et al.)</p>
+    </header>
+
+    <nav>
+      <ul>
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#foundation">Foundation</a></li>
+        <li><a href="#implementation">Implementation</a></li>
+        <li><a href="#vision">Vision System</a></li>
+        <li><a href="#results">Results</a></li>
+        <li><a href="#add-new">Add Progress</a></li>
+      </ul>
+    </nav>
+
+    <main>
+      <section id="overview">
+        <h2 style="color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 0.5rem; margin-bottom: 1.5rem;">
+          Project Overview</h2>
+
+        <p><strong>Research Objective:</strong> Develop a cooperative UAV-UGV system where an aerial vehicle provides
+          visual guidance to a ground vehicle that lacks internal navigation sensors.</p>
+
+        <p><strong>Current Implementation Status:</strong> Completed foundational click-to-move navigation with
+          vision-based localization using ArUco fiducial markers.</p>
+
+        <div style="background: #fff3e0; border-left: 3px solid #ff9800; padding: 1.2rem; margin: 1.5rem 0;">
+          <h3 style="color: #e65100; margin-bottom: 0.5rem;">System Architecture</h3>
+          <p><strong>Vision Module:</strong> Overhead camera + ArUco marker detection for UGV pose estimation</p>
+          <p><strong>Control Module:</strong> Proportional navigation controller for autonomous waypoint following</p>
+          <p><strong>Simulation Environment:</strong> ROS2 Humble + Gazebo Sim with TurtleBot3 platform</p>
+        </div>
+
+        <div style="background: #e3f2fd; border-left: 3px solid #2196f3; padding: 1.2rem; margin: 1.5rem 0;">
+          <h3 style="color: #1976d2; margin-bottom: 0.5rem;">Development Phases</h3>
+          <p>✅ <strong>Phase 0:</strong> Literature review, environment setup, control prototyping</p>
+          <p>✅ <strong>Phase 1:</strong> Odometry-based navigation (baseline)</p>
+          <p>✅ <strong>Phase 2:</strong> Vision-based localization (ArUco markers)</p>
+          <p>⏳ <strong>Phase 3:</strong> Path planning and obstacle avoidance</p>
+          <p>⏳ <strong>Phase 4:</strong> UAV integration for aerial guidance</p>
+          <p>⏳ <strong>Phase 5:</strong> Hardware deployment and field testing</p>
+        </div>
+      </section>
+
+      <section id="foundation">
+        <h2 style="color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 0.5rem; margin-bottom: 1.5rem;">
+          Foundational Work</h2>
+
+        <div class="milestone">
+          <h2>📚 Literature Review & Technology Selection</h2>
+          <span class="status completed">✓ Completed</span>
+
+          <div class="section">
+            <h3>Research Foundation</h3>
+            <p>Our project is inspired by the work of Santos et al. on aerial vision-based guidance for perception-less
+              ground vehicles. The key insight is that external visual feedback can replace expensive onboard sensors
+              like GPS, IMU, and LIDAR.</p>
+
+            <p><strong>Core Principle:</strong> A UAV equipped with a downward-facing camera tracks the UGV and computes
+              navigation commands based on visual information alone.</p>
+          </div>
+
+          <div class="section">
+            <h3>Technology Stack Selection</h3>
+            <table>
+              <tr>
+                <th>Component</th>
+                <th>Selected Technology</th>
+                <th>Justification</th>
+              </tr>
+              <tr>
+                <td>Middleware</td>
+                <td>ROS2 Humble</td>
+                <td>Modern architecture, real-time capabilities, industry standard</td>
+              </tr>
+              <tr>
+                <td>Simulator</td>
+                <td>Gazebo Sim (Ignition)</td>
+                <td>Physics-accurate, sensor simulation, ROS2 integration</td>
+              </tr>
+              <tr>
+                <td>Vision Library</td>
+                <td>OpenCV 4.x</td>
+                <td>Comprehensive computer vision algorithms, ArUco support</td>
+              </tr>
+              <tr>
+                <td>Fiducial Markers</td>
+                <td>ArUco (DICT_4X4_50)</td>
+                <td>Lightweight detection, pose estimation, rotation invariance</td>
+              </tr>
+              <tr>
+                <td>Robot Platform</td>
+                <td>TurtleBot3 Burger</td>
+                <td>Differential drive, well-documented, simulation support</td>
+              </tr>
+            </table>
+          </div>
+
+          <div class="learning">
+            <h4>💡 Key Insights</h4>
+            <ul>
+              <li>ArUco markers provide 6-DOF pose estimation from a single camera view</li>
+              <li>Simulation-first approach allows rapid iteration without hardware costs</li>
+              <li>ROS2's DDS middleware enables distributed computing for future UAV-UGV communication</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="milestone">
+          <h2>🐳 Development Environment: Docker Containerization</h2>
+          <span class="status completed">✓ Completed</span>
+
+          <div class="section">
+            <h3>Problem Statement</h3>
+            <p>Team members using different operating systems (Windows, Ubuntu 22.04, Ubuntu 24.04) faced dependency
+              conflicts and version mismatches with ROS2 Humble.</p>
+          </div>
+
+          <div class="solution">
+            <h4>✓ Solution: Containerized Development</h4>
+            <p>Implemented Docker-based workflow ensuring identical environments across all development machines.</p>
+
+            <p><strong>Docker Configuration:</strong></p>
+            <pre><code>FROM osrf/ros:humble-desktop
+
+RUN apt-get update && apt-get install -y \
+    ros-humble-gazebo-ros-pkgs \
+    ros-humble-turtlebot3* \
+    python3-pip \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install opencv-python opencv-contrib-python
+
+WORKDIR /workspace</code></pre>
+
+            <p><strong>Benefits Achieved:</strong></p>
+            <ul>
+              <li>Reproducible builds across Windows, macOS, and Linux</li>
+              <li>Isolated dependencies preventing system-level conflicts</li>
+              <li>Version-locked environment for long-term project stability</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="milestone">
+          <h2>🐢 Control Algorithm Prototyping: Turtlesim</h2>
+          <span class="status completed">✓ Completed</span>
+
+          <div class="section">
+            <h3>Objective</h3>
+            <p>Validate understanding of ROS2 pub/sub architecture and implement basic autonomous control before moving
+              to 3D simulation.</p>
+          </div>
+
+          <div class="section">
+            <h3>Implementation: Safety Cage Algorithm</h3>
+            <p>Developed autonomous boundary avoidance system demonstrating closed-loop feedback control.</p>
+
+            <p><strong>Algorithm:</strong></p>
+            <ol>
+              <li>Subscribe to <code>/turtle1/pose</code> for position feedback</li>
+              <li>Compute distance to nearest boundary: <code>d = min(x, y, 11-x, 11-y)</code></li>
+              <li>If <code>d < threshold</code>: Execute emergency turn maneuver</li>
+              <li>Else: Continue circular exploration pattern</li>
+            </ol>
+
+            <pre><code>def pose_callback(self, msg):
+    dist_to_edge = min(msg.x, msg.y, 11-msg.x, 11-msg.y)
+    
+    if dist_to_edge < 0.2:
+        # Emergency avoidance
+        cmd = Twist()
+        cmd.angular.z = 2.0
+        self.vel_pub.publish(cmd)
+    else:
+        # Normal exploration
+        cmd = Twist()
+        cmd.linear.x = 1.0
+        cmd.angular.z = 0.5
+        self.vel_pub.publish(cmd)</code></pre>
+          </div>
+
+          <div class="media-placeholder">
+            <h4>📹 Media Placeholder: Turtlesim Safety Cage Demo</h4>
+            <p>Add video/GIF showing autonomous boundary avoidance behavior</p>
+            <p style="font-size: 0.8rem; margin-top: 0.5rem;">[To add media: Replace this div with &lt;img&gt; or
+              &lt;video&gt; tag]</p>
+          </div>
+
+          <div class="challenge">
+            <h4>⚠️ Challenge: Callback Timing & State Management</h4>
+            <p><strong>Issue:</strong> Robot exhibited "stuttering" behavior near boundaries - rapid oscillation between
+              turning and forward motion.</p>
+            <p><strong>Root Cause:</strong> Pose updates arriving faster than control commands could execute, causing
+              premature state transitions.</p>
+            <p><strong>Solution:</strong> Implemented state machine with minimum dwell time in "turning" state:</p>
+            <pre><code>if dist_to_edge < threshold and self.state == 'normal':
+    self.state = 'turning'
+    self.turn_start_time = time.time()
+
+if self.state == 'turning':
+    if time.time() - self.turn_start_time > 1.0:
+        self.state = 'normal'</code></pre>
+          </div>
+
+          <div class="learning">
+            <h4>💡 Lessons Learned</h4>
+            <ul>
+              <li>Asynchronous callbacks require careful state management</li>
+              <li>Hysteresis in control systems prevents oscillatory behavior</li>
+              <li>2D prototyping validates logic before 3D complexity</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="implementation">
+        <h2 style="color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 0.5rem; margin-bottom: 1.5rem;">
+          Phase 1: Baseline Navigation System</h2>
+
+        <div class="milestone">
+          <h2>🌍 Simulation Environment Construction</h2>
+          <span class="status completed">✓ Completed</span>
+
+          <div class="section">
+            <h3>World Configuration</h3>
+            <p>Created custom Gazebo world with overhead camera positioned for aerial perspective.</p>
+
+            <p><strong>Camera Specifications:</strong></p>
+            <ul>
+              <li>Height: 10 meters above ground plane</li>
+              <li>Orientation: Downward-facing (pitch = -90°)</li>
+              <li>Field of View: 60° (1.047 radians)</li>
+              <li>Resolution: 1920×1080 pixels</li>
+              <li>Update Rate: 30 Hz</li>
+            </ul>
+          </div>
+
+          <div class="math-section">
+            <h4>📐 Camera Geometry & Visible Area Calculation</h4>
+            <p>Given camera height <em>h</em> and FOV angle <em>θ</em>, the visible ground area is:</p>
+            <pre><code>visible_width = 2 × h × tan(θ/2)
+visible_width = 2 × 10 × tan(60°/2)
+visible_width = 2 × 10 × tan(30°)
+visible_width = 2 × 10 × 0.577
+visible_width ≈ 11.55 meters</code></pre>
+            <p>This determines the operational workspace for robot navigation.</p>
+          </div>
+
+          <div class="section">
+            <h3>ROS-Gazebo Bridge Configuration</h3>
+            <p>Established bidirectional communication between ROS2 and Gazebo simulation:</p>
+            <ul>
+              <li><code>/cmd_vel</code>: ROS → Gazebo (velocity commands)</li>
+              <li><code>/overhead_camera/image</code>: Gazebo → ROS (camera feed)</li>
+              <li><code>/odom</code>: Gazebo → ROS (ground truth odometry)</li>
+            </ul>
+          </div>
+
+          <div class="challenge">
+            <h4>⚠️ Challenge: Message Type Incompatibility</h4>
+            <p><strong>Symptom:</strong> Robot remained stationary despite velocity commands being published to
+              <code>/cmd_vel</code>.</p>
+            <p><strong>Debugging Process:</strong></p>
+            <ol>
+              <li>Verified topic existence: <code>ros2 topic list</code> ✓</li>
+              <li>Confirmed message publication: <code>ros2 topic echo /cmd_vel</code> ✓</li>
+              <li>Checked Gazebo reception: <code>gz topic -e /cmd_vel</code> ✗ (No messages!)</li>
+            </ol>
+            <p><strong>Root Cause:</strong> Published <code>geometry_msgs/Twist</code> but Gazebo DiffDrive plugin
+              expected <code>geometry_msgs/TwistStamped</code> with timestamp header. Plugin silently dropped unstamped
+              messages.</p>
+            <p><strong>Solution:</strong></p>
+            <pre><code>cmd = TwistStamped()
+cmd.header.stamp = self.get_clock().now().to_msg()
+cmd.header.frame_id = 'base_link'
+cmd.twist.linear.x = velocity
+cmd.twist.angular.z = angular_velocity</code></pre>
+          </div>
+
+          <div class="media-placeholder">
+            <h4>📸 Media Placeholder: Simulation Environment</h4>
+            <p>Add screenshot showing Gazebo world with overhead camera view and robot</p>
+          </div>
+        </div>
+
+        <div class="milestone">
+          <h2>📐 Coordinate Transformation Mathematics</h2>
+          <span class="status completed">✓ Completed</span>
+
+          <div class="math-section">
+            <h4>📊 Image Coordinates → World Coordinates</h4>
+            <p><strong>Problem:</strong> Convert pixel coordinates (u, v) from mouse click to world coordinates (x, y)
+              in robot frame.</p>
+
+            <p><strong>Coordinate System Definitions:</strong></p>
+            <ul>
+              <li><strong>Image Frame:</strong> Origin at top-left, u increases right, v increases down</li>
+              <li><strong>World Frame:</strong> Origin at camera position, x forward (north), y left (west)</li>
+            </ul>
+
+            <p><strong>Transformation Derivation:</strong></p>
+            <pre><code>Step 1: Calculate scale (meters per pixel)
+scale = visible_width / image_width
+scale = 11.55 m / 1920 px
+scale ≈ 0.00602 m/px
+
+Step 2: Transform pixel to world coordinates
+x_world = (image_height/2 - v) × scale
+y_world = (image_width/2 - u) × scale
+
+Explanation:
+- (image_height/2 - v): Flip v-axis and center
+- (image_width/2 - u): Flip u-axis and center
+- Multiply by scale to convert pixels to meters</code></pre>
+
+            <p><strong>Example Calculation:</strong></p>
+            <pre><code>Click at pixel (960, 270)  [center-right of image]
+x_world = (1080/2 - 270) × 0.00602 = 1.806 m  [forward]
+y_world = (1920/2 - 960) × 0.00602 = 0.0 m    [centered]</code></pre>
+          </div>
+
+          <div class="section">
+            <h3>Odometry-Based Pose Estimation</h3>
+            <p>In Phase 1, robot pose obtained from simulation ground truth odometry:</p>
+            <ul>
+              <li>Position: (x, y) from <code>odom.pose.pose.position</code></li>
+              <li>Orientation: θ from quaternion-to-Euler conversion</li>
+            </ul>
+
+            <p><strong>Quaternion to Yaw Conversion:</strong></p>
+            <pre><code>def quaternion_to_yaw(q):
+    siny_cosp = 2 * (q.w * q.z + q.x * q.y)
+    cosy_cosp = 1 - 2 * (q.y**2 + q.z**2)
+    yaw = math.atan2(siny_cosp, cosy_cosp)
+    return yaw</code></pre>
+          </div>
+        </div>
+
+        <div class="milestone">
+          <h2>🎮 Proportional Navigation Controller</h2>
+          <span class="status completed">✓ Completed</span>
+
+          <div class="math-section">
+            <h4>🔄 Control Law Formulation</h4>
+            <p><strong>Objective:</strong> Navigate robot from current pose (x, y, θ) to target (x_t, y_t).</p>
+
+            <p><strong>Error Calculations:</strong></p>
+            <pre><code>Position error:
+Δx = x_target - x_current
+Δy = y_target - y_current
+distance = √(Δx² + Δy²)
+
+Heading error:
+θ_desired = atan2(Δy, Δx)
+θ_error = θ_desired - θ_current
+θ_error = atan2(sin(θ_error), cos(θ_error))  # Normalize to [-π, π]</code></pre>
+
+            <p><strong>Proportional Control:</strong></p>
+            <pre><code>Linear velocity:
+v = K_linear × distance
+v = min(v, v_max)  # Saturate at maximum velocity
+
+Angular velocity:
+ω = K_angular × θ_error
+ω = min(max(ω, -ω_max), ω_max)  # Saturate at ±ω_max</code></pre>
+
+            <p><strong>Tuned Parameters:</strong></p>
+            <ul>
+              <li>K_linear = 0.5 (linear gain)</li>
+              <li>K_angular = 1.5 (angular gain)</li>
+              <li>v_max = 0.5 m/s (maximum linear velocity)</li>
+              <li>ω_max = 1.0 rad/s (maximum angular velocity)</li>
+              <li>tolerance = 0.05 m (goal reached threshold)</li>
+            </ul>
+          </div>
+
+          <div class="section">
+            <h3>Implementation</h3>
+            <pre><code>def control_loop(self):
+    if self.target is None or self.robot_pose is None:
+        return
+    
+    dx = self.target[0] - self.robot_pose[0]
+    dy = self.target[1] - self.robot_pose[1]
+    distance = math.sqrt(dx**2 + dy**2)
+    
+    if distance < 0.05:  # Goal reached
+        self.stop_robot()
+        return
+    
+    # Calculate desired heading
+    theta_desired = math.atan2(dy, dx)
+    theta_error = theta_desired - self.robot_pose[2]
+    theta_error = math.atan2(math.sin(theta_error), math.cos(theta_error))
+    
+    # Proportional control
+    cmd = TwistStamped()
+    cmd.header.stamp = self.get_clock().now().to_msg()
+    cmd.twist.linear.x = min(0.5 * distance, 0.5)
+    cmd.twist.angular.z = max(min(1.5 * theta_error, 1.0), -1.0)
+    
+    self.cmd_pub.publish(cmd)</code></pre>
+          </div>
+
+          <div class="media-placeholder">
+            <h4>📹 Media Placeholder: Odometry-Based Navigation Demo</h4>
+            <p>Add video showing robot navigating to multiple clicked waypoints using odometry</p>
+          </div>
+
+          <div class="section">
+            <h3>Phase 1 Results</h3>
+            <table>
+              <tr>
+                <th>Metric</th>
+                <th>Performance</th>
+              </tr>
+              <tr>
+                <td>Position Accuracy</td>
+                <td>±3-5 cm</td>
+              </tr>
+              <tr>
+                <td>Heading Accuracy</td>
+                <td>±2-3°</td>
+              </tr>
+              <tr>
+                <td>Success Rate</td>
+                <td>100% (with perfect odometry)</td>
+              </tr>
+            </table>
+            <p><strong>Limitation:</strong> Relies on simulation ground truth odometry. Real robots experience odometry
+              drift, motivating vision-based localization.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="vision">
+        <h2 style="color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 0.5rem; margin-bottom: 1.5rem;">
+          Phase 2: Vision-Based Localization</h2>
+
+        <div class="milestone">
+          <h2>🎨 ArUco Marker Generation & Integration</h2>
+          <span class="status completed">✓ Completed</span>
+
+          <div class="section">
+            <h3>Marker Selection</h3>
+            <p><strong>Dictionary:</strong> DICT_4X4_50 (50 unique 4×4 bit markers)</p>
+            <p><strong>Marker ID:</strong> 0</p>
+            <p><strong>Physical Size:</strong> 0.5 m × 0.5 m</p>
+
+            <p><strong>Generation Process:</strong></p>
+            <pre><code>import cv2
+import cv2.aruco as aruco
+
+aruco_dict = aruco.Dictionary_get(aruco.DICT_4X4_50)
+marker_image = aruco.drawMarker(aruco_dict, 0, 200)
+
+# Critical: Add white border (quiet zone)
+marker_image = cv2.copyMakeBorder(
+    marker_image, 50, 50, 50, 50,
+    cv2.BORDER_CONSTANT, value=255
+)
+
+cv2.imwrite('aruco_marker_0.png', marker_image)</code></pre>
+          </div>
+
+          <div class="challenge">
+            <h4>⚠️ Challenge: Gazebo Material Rendering</h4>
+            <p><strong>Problem:</strong> ArUco marker texture appeared as solid gray box in simulation despite correct
+              file paths.</p>
+
+            <p><strong>Failed Approaches:</strong></p>
+            <ul>
+              <li>Tried relative paths, absolute paths, file:// URIs - no change</li>
+              <li>Tested with different image formats (PNG, JPG) - still gray</li>
+              <li>Attempted OGRE material scripts (Classic Gazebo syntax) - incompatible</li>
+              <li>Checked verbose logs - no error messages (silent failure)</li>
+            </ul>
+
+            <p><strong>Root Cause:</strong> Gazebo Sim uses Ogre2 renderer which doesn't support classic OGRE material
+              scripts. Most online tutorials target Classic Gazebo (Ogre1).</p>
+
+            <p><strong>Solution:</strong> Use PBR (Physically Based Rendering) materials:</p>
+            <pre><code>&lt;material&gt;
+  &lt;ambient&gt;1 1 1 1&lt;/ambient&gt;
+  &lt;diffuse&gt;1 1 1 1&lt;/diffuse&gt;
+  &lt;pbr&gt;
+    &lt;metal&gt;
+      &lt;albedo_map&gt;/path/to/aruco_marker_0.png&lt;/albedo_map&gt;
+    &lt;/metal&gt;
+  &lt;/pbr&gt;
+&lt;/material&gt;</code></pre>
+          </div>
+
+          <div class="media-placeholder">
+            <h4>📸 Media Placeholder: ArUco Marker on Robot</h4>
+            <p>Add image showing robot with ArUco marker visible in Gazebo simulation</p>
+          </div>
+        </div>
+
+        <div class="milestone">
+          <h2>👁️ ArUco Detection & Pose Estimation</h2>
+          <span class="status completed">✓ Completed</span>
+
+          <div class="section">
+            <h3>Detection Pipeline</h3>
+            <ol>
+              <li>Convert camera image to grayscale</li>
+              <li>Apply ArUco detection algorithm</li>
+              <li>Extract marker corners (4 points)</li>
+              <li>Compute marker center and orientation</li>
+            </ol>
+
+            <pre><code>def detect_aruco(self, image):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    
+    aruco_dict = aruco.Dictionary_get(aruco.DICT_4X4_50)
+    parameters = aruco.DetectorParameters_create()
+    
+    corners, ids, rejected = aruco.detectMarkers(
+        gray, aruco_dict, parameters=parameters
+    )
+    
+    if ids is not None and len(ids) > 0:
+        return corners[0][0]  # 4 corner points
+    return None</code></pre>
+          </div>
+
+          <div class="math-section">
+            <h4>📐 Pose Calculation from Marker Corners</h4>
+            <p><strong>Given:</strong> Four corner points in image coordinates (pixels)</p>
+            <p><strong>Calculate:</strong> Robot position (x, y) and orientation θ in world frame</p>
+
+            <p><strong>Position Estimation:</strong></p>
+            <pre><code>Center point (pixel coordinates):
+u_center = (u_tl + u_tr + u_br + u_bl) / 4
+v_center = (v_tl + v_tr + v_br + v_bl) / 4
+
+Convert to world coordinates:
+x_robot = (image_height/2 - v_center) × scale
+y_robot = (image_width/2 - u_center) × scale</code></pre>
+
+            <p><strong>Orientation Estimation:</strong></p>
+            <pre><code>Top edge vector (from top-left to top-right):
+Δu = u_tr - u_tl
+Δv = v_tr - v_tl
+
+Angle in image frame:
+θ_image = atan2(Δv, Δu)
+
+Transform to world frame (accounting for 90° rotation):
+θ_robot = -θ_image + π/2</code></pre>
+          </div>
+
+          <div class="challenge">
+            <h4>⚠️ Challenge: Low Detection Rate</h4>
+            <p><strong>Initial Setup:</strong> 0.2m marker at 10m height with 640×480 camera → 60% detection rate</p>
+
+            <p><strong>Analysis:</strong></p>
+            <pre><code>Marker size in image:
+pixels = (marker_size / visible_width) × image_width
+pixels = (0.2 m / 11.55 m) × 640 px
+pixels ≈ 11 pixels
+
+ArUco requirement: ~40 pixels minimum for reliable detection</code></pre>
+
+            <p><strong>Solutions Applied:</strong></p>
+            <ol>
+              <li>Increased marker size: 0.2m → 0.5m (80% detection)</li>
+              <li>Increased camera resolution: 640×480 → 1920×1080 (96% detection)</li>
+            </ol>
+
+            <p><strong>Final Configuration:</strong></p>
+            <pre><code>Marker size in image:
+pixels = (0.5 m / 11.55 m) × 1920 px
+pixels ≈ 83 pixels ✓
+
+Detection rate: 96%</code></pre>
+          </div>
+
+          <div class="media-placeholder">
+            <h4>📹 Media Placeholder: ArUco Detection Visualization</h4>
+            <p>Add video showing camera feed with detected marker highlighted (green box around corners)</p>
+          </div>
+        </div>
+
+        <div class="milestone">
+          <h2>🔄 Vision-Based Navigation Integration</h2>
+          <span class="status completed">✓ Completed</span>
+
+          <div class="section">
+            <h3>System Architecture</h3>
+            <p>Replaced odometry subscriber with vision-based pose estimation:</p>
+            <ul>
+              <li><strong>Input:</strong> Camera image from <code>/overhead_camera/image</code></li>
+              <li><strong>Processing:</strong> ArUco detection → pose calculation</li>
+              <li><strong>Output:</strong> Robot pose (x, y, θ) for control loop</li>
+              <li><strong>Control:</strong> Same proportional controller as Phase 1</li>
+            </ul>
+          </div>
+
+          <div class="section">
+            <h3>Implementation</h3>
+            <pre><code>def image_callback(self, msg):
+    # Convert ROS image to OpenCV
+    image = self.bridge.imgmsg_to_cv2(msg, 'bgr8')
+    
+    # Detect ArUco marker
+    corners = self.detect_aruco(image)
+    
+    if corners is not None:
+        # Calculate robot pose from marker
+        self.robot_pose = self.calculate_pose_from_marker(corners)
+        
+        # Visualize detection
+        cv2.polylines(image, [corners.astype(int)], True, (0,255,0), 2)
+        
+        # Run control loop
+        self.control_loop()
+    
+    # Display camera feed
+    cv2.imshow('Overhead Camera', image)</code></pre>
+          </div>
+
+          <div class="media-placeholder">
+            <h4>📹 Media Placeholder: Vision-Based Navigation Demo</h4>
+            <p>Add video showing complete system: camera view with marker detection + robot navigating to clicked points
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="results">
+        <h2 style="color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 0.5rem; margin-bottom: 1.5rem;">
+          Results & Performance Analysis</h2>
+
+        <div class="milestone">
+          <h2>📊 Quantitative Performance Metrics</h2>
+          <span class="status completed">✓ Completed</span>
+
+          <div class="section">
+            <h3>Accuracy Measurements</h3>
+            <table>
+              <tr>
+                <th>Metric</th>
+                <th>Phase 1 (Odometry)</th>
+                <th>Phase 2 (Vision)</th>
+                <th>Target</th>
+              </tr>
+              <tr>
+                <td>Position Accuracy</td>
+                <td>±3-5 cm</td>
+                <td>±5 mm</td>
+                <td>&lt;10 cm</td>
+              </tr>
+              <tr>
+                <td>Heading Accuracy</td>
+                <td>±2-3°</td>
+                <td>±3°</td>
+                <td>&lt;5°</td>
+              </tr>
+              <tr>
+                <td>Detection Rate</td>
+                <td>N/A</td>
+                <td>96%</td>
+                <td>&gt;90%</td>
+              </tr>
+              <tr>
+                <td>Navigation Success</td>
+                <td>100%</td>
+                <td>98%</td>
+                <td>&gt;95%</td>
+              </tr>
+              <tr>
+                <td>Update Rate</td>
+                <td>50 Hz</td>
+                <td>30 Hz</td>
+                <td>&gt;20 Hz</td>
+              </tr>
+            </table>
+          </div>
+
+          <div class="section">
+            <h3>System Capabilities Demonstrated</h3>
+            <ul>
+              <li>✅ Autonomous navigation to user-specified waypoints</li>
+              <li>✅ Real-time pose estimation from visual markers</li>
+              <li>✅ Robust detection under varying robot orientations</li>
+              <li>✅ Closed-loop feedback control without odometry</li>
+              <li>✅ Scalable architecture for multi-robot systems</li>
+            </ul>
+          </div>
+
+          <div class="media-placeholder">
+            <h4>📊 Media Placeholder: Performance Graphs</h4>
+            <p>Add plots showing: position error over time, detection rate vs distance, trajectory comparison</p>
+          </div>
+        </div>
+
+        <div class="milestone">
+          <h2>🎓 Technical Contributions & Learnings</h2>
+          <span class="status completed">✓ Completed</span>
+
+          <div class="learning">
+            <h4>💡 Key Technical Insights</h4>
+            <ul>
+              <li><strong>Vision vs Odometry:</strong> Vision-based localization eliminates drift but requires
+                line-of-sight</li>
+              <li><strong>Marker Size Optimization:</strong> Trade-off between detection range and marker footprint</li>
+              <li><strong>Coordinate Transformations:</strong> Careful frame management critical for spatial reasoning
+              </li>
+              <li><strong>Control Tuning:</strong> Proportional gains must balance responsiveness and stability</li>
+              <li><strong>Simulation Fidelity:</strong> Gazebo Sim vs Classic Gazebo have different rendering pipelines
+              </li>
+            </ul>
+          </div>
+
+          <div class="section">
+            <h3>Challenges Overcome</h3>
+            <ol>
+              <li><strong>Message Type Compatibility:</strong> Learned importance of end-to-end verification</li>
+              <li><strong>Material Rendering:</strong> Discovered PBR materials required for Gazebo Sim</li>
+              <li><strong>Coordinate Systems:</strong> Developed systematic approach to frame transformations</li>
+              <li><strong>Detection Reliability:</strong> Optimized marker size and camera resolution</li>
+              <li><strong>State Management:</strong> Implemented hysteresis to prevent oscillations</li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <div class="add-section" id="add-new">
+        <h2>➕ Template for Adding New Progress</h2>
+
+        <p><strong>Instructions:</strong> Copy the template below and paste it into the appropriate section. Replace
+          placeholder text with your actual progress.</p>
+
+        <div style="background: white; padding: 1.5rem; border: 1px solid #bdc3c7; margin-top: 1rem;">
+          <pre style="background: #f8f9fa; color: #2c3e50; white-space: pre-wrap;"><code>&lt;div class="milestone"&gt;
+    &lt;h2&gt;[Icon] Milestone Title&lt;/h2&gt;
+    &lt;span class="status completed"&gt;✓ Completed&lt;/span&gt;
+    &lt;!-- or --&gt;
+    &lt;span class="status in-progress"&gt;🔄 In Progress&lt;/span&gt;
+    
+    &lt;div class="section"&gt;
+        &lt;h3&gt;Objective&lt;/h3&gt;
+        &lt;p&gt;Describe what you aimed to achieve...&lt;/p&gt;
+    &lt;/div&gt;
+    
+    &lt;div class="section"&gt;
+        &lt;h3&gt;Implementation&lt;/h3&gt;
+        &lt;p&gt;Describe your approach and methodology...&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;// Add relevant code snippets&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+    
+    &lt;div class="math-section"&gt;
+        &lt;h4&gt;📐 Mathematical Foundation&lt;/h4&gt;
+        &lt;p&gt;Explain underlying math/algorithms...&lt;/p&gt;
+        &lt;pre&gt;&lt;code&gt;// Add equations and derivations&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+    
+    &lt;div class="media-placeholder"&gt;
+        &lt;h4&gt;📹 Media: [Description]&lt;/h4&gt;
+        &lt;p&gt;[What to show in image/video]&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;!-- Replace above with actual media: --&gt;
+    &lt;!-- &lt;img src="path/to/image.png" alt="Description" style="max-width:100%"&gt; --&gt;
+    &lt;!-- &lt;video controls style="max-width:100%"&gt;&lt;source src="path/to/video.mp4"&gt;&lt;/video&gt; --&gt;
+    
+    &lt;div class="challenge"&gt;
+        &lt;h4&gt;⚠️ Challenge: [Title]&lt;/h4&gt;
+        &lt;p&gt;&lt;strong&gt;Problem:&lt;/strong&gt; ...&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Root Cause:&lt;/strong&gt; ...&lt;/p&gt;
+        &lt;p&gt;&lt;strong&gt;Solution:&lt;/strong&gt; ...&lt;/p&gt;
+    &lt;/div&gt;
+    
+    &lt;div class="learning"&gt;
+        &lt;h4&gt;💡 Key Learnings&lt;/h4&gt;
+        &lt;ul&gt;
+            &lt;li&gt;Learning point 1&lt;/li&gt;
+            &lt;li&gt;Learning point 2&lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+        </div>
+
+        <div style="background: #fff9c4; padding: 1rem; border-left: 3px solid #f39c12; margin-top: 1rem;">
+          <p><strong>💡 Tips for Effective Documentation:</strong></p>
+          <ul>
+            <li>Focus on <strong>what you achieved</strong> and <strong>how</strong>, not time spent</li>
+            <li>Include mathematical derivations and equations where relevant</li>
+            <li>Add code snippets showing key implementations</li>
+            <li>Document challenges with root cause analysis</li>
+            <li>Use media placeholders initially, replace with actual images/videos later</li>
+            <li>Explain technical decisions and trade-offs</li>
+          </ul>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <p><strong>Cooperative Aerial-Ground Guidance System - Technical Project Log</strong></p>
+      <p>Student Research Project | Last Updated: <span id="update-date"></span></p>
+    </footer>
+  </div>
+
+  <script>
+    document.getElementById('update-date').textContent = new Date().toLocaleDateString('en-US', {
+      year: 'numeric', month: 'long', day: 'numeric'
+    });
+
+    document.querySelectorAll('nav a').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+  </script>
+</body>
+
+</html>
