@@ -158,8 +158,8 @@ turtlebot3_ws/
 ## 🤝 Contributing
 
 This is a student research project. For questions or collaboration:
-- **Maintainer**: shlok-mehndiratta
-- **Email**: shlokm23@iiserb.ac.in
+- **Maintainer**: shlok-mehndiratta , soododivyam
+- **Email**: shlokm23@iiserb.ac.in , divyam23@iiserb.ac.in
 
 ## 📄 License
 
