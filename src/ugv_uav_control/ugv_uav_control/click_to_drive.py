@@ -31,14 +31,14 @@ class ClickToDrive(Node):
         self.robot_theta = None
         
         # Camera parameters
-        self.camera_height = 10.0
+        self.camera_height = 20.0
         self.fov = 1.047 # 60 degrees
         self.image_width = None
         self.image_height = None
         self.scale = None
         
         # ArUco Dictionary
-        self.aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_4X4_50)
+        self.aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_6X6_250)
         try:
             self.aruco_params = aruco.DetectorParameters_create()
         except AttributeError:
@@ -66,7 +66,7 @@ class ClickToDrive(Node):
             if ids is not None and len(ids) > 0:
                 self.get_logger().info(f'ArUco Marker Detected: {ids}', throttle_duration_sec=2.0)
                 for i in range(len(ids)):
-                    if ids[i][0] == 0: # Robot Marker ID
+                    if ids[i][0] == 55: # Robot Marker ID
                         # Get center
                         c = corners[i][0]
                         cx = int(np.mean(c[:, 0]))

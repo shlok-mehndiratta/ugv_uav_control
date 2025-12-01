@@ -23,5 +23,11 @@ pad_width = 50
 marker_image = cv2.copyMakeBorder(marker_image, pad_width, pad_width, pad_width, pad_width, cv2.BORDER_CONSTANT, value=255)
 
 # Save
-cv2.imwrite('/home/shlok-mehndiratta/turtlebot3_ws/src/ugv_uav_control/models/turtlebot3_burger_aruco/materials/textures/aruco_marker_0.png', marker_image)
+# Save
+import os
+script_dir = os.path.dirname(os.path.abspath(__file__))
+# Go up to models/turtlebot3_burger_aruco/materials/textures
+output_path = os.path.join(script_dir, '..', 'models', 'turtlebot3_burger_aruco', 'materials', 'textures', 'aruco_marker_0.png')
+os.makedirs(os.path.dirname(output_path), exist_ok=True)
+cv2.imwrite(output_path, marker_image)
 print("Marker generated successfully.")

@@ -20,7 +20,7 @@ def generate_launch_description():
         ]
     )
 
-    world_file = os.path.join(pkg_ugv_uav, 'worlds', 'empty_with_camera.world')
+    world_file = os.path.join(pkg_ugv_uav, 'worlds', 'path_following.world')
 
     # Launch Gazebo Sim
     gz_sim = IncludeLaunchDescription(
@@ -48,7 +48,7 @@ def generate_launch_description():
         arguments=[
             '-name', 'turtlebot3_burger',
             '-file', custom_model_path,
-            '-x', '0.0',
+            '-x', '1.0',
             '-y', '0.0',
             '-z', '0.01'
         ],
@@ -88,7 +88,7 @@ def generate_launch_description():
     # Control Node
     control_node = Node(
         package='ugv_uav_control',
-        executable='click_to_drive',
+        executable='line_follower',
         output='screen'
     )
 

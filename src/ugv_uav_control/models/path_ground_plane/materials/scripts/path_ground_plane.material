@@ -1,0 +1,14 @@
+material PathGroundPlane/Image
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture Track.png
+        scale 1 1
+      }
+    }
+  }
+}
