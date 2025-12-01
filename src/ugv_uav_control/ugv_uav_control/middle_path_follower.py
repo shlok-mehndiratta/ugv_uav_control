@@ -1,11 +1,33 @@
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
-from geometry_msgs.msg import Twist, Point
+from geometry_msgs.msg import Twist, Point, PoseStamped
+# from tf_transformations import quaternion_from_euler # Not available
 from cv_bridge import CvBridge
 import cv2
 import numpy as np
 import math
+
+def quaternion_from_euler(roll, pitch, yaw):
+    """
+    Converts euler roll, pitch, yaw to quaternion (w in last place).
+    quat = [x, y, z, w]
+    Bellow should be replaced when porting for ROS 2 Python tf_conversions is done.
+    """
+    cy = math.cos(yaw * 0.5)
+    sy = math.sin(yaw * 0.5)
+    cp = math.cos(pitch * 0.5)
+    sp = math.sin(pitch * 0.5)
+    cr = math.cos(roll * 0.5)
+    sr = math.sin(roll * 0.5)
+
+    q = [0] * 4
+    q[0] = cy * cp * sr - sy * sp * cr
+    q[1] = sy * cp * sr + cy * sp * cr
+    q[2] = sy * cp * cr - cy * sp * sr
+    q[3] = cy * cp * cr + sy * sp * sr
+
+    return q
 
 class MiddlePathFollower(Node):
     def __init__(self):
@@ -49,7 +71,7 @@ class MiddlePathFollower(Node):
         self.image_height = None
         self.scale = None
         
-        self.waypoint_pub = self.create_publisher(Point, '/waypoints', 10) 
+        self.waypoint_pub = self.create_publisher(PoseStamped, '/waypoints', 10) 
         self.frame_count = 0 
         
         self.get_logger().info('Middle Path Follower Node Started')
@@ -205,10 +227,9 @@ class MiddlePathFollower(Node):
         if max_val > 0:
             target_point = max_loc
         else:
-            # If we can't find a point in the search radius (e.g. tight turn or lost),
-            # try to find ANY max point in the lane mask near the robot?
-            # For now, just fallback to projection
-            target_point = (int(proj_x), int(proj_y))
+            # If we can't find a point, STOP.
+            # Setting target to robot pos will result in 0 distance -> Stop in Pure Pursuit
+            target_point = robot_pos
 
         # Draw overlays on final image
         cv2.circle(final_img, robot_pos, 8, (255, 255, 255), -1) 
@@ -316,6 +337,11 @@ class MiddlePathFollower(Node):
             # Normalize angle
             relative_angle = (relative_angle + math.pi) % (2 * math.pi) - math.pi
             
+            # FIX: Negate relative angle because Image Frame (Y Down) vs ROS Frame (Y Left)
+            # Positive relative_angle in Image (CW) means Right Turn.
+            # Positive angle in ROS (CCW) means Left Turn.
+            relative_angle = -relative_angle
+            
             # In Robot Frame:
             # X is forward (distance * cos(relative_angle))
             # Y is left (distance * sin(relative_angle))
@@ -337,12 +363,38 @@ class MiddlePathFollower(Node):
             waypoint_x = dist_meters * math.cos(relative_angle)
             waypoint_y = dist_meters * math.sin(relative_angle)
             
+            # Calculate Orientation (Yaw) of the path
+            # We used relative_angle as the direction TO the waypoint.
+            # But we also want the orientation OF the path at that waypoint?
+            # Or just the orientation of the vector pointing to it?
+            # The user wants "orientation as well". 
+            # Usually for Stanley, we need the path heading.
+            # Let's approximate path heading as the angle of the vector from robot to target.
+            # In Robot Frame, this is exactly 'relative_angle'.
+            
+            # Wait, Stanley needs the heading of the path *at the nearest point*.
+            # Here we are giving a lookahead point.
+            # If we assume the path is a straight line from robot to target, the heading is relative_angle.
+            # Let's use that for now.
+            
+            path_yaw = relative_angle
+            q = quaternion_from_euler(0, 0, path_yaw)
+            
             # Publish
-            p = Point()
-            p.x = waypoint_x
-            p.y = waypoint_y
-            p.z = 0.0
-            self.waypoint_pub.publish(p)
+            pose_msg = PoseStamped()
+            pose_msg.header.stamp = self.get_clock().now().to_msg()
+            pose_msg.header.frame_id = 'base_link'
+            
+            pose_msg.pose.position.x = waypoint_x
+            pose_msg.pose.position.y = waypoint_y
+            pose_msg.pose.position.z = 0.0
+            
+            pose_msg.pose.orientation.x = q[0]
+            pose_msg.pose.orientation.y = q[1]
+            pose_msg.pose.orientation.z = q[2]
+            pose_msg.pose.orientation.w = q[3]
+            
+            self.waypoint_pub.publish(pose_msg)
             # Heartbeat log to prove it's working
             self.get_logger().info(f'Pub Waypoint: x={waypoint_x:.2f}, y={waypoint_y:.2f}', throttle_duration_sec=2.0)
 

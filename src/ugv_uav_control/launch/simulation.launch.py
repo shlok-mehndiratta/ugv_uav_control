@@ -1,14 +1,40 @@
 import os
+import shutil
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, SetEnvironmentVariable
+from launch.actions import IncludeLaunchDescription, SetEnvironmentVariable, DeclareLaunchArgument, OpaqueFunction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
+
+def set_track_texture(context, *args, **kwargs):
+    pkg_ugv_uav = get_package_share_directory('ugv_uav_control')
+    track_name = LaunchConfiguration('track_name').perform(context)
+    
+    texture_dir = os.path.join(pkg_ugv_uav, 'models', 'path_ground_plane', 'materials', 'textures')
+    source_file = os.path.join(texture_dir, f'{track_name}.png')
+    target_file = os.path.join(texture_dir, 'Track.png')
+    
+    if os.path.exists(source_file):
+        print(f"Setting track texture to {track_name}")
+        shutil.copyfile(source_file, target_file)
+    else:
+        print(f"Warning: Track texture {track_name} not found at {source_file}. Using default.")
 
 def generate_launch_description():
     pkg_ugv_uav = get_package_share_directory('ugv_uav_control')
     pkg_turtlebot3_gazebo = get_package_share_directory('turtlebot3_gazebo')
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
+
+    # Launch Arguments
+    track_name_arg = DeclareLaunchArgument(
+        'track_name',
+        default_value='track1',
+        description='Name of the track texture to use (e.g., track1, track2)'
+    )
+
+    # Set Track Texture Function
+    set_track_texture_action = OpaqueFunction(function=set_track_texture)
 
     # Set GZ_SIM_RESOURCE_PATH to include our package share directory so Gazebo can find the models
     gz_sim_resource_path = SetEnvironmentVariable(
@@ -93,6 +119,8 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
+        track_name_arg,
+        set_track_texture_action,
         gz_sim_resource_path,
         gz_sim,
         robot_state_publisher,

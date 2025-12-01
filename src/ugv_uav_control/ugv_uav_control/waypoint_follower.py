@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from geometry_msgs.msg import Twist, Point
+from geometry_msgs.msg import Twist, Point, PoseStamped
 import math
 
 class WaypointFollower(Node):
@@ -8,7 +8,7 @@ class WaypointFollower(Node):
         super().__init__('waypoint_follower')
         
         self.subscription = self.create_subscription(
-            Point,
+            PoseStamped,
             '/waypoints',
             self.waypoint_callback,
             10)
@@ -26,8 +26,8 @@ class WaypointFollower(Node):
 
     def waypoint_callback(self, msg):
         # Waypoint is in Robot Frame: X=Forward, Y=Left
-        x = msg.x
-        y = msg.y
+        x = msg.pose.position.x
+        y = msg.pose.position.y
         
         distance = math.sqrt(x*x + y*y)
         angle = math.atan2(y, x)

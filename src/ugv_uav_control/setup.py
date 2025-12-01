@@ -34,6 +34,8 @@ setup(
             'line_follower = ugv_uav_control.line_follower:main',
             'middle_path_follower = ugv_uav_control.middle_path_follower:main',
             'waypoint_follower = ugv_uav_control.waypoint_follower:main',
+            'pure_pursuit_node = ugv_uav_control.pure_pursuit_node:main',
+            'stanley_node = ugv_uav_control.stanley_node:main',
         ],
     },
 )
