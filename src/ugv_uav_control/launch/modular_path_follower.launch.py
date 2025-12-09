@@ -153,6 +153,16 @@ def generate_launch_description():
         )
     )
 
+    # Control Node (Simple P)
+    simple_p_node = Node(
+        package='ugv_uav_control',
+        executable='simple_p_node',
+        output='screen',
+        condition=IfCondition(
+            PythonExpression(["'", LaunchConfiguration('controller'), "' == 'simple_p'"])
+        )
+    )
+
     return LaunchDescription([
         controller_arg,
         track_name_arg,
@@ -166,5 +176,6 @@ def generate_launch_description():
         perception_node,
         waypoint_follower_node,
         pure_pursuit_node,
-        stanley_node
+        stanley_node,
+        simple_p_node
     ])

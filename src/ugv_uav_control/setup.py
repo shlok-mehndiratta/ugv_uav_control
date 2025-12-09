@@ -33,9 +33,11 @@ setup(
             'click_to_drive = ugv_uav_control.click_to_drive:main',
             'line_follower = ugv_uav_control.line_follower:main',
             'middle_path_follower = ugv_uav_control.middle_path_follower:main',
+            'stanley_perception = ugv_uav_control.stanley_perception:main',
             'waypoint_follower = ugv_uav_control.waypoint_follower:main',
             'pure_pursuit_node = ugv_uav_control.pure_pursuit_node:main',
             'stanley_node = ugv_uav_control.stanley_node:main',
+            'simple_p_node = ugv_uav_control.simple_p_node:main',
         ],
     },
 )

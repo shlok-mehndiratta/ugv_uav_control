@@ -72,12 +72,13 @@ class MiddlePathFollower(Node):
         self.scale = None
         
         self.waypoint_pub = self.create_publisher(PoseStamped, '/waypoints', 10) 
+        self.nearest_pub = self.create_publisher(PoseStamped, '/nearest_point', 10)
         self.frame_count = 0 
         
         self.get_logger().info('Middle Path Follower Node Started')
 
     def image_callback(self, msg):
-        self.get_logger().info('Image callback received', throttle_duration_sec=1.0)
+        #self.get_logger().info('Image callback received', throttle_duration_sec=1.0)
         try:
             cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
         except Exception as e:
@@ -92,7 +93,7 @@ class MiddlePathFollower(Node):
             self.get_logger().info(f'Camera Calibrated. Scale: {self.scale:.5f} m/px')
 
         # 1. Detect Robot (ArUco)
-        # self.get_logger().info('Detecting markers...', throttle_duration_sec=1.0)
+        self.get_logger().info('Detecting markers...', throttle_duration_sec=1.0)
         corners, ids, rejected = cv2.aruco.detectMarkers(cv_image, self.aruco_dict, parameters=self.aruco_params)
         
         if ids is not None:
@@ -126,7 +127,7 @@ class MiddlePathFollower(Node):
             return
 
         # 2. Compute Middle Path
-        self.get_logger().info('Computing middle path...', throttle_duration_sec=1.0)
+        #self.get_logger().info('Computing middle path...', throttle_duration_sec=1.0)
         gray = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY)
         
         # Threshold: Lines are black (0), Background is white (255)
@@ -177,7 +178,7 @@ class MiddlePathFollower(Node):
         lane_mask[lane_mask_img == 128] = 255
         
         # Distance Transform
-        self.get_logger().info('Running distanceTransform...', throttle_duration_sec=1.0)
+        #self.get_logger().info('Running distanceTransform...', throttle_duration_sec=1.0)
         # We only care about distance to zero pixels (lines)
         # But we only want the result INSIDE the lane mask
         dist_map = cv2.distanceTransform(thresh, cv2.DIST_L2, 5)
@@ -397,6 +398,134 @@ class MiddlePathFollower(Node):
             self.waypoint_pub.publish(pose_msg)
             # Heartbeat log to prove it's working
             self.get_logger().info(f'Pub Waypoint: x={waypoint_x:.2f}, y={waypoint_y:.2f}', throttle_duration_sec=2.0)
+
+        # 5. Publish Nearest Point (for Stanley / P-Control)
+        if self.scale is not None:
+            # Find nearest point on the ridge mask
+            # We can use the distance transform 'dist_map' or 'ridge_mask'
+            # Let's use ridge_mask to find all points, then find the one closest to robot
+            
+            # Get all points in ridge_mask
+            pts = cv2.findNonZero(ridge_mask)
+            
+            if pts is not None:
+                # pts is (N, 1, 2) array of (x, y)
+                pts = pts.squeeze() # (N, 2)
+                
+                if pts.ndim == 1:
+                    pts = pts.reshape(1, 2)
+                
+                # Robot pos
+                rx, ry = robot_pos
+                
+                # Calculate distances
+                dists = np.sqrt((pts[:, 0] - rx)**2 + (pts[:, 1] - ry)**2)
+                
+                # Find index of min distance
+                min_idx = np.argmin(dists)
+                nearest_pt = pts[min_idx] # (x, y)
+                
+                # Calculate Heading at this point
+                # We need a point slightly ahead to estimate tangent
+                # Let's look for a point on the ridge that is further away?
+                # Or just use the gradient of the distance map?
+                # Or fit a line to local points?
+                
+                # Simple approach: Find a point 'delta' pixels away from nearest_pt along the ridge
+                # that is ALSO further from the robot (to ensure forward direction)
+                
+                # Filter points that are further from robot than nearest_pt + buffer
+                # dists > dists[min_idx] + 10
+                
+                future_mask = dists > (dists[min_idx] + 10)
+                future_pts = pts[future_mask]
+                
+                path_heading = 0.0
+                
+                if len(future_pts) > 0:
+                    # Filter for points that are "in front" of the robot
+                    # Vector from Robot to Point
+                    v_x = future_pts[:, 0] - rx
+                    v_y = future_pts[:, 1] - ry
+                    
+                    # Robot Heading Vector (in Image Frame)
+                    # robot_angle is angle of robot in image.
+                    # Heading vector: (cos(robot_angle), sin(robot_angle))
+                    h_x = math.cos(robot_angle)
+                    h_y = math.sin(robot_angle)
+                    
+                    # Dot product
+                    dot_prod = v_x * h_x + v_y * h_y
+                    
+                    # Keep only points with positive dot product (in front)
+                    valid_indices = dot_prod > 0
+                    valid_future_pts = future_pts[valid_indices]
+                    
+                    if len(valid_future_pts) > 0:
+                        # Find the one closest to the nearest_pt among the VALID future points
+                        dists_from_nearest = np.sqrt((valid_future_pts[:, 0] - nearest_pt[0])**2 + (valid_future_pts[:, 1] - nearest_pt[1])**2)
+                        idx_next = np.argmin(dists_from_nearest)
+                        next_pt = valid_future_pts[idx_next]
+                        
+                        # Vector from nearest to next
+                        vx = next_pt[0] - nearest_pt[0]
+                        vy = next_pt[1] - nearest_pt[1]
+                        
+                        # Angle in Image Frame
+                        path_heading_img = math.atan2(vy, vx)
+                        
+                        # Convert to Robot Frame Angle
+                        # Image: Y Down. Robot: Y Left.
+                        # Relative angle logic same as before?
+                        # We want the angle of the path vector relative to the robot's heading.
+                        
+                        # Robot heading in image is 'robot_angle'
+                        # Path heading in image is 'path_heading_img'
+                        
+                        # Relative heading = path - robot
+                        heading_diff = path_heading_img - robot_angle
+                        
+                        # Normalize
+                        heading_diff = (heading_diff + math.pi) % (2 * math.pi) - math.pi
+                        
+                        # Negate for ROS frame (Right turn in image is + angle, but - in ROS)
+                        path_heading = -heading_diff
+                    
+                # Calculate Position in Robot Frame
+                # Vector from Robot to Nearest Point
+                dx_pixel = nearest_pt[0] - robot_pos[0]
+                dy_pixel = nearest_pt[1] - robot_pos[1]
+                
+                dist_pixels = math.sqrt(dx_pixel**2 + dy_pixel**2)
+                dist_meters = dist_pixels * self.scale
+                
+                # Angle to nearest point
+                angle_to_pt_img = math.atan2(dy_pixel, dx_pixel)
+                rel_angle_pt = angle_to_pt_img - robot_angle
+                rel_angle_pt = (rel_angle_pt + math.pi) % (2 * math.pi) - math.pi
+                rel_angle_pt = -rel_angle_pt # Convert to ROS frame
+                
+                near_x = dist_meters * math.cos(rel_angle_pt)
+                near_y = dist_meters * math.sin(rel_angle_pt)
+                
+                # Publish
+                near_msg = PoseStamped()
+                near_msg.header.stamp = self.get_clock().now().to_msg()
+                near_msg.header.frame_id = 'base_link'
+                
+                near_msg.pose.position.x = near_x
+                near_msg.pose.position.y = near_y
+                near_msg.pose.position.z = 0.0
+                
+                # Orientation (Path Heading)
+                q_near = quaternion_from_euler(0, 0, path_heading)
+                near_msg.pose.orientation.x = q_near[0]
+                near_msg.pose.orientation.y = q_near[1]
+                near_msg.pose.orientation.z = q_near[2]
+                near_msg.pose.orientation.w = q_near[3]
+                
+                self.nearest_pub.publish(near_msg)
+                # self.get_logger().info(f'Pub Nearest: x={near_x:.2f}, y={near_y:.2f}, head={path_heading:.2f}', throttle_duration_sec=2.0)
 
 def main(args=None):
     rclpy.init(args=args)

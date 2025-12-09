@@ -37,7 +37,7 @@ class StanleyNode(Node):
         
         self.subscription = self.create_subscription(
             PoseStamped,
-            '/waypoints',
+            '/nearest_point',
             self.waypoint_callback,
             10)
             

@@ -31,6 +31,8 @@ class PurePursuitNode(Node):
         
         twist = Twist()
         
+        self.get_logger().info(f'Received Waypoint: x={x:.2f}, y={y:.2f}, dist={distance:.2f}', throttle_duration_sec=1.0)
+
         if distance > self.stop_distance:
             # Pure Pursuit Logic
             # Curvature gamma = 2y / L^2
@@ -66,6 +68,7 @@ class PurePursuitNode(Node):
             twist.linear.x = 0.0
             twist.angular.z = 0.0
             
+        self.get_logger().info(f'Publishing Twist: lin={twist.linear.x:.2f}, ang={twist.angular.z:.2f}', throttle_duration_sec=1.0)
         self.publisher.publish(twist)
 
 def main(args=None):
