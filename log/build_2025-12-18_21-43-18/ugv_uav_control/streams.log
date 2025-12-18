@@ -1,0 +1,41 @@
+[0.493s] Invoking command in '/home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/build --no-deps symlink_data
+[0.695s] running develop
+[0.804s] running egg_info
+[0.804s] creating ugv_uav_control.egg-info
+[0.816s] writing ugv_uav_control.egg-info/PKG-INFO
+[0.816s] writing dependency_links to ugv_uav_control.egg-info/dependency_links.txt
+[0.816s] writing entry points to ugv_uav_control.egg-info/entry_points.txt
+[0.816s] writing requirements to ugv_uav_control.egg-info/requires.txt
+[0.816s] writing top-level names to ugv_uav_control.egg-info/top_level.txt
+[0.816s] writing manifest file 'ugv_uav_control.egg-info/SOURCES.txt'
+[0.838s] reading manifest file 'ugv_uav_control.egg-info/SOURCES.txt'
+[0.838s] writing manifest file 'ugv_uav_control.egg-info/SOURCES.txt'
+[0.850s] running build_ext
+[0.850s] Creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/lib/python3.12/site-packages/ugv-uav-control.egg-link (link to .)
+[0.850s] Installing middle_path_follower script to /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/lib/ugv_uav_control
+[0.850s] Installing stanley_node script to /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/lib/ugv_uav_control
+[0.850s] 
+[0.850s] Installed /home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control
+[0.850s] running symlink_data
+[0.851s] creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ament_index
+[0.851s] creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ament_index/resource_index
+[0.851s] creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ament_index/resource_index/packages
+[0.851s] symbolically linking /home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/resource/ugv_uav_control -> /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ament_index/resource_index/packages
+[0.851s] symbolically linking /home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/package.xml -> /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control
+[0.851s] creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/launch
+[0.851s] symbolically linking /home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/launch/middle_path_follower.launch.py -> /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/launch
+[0.851s] creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/worlds
+[0.851s] symbolically linking /home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/worlds/path_following.world -> /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/worlds
+[0.851s] creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/models
+[0.851s] creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/models/path_ground_plane_v2
+[0.851s] symbolically linking /home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/models/path_ground_plane_v2/model.sdf -> /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/models/path_ground_plane_v2
+[0.851s] symbolically linking /home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/models/path_ground_plane_v2/model.config -> /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/models/path_ground_plane_v2
+[0.851s] creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/models/path_ground_plane_v2/materials
+[0.851s] creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/models/path_ground_plane_v2/materials/scripts
+[0.851s] creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/models/turtlebot3_burger_aruco
+[0.851s] symbolically linking /home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/models/turtlebot3_burger_aruco/model.sdf -> /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/models/turtlebot3_burger_aruco
+[0.851s] symbolically linking /home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/models/turtlebot3_burger_aruco/model.config -> /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/models/turtlebot3_burger_aruco
+[0.851s] creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/models/turtlebot3_burger_aruco/materials
+[0.851s] creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/models/turtlebot3_burger_aruco/materials/textures
+[0.852s] symbolically linking /home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/models/turtlebot3_burger_aruco/materials/textures/aruco_marker_0.png -> /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/models/turtlebot3_burger_aruco/materials/textures
+[0.872s] Invoked command in '/home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/build --no-deps symlink_data

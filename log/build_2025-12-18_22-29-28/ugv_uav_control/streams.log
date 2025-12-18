@@ -1,0 +1,18 @@
+[0.528s] Invoking command in '/home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/build --no-deps symlink_data
+[0.738s] running develop
+[0.856s] running egg_info
+[0.868s] writing ugv_uav_control.egg-info/PKG-INFO
+[0.868s] writing dependency_links to ugv_uav_control.egg-info/dependency_links.txt
+[0.868s] writing entry points to ugv_uav_control.egg-info/entry_points.txt
+[0.868s] writing requirements to ugv_uav_control.egg-info/requires.txt
+[0.868s] writing top-level names to ugv_uav_control.egg-info/top_level.txt
+[0.893s] reading manifest file 'ugv_uav_control.egg-info/SOURCES.txt'
+[0.894s] writing manifest file 'ugv_uav_control.egg-info/SOURCES.txt'
+[0.907s] running build_ext
+[0.907s] Creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/lib/python3.12/site-packages/ugv-uav-control.egg-link (link to .)
+[0.908s] Installing middle_path_follower script to /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/lib/ugv_uav_control
+[0.908s] Installing stanley_node script to /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/lib/ugv_uav_control
+[0.908s] 
+[0.908s] Installed /home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control
+[0.908s] running symlink_data
+[0.936s] Invoked command in '/home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/build --no-deps symlink_data

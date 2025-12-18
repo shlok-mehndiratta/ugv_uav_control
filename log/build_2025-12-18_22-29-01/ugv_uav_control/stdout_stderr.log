@@ -1,0 +1,16 @@
+running develop
+running egg_info
+writing ugv_uav_control.egg-info/PKG-INFO
+writing dependency_links to ugv_uav_control.egg-info/dependency_links.txt
+writing entry points to ugv_uav_control.egg-info/entry_points.txt
+writing requirements to ugv_uav_control.egg-info/requires.txt
+writing top-level names to ugv_uav_control.egg-info/top_level.txt
+reading manifest file 'ugv_uav_control.egg-info/SOURCES.txt'
+writing manifest file 'ugv_uav_control.egg-info/SOURCES.txt'
+running build_ext
+Creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/lib/python3.12/site-packages/ugv-uav-control.egg-link (link to .)
+Installing middle_path_follower script to /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/lib/ugv_uav_control
+Installing stanley_node script to /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/lib/ugv_uav_control
+
+Installed /home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control
+running symlink_data

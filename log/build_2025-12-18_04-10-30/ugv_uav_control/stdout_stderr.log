@@ -1,0 +1,57 @@
+running egg_info
+creating ../../build/ugv_uav_control/ugv_uav_control.egg-info
+writing ../../build/ugv_uav_control/ugv_uav_control.egg-info/PKG-INFO
+writing dependency_links to ../../build/ugv_uav_control/ugv_uav_control.egg-info/dependency_links.txt
+writing entry points to ../../build/ugv_uav_control/ugv_uav_control.egg-info/entry_points.txt
+writing requirements to ../../build/ugv_uav_control/ugv_uav_control.egg-info/requires.txt
+writing top-level names to ../../build/ugv_uav_control/ugv_uav_control.egg-info/top_level.txt
+writing manifest file '../../build/ugv_uav_control/ugv_uav_control.egg-info/SOURCES.txt'
+reading manifest file '../../build/ugv_uav_control/ugv_uav_control.egg-info/SOURCES.txt'
+writing manifest file '../../build/ugv_uav_control/ugv_uav_control.egg-info/SOURCES.txt'
+running build
+running build_py
+creating /home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/build
+creating /home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/build/lib
+creating /home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/build/lib/ugv_uav_control
+copying ugv_uav_control/stanley_node.py -> /home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/build/lib/ugv_uav_control
+copying ugv_uav_control/middle_path_follower.py -> /home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/build/lib/ugv_uav_control
+copying ugv_uav_control/__init__.py -> /home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/build/lib/ugv_uav_control
+running install
+running install_lib
+creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/lib/python3.12/site-packages/ugv_uav_control
+copying /home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/build/lib/ugv_uav_control/stanley_node.py -> /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/lib/python3.12/site-packages/ugv_uav_control
+copying /home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/build/lib/ugv_uav_control/middle_path_follower.py -> /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/lib/python3.12/site-packages/ugv_uav_control
+copying /home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/build/lib/ugv_uav_control/__init__.py -> /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/lib/python3.12/site-packages/ugv_uav_control
+byte-compiling /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/lib/python3.12/site-packages/ugv_uav_control/stanley_node.py to stanley_node.cpython-312.pyc
+byte-compiling /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/lib/python3.12/site-packages/ugv_uav_control/middle_path_follower.py to middle_path_follower.cpython-312.pyc
+byte-compiling /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/lib/python3.12/site-packages/ugv_uav_control/__init__.py to __init__.cpython-312.pyc
+running install_data
+creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ament_index
+creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ament_index/resource_index
+creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ament_index/resource_index/packages
+copying resource/ugv_uav_control -> /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ament_index/resource_index/packages
+copying package.xml -> /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control
+creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/launch
+copying launch/middle_path_follower.launch.py -> /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/launch
+creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/worlds
+copying worlds/path_following.world -> /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/worlds
+creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/models
+creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/models/path_ground_plane
+copying models/path_ground_plane/model.sdf -> /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/models/path_ground_plane
+copying models/path_ground_plane/model.config -> /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/models/path_ground_plane
+creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/models/path_ground_plane/materials
+creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/models/path_ground_plane/materials/scripts
+creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/models/path_ground_plane/materials/textures
+copying models/path_ground_plane/materials/textures/track4.png -> /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/models/path_ground_plane/materials/textures
+creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/models/turtlebot3_burger_aruco
+copying models/turtlebot3_burger_aruco/model.sdf -> /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/models/turtlebot3_burger_aruco
+copying models/turtlebot3_burger_aruco/model.config -> /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/models/turtlebot3_burger_aruco
+creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/models/turtlebot3_burger_aruco/materials
+creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/models/turtlebot3_burger_aruco/materials/textures
+copying models/turtlebot3_burger_aruco/materials/textures/aruco_marker_0.png -> /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/models/turtlebot3_burger_aruco/materials/textures
+running install_egg_info
+Copying ../../build/ugv_uav_control/ugv_uav_control.egg-info to /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/lib/python3.12/site-packages/ugv_uav_control-0.1.0-py3.12.egg-info
+running install_scripts
+Installing middle_path_follower script to /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/lib/ugv_uav_control
+Installing stanley_node script to /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/lib/ugv_uav_control
+writing list of installed files to '/home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/install.log'
