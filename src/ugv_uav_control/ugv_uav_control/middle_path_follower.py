@@ -42,7 +42,7 @@ class MiddlePathFollower(Node):
         self.fov = 1.047 # 60 degrees
         self.image_width = None
         self.scale = None
-        self.frame_count = 0 
+        self.frame_count = 0
         self.get_logger().info('Middle Path Follower Node Started')
     def image_callback(self, msg):
         try:

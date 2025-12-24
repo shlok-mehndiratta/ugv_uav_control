@@ -1,0 +1,22 @@
+[0.559s] Invoking command in '/home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/build --no-deps symlink_data
+[0.761s] running develop
+[0.876s] running egg_info
+[0.888s] writing ugv_uav_control.egg-info/PKG-INFO
+[0.888s] writing dependency_links to ugv_uav_control.egg-info/dependency_links.txt
+[0.888s] writing entry points to ugv_uav_control.egg-info/entry_points.txt
+[0.888s] writing requirements to ugv_uav_control.egg-info/requires.txt
+[0.888s] writing top-level names to ugv_uav_control.egg-info/top_level.txt
+[0.912s] reading manifest file 'ugv_uav_control.egg-info/SOURCES.txt'
+[0.913s] writing manifest file 'ugv_uav_control.egg-info/SOURCES.txt'
+[0.924s] running build_ext
+[0.924s] Creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/lib/python3.12/site-packages/ugv-uav-control.egg-link (link to .)
+[0.925s] Installing middle_path_follower script to /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/lib/ugv_uav_control
+[0.925s] Installing pure_pursuit_node script to /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/lib/ugv_uav_control
+[0.925s] Installing stanley_node script to /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/lib/ugv_uav_control
+[0.925s] 
+[0.925s] Installed /home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control
+[0.925s] running symlink_data
+[0.925s] creating /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/models/x500_downward_camera
+[0.926s] symbolically linking /home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/models/x500_downward_camera/model.sdf -> /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/models/x500_downward_camera
+[0.926s] symbolically linking /home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/models/x500_downward_camera/model.config -> /home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/share/ugv_uav_control/models/x500_downward_camera
+[0.949s] Invoked command in '/home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/shlok-mehndiratta/Desktop/Project_ws/install/ugv_uav_control/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/shlok-mehndiratta/Desktop/Project_ws/build/ugv_uav_control/build --no-deps symlink_data

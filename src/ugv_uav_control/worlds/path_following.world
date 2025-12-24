@@ -10,7 +10,7 @@
 
     <!-- GROUND PLANE REMOVED (Spawned by Launch File) -->
 
-    <model name="overhead_camera">
+    <!-- <model name="overhead_camera">
       <static>true</static>
       <pose>0 0 10 0 1.5707 0</pose>
       <link name="link">
@@ -20,6 +20,6 @@
           <always_on>1</always_on><update_rate>30</update_rate><visualize>true</visualize><topic>overhead_camera/image</topic>
         </sensor>
       </link>
-    </model>
+    </model> -->
   </world>
 </sdf>

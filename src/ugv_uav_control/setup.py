@@ -23,6 +23,9 @@ setup(
         # NEW: Custom Robot Model (This was missing!)
         (os.path.join('share', package_name, 'models/turtlebot3_burger_aruco'), glob('models/turtlebot3_burger_aruco/model.*')),
         (os.path.join('share', package_name, 'models/turtlebot3_burger_aruco/materials/textures'), glob('models/turtlebot3_burger_aruco/materials/textures/*')),
+
+        # NEW: X500 Drone Model
+        (os.path.join('share', package_name, 'models/x500_downward_camera'), glob('models/x500_downward_camera/model.*')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -36,6 +39,7 @@ setup(
             'middle_path_follower = ugv_uav_control.middle_path_follower:main',
             'stanley_node = ugv_uav_control.stanley_node:main',
             'pure_pursuit_node = ugv_uav_control.pure_pursuit_node:main',
+            'mpc_node = ugv_uav_control.mpc_node:main', 
         ],
     },
 )

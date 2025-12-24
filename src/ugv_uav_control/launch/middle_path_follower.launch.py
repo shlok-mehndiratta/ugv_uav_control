@@ -38,18 +38,38 @@ def launch_setup(context, *args, **kwargs):
         arguments=['-name', 'turtlebot3_burger', '-file', robot_sdf, '-z', '0.01'],
         output='screen')
 
-    # 4. Bridges
-    bridge = Node(package='ros_gz_bridge', executable='parameter_bridge',
-        arguments=['/overhead_camera/image@sensor_msgs/msg/Image@gz.msgs.Image', 
-                   '/overhead_camera/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo'],
+    # 4. Spawn Drone at 10m height
+    drone_sdf = os.path.join(pkg_ugv, 'models', 'x500_downward_camera', 'model.sdf')
+    spawn_drone = Node(package='ros_gz_sim', executable='create',
+        arguments=['-name', 'uav', '-file', drone_sdf, '-z', '10.0', '-x', '0.0', '-y', '0.0'],
         output='screen')
+
+    # 5. Bridges
+    bridge = Node(package='ros_gz_bridge', executable='parameter_bridge',
+        arguments=[
+            '/drone/camera/image@sensor_msgs/msg/Image@gz.msgs.Image',
+            '/drone/camera/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo'
+        ],
+        remappings=[
+            ('/drone/camera/image', '/overhead_camera/image'),
+            ('/drone/camera/camera_info', '/overhead_camera/camera_info')
+        ],
+        output='screen')
+
+    # # 4. Bridges
+    # bridge = Node(package='ros_gz_bridge', executable='parameter_bridge',
+    #     arguments=['/overhead_camera/image@sensor_msgs/msg/Image@gz.msgs.Image', 
+    #                '/overhead_camera/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo'],
+    #     output='screen')
         
     robot_bridge = Node(package='ros_gz_bridge', executable='parameter_bridge',
         arguments=['--ros-args', '-p', f'config_file:={os.path.join(pkg_bot, "params", "turtlebot3_burger_bridge.yaml")}'],
         output='screen')
 
+    
+
     # 5. Smart Controller Selection
-    nodes_to_start = [spawn_ground, spawn_robot, bridge, robot_bridge]
+    nodes_to_start = [spawn_ground, spawn_robot, bridge, robot_bridge, spawn_drone]
     
     # Vision Node (Always needed)
     nodes_to_start.append(Node(package='ugv_uav_control', executable='middle_path_follower', output='screen'))
@@ -58,7 +78,8 @@ def launch_setup(context, *args, **kwargs):
         nodes_to_start.append(Node(package='ugv_uav_control', executable='stanley_node', output='screen'))
     elif controller_type == 'pure_pursuit':
         nodes_to_start.append(Node(package='ugv_uav_control', executable='pure_pursuit_node', output='screen'))
-    # Add more elif here for mpc, etc.
+    elif controller_type == 'mpc':                                                                         
+        nodes_to_start.append(Node(package='ugv_uav_control', executable='mpc_node', output='screen')) 
 
     return nodes_to_start
 
