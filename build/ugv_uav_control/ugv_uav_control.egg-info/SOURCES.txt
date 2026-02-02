@@ -11,6 +11,9 @@ models/x500_downward_camera/model.config
 models/x500_downward_camera/model.sdf
 resource/ugv_uav_control
 ugv_uav_control/__init__.py
+ugv_uav_control/belief_mpc_node.py
+ugv_uav_control/ekf_node.py
+ugv_uav_control/experiment_logger.py
 ugv_uav_control/middle_path_follower.py
 ugv_uav_control/mpc_node.py
 ugv_uav_control/pure_pursuit_node.py

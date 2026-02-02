@@ -40,6 +40,9 @@ setup(
             'stanley_node = ugv_uav_control.stanley_node:main',
             'pure_pursuit_node = ugv_uav_control.pure_pursuit_node:main',
             'mpc_node = ugv_uav_control.mpc_node:main', 
+            'ekf_node = ugv_uav_control.ekf_node:main',
+            'belief_mpc_node = ugv_uav_control.belief_mpc_node:main',
+            'experiment_logger = ugv_uav_control.experiment_logger:main',
         ],
     },
 )

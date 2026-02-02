@@ -28,6 +28,7 @@ class MiddlePathFollower(Node):
         self.debug_pub = self.create_publisher(Image, '/middle_path/debug_image', 10)
         self.waypoint_pub = self.create_publisher(PoseStamped, '/waypoints', 10) 
         self.nearest_pub = self.create_publisher(PoseStamped, '/nearest_point', 10)
+        self.aruco_pose_pub = self.create_publisher(PoseStamped, '/aruco_pose', 10)
         
         self.bridge = CvBridge()
         self.aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_6X6_250)
@@ -73,6 +74,19 @@ class MiddlePathFollower(Node):
                     top_mid_y = (c[0][1] + c[1][1]) / 2
                     robot_angle = math.atan2(top_mid_y - cy, top_mid_x - cx)
                     break
+                
+        # Publish ArUco pose for EKF
+        if robot_pos is not None:
+            aruco_msg = PoseStamped()
+            aruco_msg.header.stamp = self.get_clock().now().to_msg()
+            aruco_msg.header.frame_id = 'world'
+            # Convert pixel to world coordinates
+            aruco_msg.pose.position.x = (robot_pos[0] - self.image_width/2) * self.scale
+            aruco_msg.pose.position.y = (robot_pos[1] - self.image_height/2) * self.scale
+            q = quaternion_from_euler(0, 0, robot_angle)
+            aruco_msg.pose.orientation.x, aruco_msg.pose.orientation.y = q[0], q[1]
+            aruco_msg.pose.orientation.z, aruco_msg.pose.orientation.w = q[2], q[3]
+            self.aruco_pose_pub.publish(aruco_msg)
         
         if robot_pos is None:
             return
@@ -121,7 +135,7 @@ class MiddlePathFollower(Node):
         proj_y = robot_pos[1] + lookahead_dist * math.sin(robot_angle)
         
         mask = np.zeros_like(gray)
-        cv2.circle(mask, (int(proj_x), int(proj_y)), 40, 255, -1)
+        cv2.circle(mask, (int(proj_x), int(proj_y)), 60, 255, -1)
         
         masked_dist = dist_map.copy()
         masked_dist[mask == 0] = 0

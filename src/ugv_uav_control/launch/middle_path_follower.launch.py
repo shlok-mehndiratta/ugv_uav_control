@@ -73,13 +73,16 @@ def launch_setup(context, *args, **kwargs):
     
     # Vision Node (Always needed)
     nodes_to_start.append(Node(package='ugv_uav_control', executable='middle_path_follower', output='screen'))
-
+    nodes_to_start.append(Node(package='ugv_uav_control', executable='ekf_node', output='screen'))
+    
     if controller_type == 'stanley':
         nodes_to_start.append(Node(package='ugv_uav_control', executable='stanley_node', output='screen'))
     elif controller_type == 'pure_pursuit':
         nodes_to_start.append(Node(package='ugv_uav_control', executable='pure_pursuit_node', output='screen'))
     elif controller_type == 'mpc':                                                                         
-        nodes_to_start.append(Node(package='ugv_uav_control', executable='mpc_node', output='screen')) 
+        nodes_to_start.append(Node(package='ugv_uav_control', executable='mpc_node', output='screen'))
+    elif controller_type == 'belief_mpc':
+        nodes_to_start.append(Node(package='ugv_uav_control', executable='belief_mpc_node', output='screen')) 
 
     return nodes_to_start
 
