@@ -7,6 +7,7 @@ import math
 def wrap_angle(angle):
     """Normalize angle to [-π, π]."""
     return (angle + np.pi) % (2 * np.pi) - np.pi
+    
 def quaternion_from_euler(roll, pitch, yaw):
     """Convert Euler angles to quaternion."""
     cy = math.cos(yaw * 0.5)
@@ -21,11 +22,13 @@ def quaternion_from_euler(roll, pitch, yaw):
         sy * cp * cr - cy * sp * sr,  # z
         cy * cp * cr + sy * sp * sr   # w
     ]
+
 def euler_from_quaternion(q):
     """Extract yaw from quaternion [x, y, z, w]."""
     siny_cosp = 2 * (q[3] * q[2] + q[0] * q[1])
     cosy_cosp = 1 - 2 * (q[1] * q[1] + q[2] * q[2])
     return math.atan2(siny_cosp, cosy_cosp)
+
 class EKFNode(Node):
     def __init__(self):
         super().__init__('ekf_node')
@@ -254,6 +257,8 @@ class EKFNode(Node):
         msg.pose.covariance = cov.flatten().tolist()
         
         self.belief_pub.publish(msg)
+
+
 def main(args=None):
     rclpy.init(args=args)
     node = EKFNode()
