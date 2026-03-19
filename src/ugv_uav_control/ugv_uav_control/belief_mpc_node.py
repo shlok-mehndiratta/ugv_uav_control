@@ -186,10 +186,13 @@ class BeliefMPCNode(Node):
         q = msg.pose.pose.orientation
         siny_cosp = 2 * (q.w * q.z + q.x * q.y)
         cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z)
-        self.world_pos = np.array([self.mu[0], self.mu[1], self.mu[2]])
         self.mu[2] = math.atan2(siny_cosp, cosy_cosp)
         
-        # Velocity states (keep from prediction, not in standard PoseWithCovariance)
+        # Store world-frame position AFTER yaw is correctly computed
+        # This is used by the FoV observability check inside the optimizer
+        self.world_pos = np.array([self.mu[0], self.mu[1], self.mu[2]])
+        
+        # Velocity states (keep from last control command)
         # self.mu[3], self.mu[4] are updated via control commands
         
         # Extract covariance (6x6 in message, we need 5x5)
