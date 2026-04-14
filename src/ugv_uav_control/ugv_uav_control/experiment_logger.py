@@ -5,13 +5,14 @@ Subscribes to common topics and optionally to /belief_state for covariance data.
 """
 import rclpy
 from rclpy.node import Node
-from geometry_msgs.msg import TwistStamped, PoseStamped, PoseWithCovarianceStamped
+from geometry_msgs.msg import TwistStamped, PoseStamped, PoseWithCovarianceStamped, Pose
 from nav_msgs.msg import Odometry
 import numpy as np
 import csv
 import os
 import math
 from datetime import datetime
+import ugv_uav_control.view_quality as view_quality
 
 
 class ExperimentLogger(Node):
@@ -36,11 +37,14 @@ class ExperimentLogger(Node):
             'cov_xx': [], 'cov_yy': [], 'cov_tt': [],
             'fov_distance': [],
             'aruco_visible': [],
+            'uav_x': [], 'uav_y': [],
+            'uav_dist': [],
+            'q_k': [],
         }
 
         # UAV FoV parameters
         self.uav_x, self.uav_y = 0.0, 0.0
-        self.fov_radius = 5.77
+        self.fov_radius = 2.89
 
         # State cache
         self.current_cmd = [0.0, 0.0]
@@ -67,6 +71,9 @@ class ExperimentLogger(Node):
 
         # Odometry fallback (always available from Gazebo)
         self.create_subscription(Odometry, '/odom', self.odom_cb, 10)
+        
+        # UAV Position (for q_k and distance calculations)
+        self.create_subscription(Pose, '/uav_gps_pose', self.uav_cb, 10)
 
         # Timer for periodic logging
         self.create_timer(1.0 / log_rate, self.log_callback)
@@ -103,6 +110,10 @@ class ExperimentLogger(Node):
                 2 * (q.w * q.z + q.x * q.y),
                 1 - 2 * (q.y * q.y + q.z * q.z))
 
+    def uav_cb(self, msg):
+        self.uav_x = msg.position.x
+        self.uav_y = msg.position.y
+
     def cmd_cb(self, msg):
         self.current_cmd = [msg.twist.linear.x, msg.twist.angular.z]
 
@@ -138,6 +149,9 @@ class ExperimentLogger(Node):
         cov_trace = sum(self.current_cov)
 
         self.data['timestamp'].append(elapsed)
+        if len(self.data['timestamp']) % 100 == 0:
+            self.get_logger().info(f"Logging: {elapsed:.1f}/{self.duration}s | Samples: {len(self.data['timestamp'])}")
+            
         self.data['x'].append(x)
         self.data['y'].append(y)
         self.data['theta'].append(theta)
@@ -151,6 +165,14 @@ class ExperimentLogger(Node):
         self.data['cov_tt'].append(self.current_cov[2])
         self.data['fov_distance'].append(fov_dist)
         self.data['aruco_visible'].append(1 if self.aruco_visible else 0)
+        
+        # Enhanced Study Metrics
+        self.data['uav_x'].append(self.uav_x)
+        self.data['uav_y'].append(self.uav_y)
+        self.data['uav_dist'].append(fov_dist)
+        
+        qk = view_quality.compute_view_quality(self.uav_x, self.uav_y, x, y, r_fov=self.fov_radius)
+        self.data['q_k'].append(qk)
 
     # =========================================
     # SAVE AND EXIT
@@ -216,18 +238,23 @@ class ExperimentLogger(Node):
                         f.write(f'{k}: {v}\n')
 
             self.get_logger().info(f'Data saved to: {filename}')
-            self.get_logger().info(f'Samples: {n} | '
-                                   f'Mean Error: {summary["mean_tracking_error"]:.4f} m | '
-                                   f'Smoothness: {summary["control_smoothness"]:.4f} | '
-                                   f'FoV Exit: {summary["fov_exit_pct"]:.1f}%')
 
-        rclpy.shutdown()
-
+    def destroy_node(self):
+        if not self.saved:
+            self.save_and_exit()
+        super().destroy_node()
 
 def main(args=None):
     rclpy.init(args=args)
-    rclpy.spin(ExperimentLogger())
-
+    node = ExperimentLogger()
+    try:
+        rclpy.spin(node)
+    except (KeyboardInterrupt, rclpy.executors.ExternalShutdownException):
+        pass
+    finally:
+        node.destroy_node()
+        if rclpy.ok():
+            rclpy.shutdown()
 
 if __name__ == '__main__':
     main()

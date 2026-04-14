@@ -1,11 +1,12 @@
 import rclpy
 from rclpy.node import Node
-from geometry_msgs.msg import TwistStamped, PoseStamped, PoseWithCovarianceStamped
+from geometry_msgs.msg import TwistStamped, Pose, PoseStamped, PoseWithCovarianceStamped
+from nav_msgs.msg import Path
 from scipy.optimize import minimize
+from ugv_uav_control import ugv_model
 import numpy as np
 import math
-def wrap_angle(angle):
-    return (angle + np.pi) % (2 * np.pi) - np.pi
+
 class BeliefMPCNode(Node):
     def __init__(self):
         super().__init__('belief_mpc_node')
@@ -13,9 +14,11 @@ class BeliefMPCNode(Node):
         # === SUBSCRIPTIONS ===
         self.create_subscription(PoseStamped, '/waypoints', self.waypoint_callback, 10)
         self.create_subscription(PoseWithCovarianceStamped, '/belief_state', self.belief_callback, 10)
+        self.create_subscription(Pose, '/uav_gps_pose', self.uav_callback, 10)
         
-        # === PUBLISHER ===
+        # === PUBLISHERS ===
         self.publisher = self.create_publisher(TwistStamped, '/cmd_vel', 10)
+        self.traj_pub = self.create_publisher(Path, '/ugv_predicted_traj', 10)
         
         # === MPC PARAMETERS ===
         self.horizon = 5
@@ -48,59 +51,28 @@ class BeliefMPCNode(Node):
         # UAV parameters (static for now)
         self.uav_x = 0.0
         self.uav_y = 0.0
-        self.uav_z = 10.0
+        self.uav_z = 5.0
         self.fov_angle = 1.047  # 60 degrees
 
         # Compute FoV radius
-        self.fov_radius = self.uav_z * np.tan(self.fov_angle / 2)  # ~5.77 m
+        self.fov_radius = self.uav_z * np.tan(self.fov_angle / 2)  # ~2.89 m
 
         # Observability smoothing parameter
         self.gamma_k = 5.0  # Sigmoid sharpness
 
         # Observation matrices (for when visible)
         self.H_obs = np.eye(5)
-        self.R_obs = np.diag([0.0025, 0.0025, 0.01, 0.0004, 0.0025])
+        self.R_obs_base = np.diag([0.0025, 0.0025, 0.01, 0.0004, 0.0025])
+        
+        # UAV state for dynamic R_k
+        self.uav_pos = np.array([0.0, 0.0])
+        self.last_log_time_mpc = self.get_clock().now()
+        self.last_log_time_sigma = self.get_clock().now()
+        
         self.get_logger().info(f'FoV radius: {self.fov_radius:.2f} m')
 
     
-    # =========================================
-    # PROCESS MODEL (same as existing MPC)
-    # =========================================
-    def process_model(self, state, u, dt):
-        x, y, theta, v, omega = state
-        v_cmd, omega_cmd = u
-        
-        v_next = v + self.alpha_v * (v_cmd - v) * dt
-        omega_next = omega + self.alpha_w * (omega_cmd - omega) * dt
-        
-        v_avg = (v + v_next) / 2.0
-        omega_avg = (omega + omega_next) / 2.0
-        
-        if abs(omega_avg) < 1e-4:
-            x_next = x + v_avg * np.cos(theta) * dt
-            y_next = y + v_avg * np.sin(theta) * dt
-        else:
-            x_next = x + (v_avg / omega_avg) * (np.sin(theta + omega_avg * dt) - np.sin(theta))
-            y_next = y - (v_avg / omega_avg) * (np.cos(theta + omega_avg * dt) - np.cos(theta))
-        
-        theta_next = wrap_angle(theta + omega_avg * dt)
-        
-        return np.array([x_next, y_next, theta_next, v_next, omega_next])
-    
-    def compute_jacobian_F(self, state, dt):
-        """Compute Jacobian of process model."""
-        x, y, theta, v, omega = state
-        
-        F = np.eye(5)
-        F[0, 2] = -v * np.sin(theta) * dt
-        F[0, 3] = np.cos(theta) * dt
-        F[1, 2] = v * np.cos(theta) * dt
-        F[1, 3] = np.sin(theta) * dt
-        F[2, 4] = dt
-        F[3, 3] = 1 - self.alpha_v * dt
-        F[4, 4] = 1 - self.alpha_w * dt
-        
-        return F
+        self.get_logger().info(f'FoV radius: {self.fov_radius:.2f} m')
     
     # =========================================
     # BELIEF-SPACE COST FUNCTION
@@ -119,10 +91,10 @@ class BeliefMPCNode(Node):
             w_cmd = u[k, 1]
             
             # Mean propagation
-            mu = self.process_model(mu, [v_cmd, w_cmd], self.dt)
+            mu = ugv_model.process_model(mu, [v_cmd, w_cmd], self.dt, self.alpha_v, self.alpha_w)
             
-            # Covariance prediction (no measurement)
-            F = self.compute_jacobian_F(mu, self.dt)
+            # Covariance prediction
+            F = ugv_model.compute_jacobian_F(mu, self.dt, self.alpha_v, self.alpha_w)
             Sigma_pred = F @ Sigma @ F.T + self.Q
             
             # ========================================
@@ -136,9 +108,22 @@ class BeliefMPCNode(Node):
             gamma, d = self.compute_observability(world_mu)
             
             # Blend between no-observation and observation
-            if gamma > 0.01:  # Avoid computing Kalman update when clearly outside
-                Sigma_obs = self.kalman_update(Sigma_pred)
+            if gamma > 0.01:
+                # Use shared logic for R_k and Sigma_obs
+                R_k, q_k = ugv_model.get_dynamic_R(
+                    self.uav_pos, world_mu[:2], self.R_obs_base, self.fov_radius
+                )
+                Sigma_obs = ugv_model.kalman_update(Sigma_pred, self.H_obs, R_k)
                 Sigma = (1 - gamma) * Sigma_pred + gamma * Sigma_obs
+                
+                # Throttled logging (every 5s) - only for first horizon step to avoid spam
+                if k == 0:
+                    now = self.get_clock().now()
+                    if (now - self.last_log_time_mpc).nanoseconds > 5e9:
+                        self.get_logger().info(
+                            f'[MPC] Dynamic R_k: q={q_k:.3f}, tr(R)={np.trace(R_k):.4f}'
+                        )
+                        self.last_log_time_mpc = now
             else:
                 Sigma = Sigma_pred
             
@@ -149,7 +134,7 @@ class BeliefMPCNode(Node):
             
             dist_sq = (x - target_x)**2 + (y - target_y)**2
             target_angle = math.atan2(target_y - y, target_x - x)
-            angle_err = wrap_angle(theta - target_angle)
+            angle_err = ugv_model.wrap_angle(theta - target_angle)
             w_head_k = self.w_head if dist_sq > 0.05 else 0.0
             rate_penalty = (v_cmd - prev_u[0])**2 + (w_cmd - prev_u[1])**2
             
@@ -192,9 +177,6 @@ class BeliefMPCNode(Node):
         # This is used by the FoV observability check inside the optimizer
         self.world_pos = np.array([self.mu[0], self.mu[1], self.mu[2]])
         
-        # Velocity states (keep from last control command)
-        # self.mu[3], self.mu[4] are updated via control commands
-        
         # Extract covariance (6x6 in message, we need 5x5)
         cov_flat = np.array(msg.pose.covariance).reshape((6, 6))
         self.Sigma[0, 0] = cov_flat[0, 0]
@@ -206,6 +188,22 @@ class BeliefMPCNode(Node):
         self.Sigma[2, 0] = cov_flat[5, 0]
         self.Sigma[1, 2] = cov_flat[1, 5]
         self.Sigma[2, 1] = cov_flat[5, 1]
+
+        # Log Sigma update confirmation (throttled)
+        now = self.get_clock().now()
+        if (now - self.last_log_time_sigma).nanoseconds > 5e9:
+            self.get_logger().info(f'[MPC] Sigma updated. Trace: {np.trace(self.Sigma):.6f}')
+            self.last_log_time_sigma = now
+        
+        # Velocity states (keep from last control command)
+        # self.mu[3], self.mu[4] are updated via control commands
+        
+    def uav_callback(self, msg):
+        # Handle both Pose and PoseStamped for robustness
+        if hasattr(msg, 'pose'):
+            self.uav_pos = np.array([msg.pose.position.x, msg.pose.position.y])
+        else:
+            self.uav_pos = np.array([msg.position.x, msg.position.y])
     
     def waypoint_callback(self, msg):
         """Optimize control given target waypoint in ROBOT FRAME."""
@@ -246,6 +244,19 @@ class BeliefMPCNode(Node):
             u_opt = result.x.reshape((self.horizon, 2))
             v_cmd = u_opt[0, 0]
             w_cmd = u_opt[0, 1]
+            
+            # Update internal state
+            self.prev_ctrl = np.array([v_cmd, w_cmd])
+            
+            # Publish control
+            cmd_msg = TwistStamped()
+            cmd_msg.header.stamp = self.get_clock().now().to_msg()
+            cmd_msg.twist.linear.x = v_cmd
+            cmd_msg.twist.angular.z = w_cmd
+            self.publisher.publish(cmd_msg)
+
+            # Publish predicted trajectory for UAV
+            self.publish_predicted_trajectory(u_opt, start_mu)
         else:
             # Fallback if optimization fails
             v_cmd = 0.1
@@ -278,16 +289,64 @@ class BeliefMPCNode(Node):
         return gamma, d
 
 
-    def kalman_update(self, Sigma_pred):
-        """
-        Apply Kalman update assuming full observation.
-        Returns reduced covariance.
-        """
-        S = self.H_obs @ Sigma_pred @ self.H_obs.T + self.R_obs
-        K = Sigma_pred @ self.H_obs.T @ np.linalg.inv(S)
-        I_KH = np.eye(5) - K @ self.H_obs
-        Sigma_updated = I_KH @ Sigma_pred @ I_KH.T + K @ self.R_obs @ K.T
-        return Sigma_updated
+        self.traj_pub.publish(path_msg)
+
+    def publish_predicted_trajectory(self, u_opt, start_mu):
+        """Perform final rollout and publish as Path message."""
+        path_msg = Path()
+        path_msg.header.stamp = self.get_clock().now().to_msg()
+        path_msg.header.frame_id = "world"
+        
+        mu = start_mu.copy()
+        now = self.get_clock().now()
+        
+        # Origin for world frame transform
+        x0, y0, th0 = self.world_pos
+        
+        for k in range(self.horizon + 1):
+            # Transform to world frame
+            # mu[0,1] are relative x,y; mu[2] is relative theta
+            wx = x0 + mu[0] * math.cos(th0) - mu[1] * math.sin(th0)
+            wy = y0 + mu[0] * math.sin(th0) + mu[1] * math.cos(th0)
+            wth = ugv_model.wrap_angle(th0 + mu[2])
+            
+            pose = PoseStamped()
+            # Time offset for each step
+            step_time = now.nanoseconds + int(k * self.dt * 1e9)
+            pose.header.stamp = rclpy.time.Time(nanoseconds=step_time).to_msg()
+            pose.header.frame_id = "world"
+            
+            pose.pose.position.x = wx
+            pose.pose.position.y = wy
+            pose.pose.position.z = 0.0
+            
+            q = self._quaternion_from_euler(0, 0, wth)
+            pose.pose.orientation.x = q[0]
+            pose.pose.orientation.y = q[1]
+            pose.pose.orientation.z = q[2]
+            pose.pose.orientation.w = q[3]
+            
+            path_msg.poses.append(pose)
+            
+            if k < self.horizon:
+                # Predict next state using central logic
+                mu = ugv_model.process_model(mu, u_opt[k], self.dt, self.alpha_v, self.alpha_w)
+
+        self.traj_pub.publish(path_msg)
+
+    def _quaternion_from_euler(self, roll, pitch, yaw):
+        cy = math.cos(yaw * 0.5)
+        sy = math.sin(yaw * 0.5)
+        cp = math.cos(pitch * 0.5)
+        sp = math.sin(pitch * 0.5)
+        cr = math.cos(roll * 0.5)
+        sr = math.sin(roll * 0.5)
+        q = [0.0] * 4
+        q[0] = cy * cp * sr - sy * sp * cr
+        q[1] = sy * cp * sr + cy * sp * cr
+        q[2] = sy * cp * cr - cy * sp * sr
+        q[3] = cy * cp * cr + sy * sp * sr
+        return q
 
 
 

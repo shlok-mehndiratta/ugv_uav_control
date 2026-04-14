@@ -1,12 +1,10 @@
 import rclpy
 from rclpy.node import Node
-from geometry_msgs.msg import TwistStamped, PoseStamped, PoseWithCovarianceStamped
+from geometry_msgs.msg import TwistStamped, Pose, PoseStamped, PoseWithCovarianceStamped
 from nav_msgs.msg import Odometry
+from ugv_uav_control import ugv_model
 import numpy as np
 import math
-def wrap_angle(angle):
-    """Normalize angle to [-π, π]."""
-    return (angle + np.pi) % (2 * np.pi) - np.pi
     
 def quaternion_from_euler(roll, pitch, yaw):
     """Convert Euler angles to quaternion."""
@@ -55,10 +53,18 @@ class EKFNode(Node):
         self.last_aruco_time = self.get_clock().now()
         self.aruco_timeout = 2.0  # seconds
         
+        # UAV state for dynamic R_k
+        self.uav_pos = np.array([0.0, 0.0])
+        self.uav_z = 5.0
+        self.fov_angle = 1.047 # 60 degrees
+        self.fov_radius = self.uav_z * np.tan(self.fov_angle / 2) # ~2.89 m
+        self.last_log_time_ekf = self.get_clock().now()
+        
         # === SUBSCRIBERS ===
         self.create_subscription(TwistStamped, '/cmd_vel', self.cmd_callback, 10)
         self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
         self.create_subscription(PoseStamped, '/aruco_pose', self.aruco_callback, 10)
+        self.create_subscription(Pose, '/uav_gps_pose', self.uav_callback, 10)
         
         # === PUBLISHER ===
         self.belief_pub = self.create_publisher(PoseWithCovarianceStamped, '/belief_state', 10)
@@ -71,57 +77,9 @@ class EKFNode(Node):
     # =========================================
     # PROCESS MODEL
     # =========================================
-    def process_model(self, state, u, dt):
-        """
-        Propagate state: x_{k+1} = f(x_k, u_k)
-        Uses simplified Euler integration.
-        """
-        x, y, theta, v, omega = state
-        v_cmd, omega_cmd = u
-        
-        # Actuator dynamics
-        v_next = v + self.alpha_v * (v_cmd - v) * dt
-        omega_next = omega + self.alpha_w * (omega_cmd - omega) * dt
-        
-        # Average velocities for integration
-        v_avg = (v + v_next) / 2.0
-        omega_avg = (omega + omega_next) / 2.0
-        
-        # Pose kinematics
-        x_next = x + v_avg * np.cos(theta) * dt
-        y_next = y + v_avg * np.sin(theta) * dt
-        theta_next = wrap_angle(theta + omega_avg * dt)
-        
-        return np.array([x_next, y_next, theta_next, v_next, omega_next])
-    
-    def compute_jacobian_F(self, state, u, dt):
-        """
-        Compute Jacobian of process model w.r.t. state.
-        """
-        x, y, theta, v, omega = state
-        
-        F = np.eye(5)
-        
-        # ∂x'/∂θ = -v * sin(θ) * dt
-        F[0, 2] = -v * np.sin(theta) * dt
-        # ∂x'/∂v = cos(θ) * dt
-        F[0, 3] = np.cos(theta) * dt
-        
-        # ∂y'/∂θ = v * cos(θ) * dt
-        F[1, 2] = v * np.cos(theta) * dt
-        # ∂y'/∂v = sin(θ) * dt
-        F[1, 3] = np.sin(theta) * dt
-        
-        # ∂θ'/∂ω = dt
-        F[2, 4] = dt
-        
-        # ∂v'/∂v = 1 - α_v * dt
-        F[3, 3] = 1 - self.alpha_v * dt
-        
-        # ∂ω'/∂ω = 1 - α_ω * dt
-        F[4, 4] = 1 - self.alpha_w * dt
-        
-        return F
+    # =========================================
+    # EKF STEPS
+    # =========================================
     
     # =========================================
     # EKF STEPS
@@ -131,10 +89,10 @@ class EKFNode(Node):
         Timer callback: Predict belief forward using last control.
         """
         # Predict mean
-        self.mu = self.process_model(self.mu, self.last_cmd, self.dt)
+        self.mu = ugv_model.process_model(self.mu, self.last_cmd, self.dt, self.alpha_v, self.alpha_w)
         
         # Predict covariance
-        F = self.compute_jacobian_F(self.mu, self.last_cmd, self.dt)
+        F = ugv_model.compute_jacobian_F(self.mu, self.dt, self.alpha_v, self.alpha_w)
         self.Sigma = F @ self.Sigma @ F.T + self.Q
         
         # Publish belief
@@ -153,34 +111,30 @@ class EKFNode(Node):
         
         # Handle angle wrapping for θ (index 2)
         if H.shape[0] >= 3 and H[2, 2] == 1.0:
-            y[2] = wrap_angle(y[2])
-        
-        # Innovation covariance
-        S = H @ self.Sigma @ H.T + R
+            y[2] = ugv_model.wrap_angle(y[2])
         
         # Kalman gain
+        S = H @ self.Sigma @ H.T + R
         K = self.Sigma @ H.T @ np.linalg.inv(S)
         
         # State update
         self.mu = self.mu + K @ y
-        self.mu[2] = wrap_angle(self.mu[2])  # Normalize θ
+        self.mu[2] = ugv_model.wrap_angle(self.mu[2])  # Normalize θ
         
-        # Covariance update (Joseph form for numerical stability)
-        I_KH = np.eye(5) - K @ H
-        self.Sigma = I_KH @ self.Sigma @ I_KH.T + K @ R @ K.T
-        
-        # Ensure symmetry
-        self.Sigma = (self.Sigma + self.Sigma.T) / 2.0
+        # Covariance update (Joseph form)
+        self.Sigma = ugv_model.kalman_update(self.Sigma, H, R)
     
-    # =========================================
-    # CALLBACKS
-    # =========================================
     def cmd_callback(self, msg):
         """Store latest control command."""
         self.last_cmd = np.array([
             msg.twist.linear.x,
             msg.twist.angular.z
         ])
+
+    def uav_callback(self, msg):
+        """Update UAV position for view quality calculation."""
+        self.uav_pos[0] = msg.position.x
+        self.uav_pos[1] = msg.position.y
     
     def odom_callback(self, msg):
         """
@@ -214,7 +168,20 @@ class EKFNode(Node):
         
         H = np.eye(5)
         
-        self.update_step(z, H, self.R_full)
+        # --- DYNAMIC R_k ---
+        R_k, q_k = ugv_model.get_dynamic_R(
+            self.uav_pos, [x_aruco, y_aruco], self.R_full, self.fov_radius
+        )
+        
+        self.update_step(z, H, R_k)
+        
+        # Throttled logging (every 5s)
+        now = self.get_clock().now()
+        if (now - self.last_log_time_ekf).nanoseconds > 5e9:
+            self.get_logger().info(
+                f'[EKF] Dynamic R_k: q={q_k:.3f}, tr(R)={np.trace(R_k):.4f}'
+            )
+            self.last_log_time_ekf = now
         
         self.last_aruco_time = self.get_clock().now()
         self.get_logger().debug(f'ArUco update: x={x_aruco:.2f}, y={y_aruco:.2f}, θ={theta_aruco:.2f}')

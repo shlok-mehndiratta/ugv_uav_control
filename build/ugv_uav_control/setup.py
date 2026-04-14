@@ -1,1 +1,0 @@
-/home/shlok-mehndiratta/Desktop/Project_ws/src/ugv_uav_control/setup.py
