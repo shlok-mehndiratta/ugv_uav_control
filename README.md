@@ -1,13 +1,13 @@
 # UGV-UAV Multi-Agent Control & Perception
 
-Professional graduation project focused on coordinated path following and observability-aware aerial tracking.
+Project focused on coordinated path following and observability-aware aerial tracking.
 
 ## Overview
 This project implements a ROS 2 based system where a UAV (Drone) autonomously tracks a UGV (Ground Robot) while the UGV follows a pre-defined path. The core innovation (v2.0) is a **Belief-Space MPC** that optimizes the UAV's position to maximize the observability of the UGV, minimizing estimation uncertainty.
 
 ---
 
-## 🚀 UAV Pipeline Extension (v2.0)
+## UAV Pipeline Extension (v2.0)
 
 ### 1. Key Changes from v1.1
 - **Mobile Observation Pool**: UAV moved from fixed 10m altitude to dynamic 2D trailer at 5m.
