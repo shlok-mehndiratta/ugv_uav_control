@@ -1,24 +1,10 @@
-"""
-Phase 1: Offline Tube Calculation for Event-Triggered Tube MPC
-Computes local feedback gain K, mRPI set, and tightened constraints.
-"""
-
 import numpy as np
 import scipy.linalg as la
 from itertools import product
 import pypoman
+from pathlib import Path
 
-# ==============================================================================
-# System Dynamics & Constants
-# ==============================================================================
-dt = 0.05  # Sample time (seconds)
-
-# Claude says: removed unused g=9.81. The model assumes az is already
-# gravity-compensated (net acceleration = thrust - g). This is the standard
-# linearisation for quadrotor control. The asymmetric Z input bounds
-# (u_lb_z=-4.0 vs u_ub_z=+4.0) reflect the physical thrust range after
-# subtracting the gravity baseline.
-
+dt = 0.05  #Sample time
 # State: x = [px, py, pz, vx, vy, vz]^T
 # Input: u = [ax, ay, az]^T  (gravity-compensated accelerations)
 
@@ -87,9 +73,9 @@ Hu, hu = box_constraints_to_h_representation(u_lb, u_ub)
 print(f"\nInput constraint H-representation: Hu shape {Hu.shape}, hu shape {hu.shape}")
 
 # State Constraints (X): 2m x 3m x 3m arena and velocity caps
-# p_x in [-1.0, 1.0], p_y in [-1.5, 1.5], p_z in [0.2, 2.8]
+# p_x in [-1.0, 1.0], p_y in [-1.5, 1.5], p_z in [0.0, 2.8]
 # v_x, v_y, v_z in [-1.5, 1.5]
-x_lb = np.array([-1.0, -1.5, 0.2, -1.5, -1.5, -1.5])
+x_lb = np.array([-1.0, -1.5, 0.0, -1.5, -1.5, -1.5])
 x_ub = np.array([1.0, 1.5, 2.8, 1.5, 1.5, 1.5])
 Hx, hx = box_constraints_to_h_representation(x_lb, x_ub)
 print(f"State constraint H-representation: Hx shape {Hx.shape}, hx shape {hx.shape}")
@@ -333,13 +319,9 @@ if arena_collapsed:
 else:
     print("\nSUCCESS: The arena survived the Pontryagin difference. The constraints are mathematically feasible.")
 
-# ==============================================================================
-# Save Results
-# ==============================================================================
-print("\nSaving results to tube_data_gemini.npz...")
-# Claude says: saving P (DARE solution) for use as terminal cost in MPC.
-# Using P as terminal cost provides a proper Lyapunov stability certificate.
-np.savez('tube_data_gemini.npz',
+# Save data relative to script location
+save_path = Path(__file__).resolve().parent / 'tube_data.npz'
+np.savez(save_path,
          A_d=A_d, B_d=B_d, K=K, A_k=A_k, P=P,
          Hx=Hx, hx=hx, Hu=Hu, hu=hu,
          Omega_H=Omega_H, Omega_h=Omega_h,
@@ -350,7 +332,7 @@ np.savez('tube_data_gemini.npz',
          u_lb=u_lb, u_ub=u_ub,
          Q=Q, R=R)
 
-print("Phase 1 complete! Data saved to tube_data_gemini.npz")
+print(f"Data saved to {save_path}")
 print("\nSummary:")
 print(f"- LQR gain K: {K.shape}")
 print(f"- A_k eigenvalues: {eigenvalues}")

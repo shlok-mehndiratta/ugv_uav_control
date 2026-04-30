@@ -21,6 +21,7 @@ Key difference from Tube MPC:
     - Logs trigger events for analysis
 """
 
+from pathlib import Path
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy
@@ -39,11 +40,15 @@ class ETTubeMPCNode(Node):
     def __init__(self):
         super().__init__('et_tube_mpc_node')
         
+        # Default data path
+        base_dir = Path(__file__).resolve().parent.parent
+        default_tube_path = str(base_dir / 'simulations' / 'tube_data.npz')
+        
         # Parameters
         self.declare_parameter('horizon', 20)
         self.declare_parameter('dt', 0.05)
         self.declare_parameter('control_rate', 20.0)  # Hz
-        self.declare_parameter('tube_data_path', '/home/ptc/IROS_paper/tube_data.npz')
+        self.declare_parameter('tube_data_path', default_tube_path)
         self.declare_parameter('waypoint_threshold', 0.1)
         self.declare_parameter('trigger_threshold', 0.15)  # Position error threshold (m)
         self.declare_parameter('consecutive_threshold', 3)  # Consecutive steps to trigger

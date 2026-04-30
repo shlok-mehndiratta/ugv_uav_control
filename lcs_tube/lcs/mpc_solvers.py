@@ -13,6 +13,7 @@ import numpy as np
 import cvxpy as cp
 import scipy.linalg as la
 import os
+from pathlib import Path
 from typing import List, Dict, Optional, Tuple
 
 
@@ -44,7 +45,8 @@ class StandardMPC:
         
         # Load system matrices and constraints
         if tube_data_path is None:
-            tube_data_path = '/home/ptc/IROS_paper/tube_data.npz'
+            base_dir = Path(__file__).resolve().parent.parent
+            tube_data_path = str(base_dir / 'simulations' / 'tube_data.npz')
         
         data = np.load(tube_data_path, allow_pickle=True)
         self.A_d = data['A_d']
@@ -169,7 +171,8 @@ class TubeMPC:
         
         # Load tube data
         if tube_data_path is None:
-            tube_data_path = '/home/ptc/IROS_paper/tube_data.npz'
+            base_dir = Path(__file__).resolve().parent.parent
+            tube_data_path = str(base_dir / 'simulations' / 'tube_data.npz')
         
         data = np.load(tube_data_path, allow_pickle=True)
         self.A_d = data['A_d']

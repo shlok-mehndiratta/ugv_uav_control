@@ -15,6 +15,7 @@ Publications:
     /drone/mpc_status (std_msgs/String): Solver status
 """
 
+from pathlib import Path
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy
@@ -33,11 +34,15 @@ class TubeMPCNode(Node):
     def __init__(self):
         super().__init__('tube_mpc_node')
         
+        # Default data path
+        base_dir = Path(__file__).resolve().parent.parent
+        default_tube_path = str(base_dir / 'simulations' / 'tube_data.npz')
+        
         # Parameters
         self.declare_parameter('horizon', 20)
         self.declare_parameter('dt', 0.05)
         self.declare_parameter('control_rate', 20.0)  # Hz
-        self.declare_parameter('tube_data_path', '/home/ptc/IROS_paper/tube_data.npz')
+        self.declare_parameter('tube_data_path', default_tube_path)
         self.declare_parameter('waypoint_threshold', 0.1)
         
         # Get parameters

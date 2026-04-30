@@ -64,6 +64,12 @@ def generate_launch_description():
         description='Seconds to wait before starting'
     )
     
+    drone_name_arg = DeclareLaunchArgument(
+        'drone_name',
+        default_value='cf10',
+        description='Drone name (used for odometry topic)'
+    )
+    
     # Waypoint Publisher Node
     waypoint_publisher_node = Node(
         package='lcs',
@@ -79,7 +85,7 @@ def generate_launch_description():
             'start_delay': LaunchConfiguration('start_delay'),
         }],
         remappings=[
-            ('/drone/odom', '/drone/odom'),
+            ('/drone/odom', ['/', LaunchConfiguration('drone_name'), '/odom']),
             ('/waypoint', '/waypoint'),
         ]
     )
@@ -91,5 +97,6 @@ def generate_launch_description():
         waypoint_threshold_arg,
         loop_arg,
         start_delay_arg,
+        drone_name_arg,
         waypoint_publisher_node,
     ])

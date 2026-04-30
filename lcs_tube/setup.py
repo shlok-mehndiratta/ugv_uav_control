@@ -1,3 +1,5 @@
+import os
+from glob import glob
 from setuptools import find_packages, setup
 
 package_name = 'lcs'
@@ -16,7 +18,9 @@ setup(
             'launch/et_tube_mpc.launch.py',
             'launch/crazyswarm_bridge.launch.py',
             'launch/waypoint_publisher.launch.py',
+            'launch/simple_gazebo.launch.py',
         ]),
+        ('share/' + package_name + '/urdf', ['urdf/simple_drone.urdf']),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -31,6 +35,7 @@ setup(
             'et_tube_mpc_node = lcs.et_tube_mpc_node:main',
             'crazyswarm_bridge_node = lcs.crazyswarm_bridge_node:main',
             'waypoint_publisher_node = lcs.waypoint_publisher_node:main',
+            'gazebo_bridge_node = lcs.gazebo_bridge_node:main',
         ],
     },
 )

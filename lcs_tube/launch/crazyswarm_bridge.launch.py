@@ -22,7 +22,7 @@ def generate_launch_description():
     # Launch arguments
     drone_name_arg = DeclareLaunchArgument(
         'drone_name',
-        default_value='cf1',
+        default_value='cf10',
         description='Drone name for Crazyswarm2 (topic: /{drone_name}/cmd_full_state)'
     )
     
@@ -51,7 +51,7 @@ def generate_launch_description():
         }],
         remappings=[
             ('/drone/cmd_accel', '/drone/cmd_accel'),
-            ('/drone/odom', '/drone/odom'),
+            ('/drone/odom', ['/', LaunchConfiguration('drone_name'), '/odom']),
         ]
     )
     
