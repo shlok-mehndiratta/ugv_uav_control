@@ -9,10 +9,14 @@ from launch_ros.actions import Node
 def launch_setup(context, *args, **kwargs):
     # 1. Get Arguments
     track_name = LaunchConfiguration('track_name').perform(context)
-    controller_type = LaunchConfiguration('controller').perform(context)
+    controller_type = LaunchConfiguration('controller').perform(context).lower().strip()
     force_fallback = LaunchConfiguration('force_fallback').perform(context)
     duration = LaunchConfiguration('duration').perform(context)
     exp_name = LaunchConfiguration('experiment_name').perform(context)
+    use_ancillary = LaunchConfiguration('use_ancillary').perform(context).lower().strip() == 'true'
+    
+    # DEBUG
+    print(f"[LAUNCH_DEBUG] controller_type: {controller_type}", flush=True)
     
     pkg_ugv = get_package_share_directory('ugv_uav_control')
     pkg_bot = get_package_share_directory('turtlebot3_gazebo')
@@ -76,18 +80,34 @@ def launch_setup(context, *args, **kwargs):
     # 5. Smart Controller Selection
     nodes_to_start = [spawn_ground, spawn_robot, bridge, robot_bridge, spawn_drone]
     
-    # Perception Nodes (modular architecture)
-    nodes_to_start.append(Node(package='ugv_uav_control', executable='aruco_detection_node', output='screen'))
-    nodes_to_start.append(Node(package='ugv_uav_control', executable='path_extraction_node', output='screen'))
+    # Perception: Original all-in-one node (ArUco + Path + Debug Window)
+    nodes_to_start.append(Node(package='ugv_uav_control', executable='middle_path_follower', output='screen'))
+    # Note: middle_path_follower publishes /aruco_pose, /waypoints, /middle_path/debug_image
+
     nodes_to_start.append(Node(package='ugv_uav_control', executable='ekf_node', output='screen',
+                               parameters=[{
+                                   'block_aruco': LaunchConfiguration('block_aruco'),
+                                   'block_aruco_start': LaunchConfiguration('block_aruco_start'),
+                                   'block_aruco_end': LaunchConfiguration('block_aruco_end'),
+                               }],
                                remappings=[('/uav_gps_pose', '/model/uav/pose')]))
     nodes_to_start.append(Node(package='ugv_uav_control', executable='uav_mpc_node', output='screen',
-                               parameters=[{'force_fallback': (force_fallback.lower() == 'true')}],
+                               parameters=[{
+                                   'force_fallback': (force_fallback.lower() == 'true'),
+                                   'z_opt': LaunchConfiguration('z_opt'),
+                                   'z_min': LaunchConfiguration('z_min'),
+                                   'z_max': LaunchConfiguration('z_max'),
+                                   'vz_max': LaunchConfiguration('vz_max'),
+                                   'w_alt': LaunchConfiguration('w_alt'),
+                                   'sigma_z': LaunchConfiguration('sigma_z'),
+                                   'use_timer': LaunchConfiguration('use_timer')
+                               }],
                                remappings=[('/uav_gps_pose', '/model/uav/pose'),
                                            ('/uav_cmd_vel', '/model/uav/cmd_vel')]))
                                            
     nodes_to_start.append(Node(package='ugv_uav_control', executable='experiment_logger', output='screen',
-                               parameters=[{'experiment_name': exp_name, 'duration': float(duration)}]))
+                               parameters=[{'experiment_name': exp_name, 'duration': float(duration)}],
+                               remappings=[('/uav_gps_pose', '/model/uav/pose')]))
     
     if controller_type == 'stanley':
         nodes_to_start.append(Node(package='ugv_uav_control', executable='stanley_node', output='screen'))
@@ -99,6 +119,26 @@ def launch_setup(context, *args, **kwargs):
         nodes_to_start.append(Node(package='ugv_uav_control', executable='belief_mpc_node', output='screen',
                                    remappings=[('/uav_gps_pose', '/model/uav/pose')])) 
 
+    # Ancillary Controller (High-frequency correction)
+    if use_ancillary:
+        nodes_to_start.append(Node(
+                package='ugv_uav_control',
+                executable='uav_ancillary_node',
+                name='uav_ancillary_node',
+                parameters=[{
+                    'alpha_min': LaunchConfiguration('alpha_min'),
+                    'alpha_max': LaunchConfiguration('alpha_max'),
+                    'tr_min': LaunchConfiguration('tr_min'),
+                    'tr_max': LaunchConfiguration('tr_max'),
+                    'tr_spike_threshold': LaunchConfiguration('tr_spike_threshold'),
+                    'kappa_thresh': LaunchConfiguration('kappa_thresh'),
+                    'drift_threshold': LaunchConfiguration('drift_threshold'),
+                    'T_min': LaunchConfiguration('T_min'),
+                }],
+                remappings=[('/uav_gps_pose', '/model/uav/pose')],
+                output='screen'
+            ))
+
     return nodes_to_start
 
 def generate_launch_description():
@@ -107,10 +147,35 @@ def generate_launch_description():
     
     # Define Arguments
     arg_track = DeclareLaunchArgument('track_name', default_value='track4.png', description='Texture file to usage')
-    arg_ctrl = DeclareLaunchArgument('controller', default_value='stanley', description='Controller node to launch')
+    arg_ctrl = DeclareLaunchArgument('controller', default_value='belief_mpc', description='Controller node to launch')
     arg_fallback = DeclareLaunchArgument('force_fallback', default_value='false', description='Force UAV fallback policy')
     arg_dur = DeclareLaunchArgument('duration', default_value='60.0', description='Experiment duration in seconds')
     arg_name = DeclareLaunchArgument('experiment_name', default_value='study_run', description='Experiment name')
+    arg_use_timer = DeclareLaunchArgument('use_timer', default_value='false', description='Enable 1Hz timer in MPC (legacy)')
+    arg_use_ancillary = DeclareLaunchArgument('use_ancillary', default_value='true', description='Launch Ancillary node')
+
+    # New 3D Trajectory Parameters
+    arg_z_opt = DeclareLaunchArgument('z_opt', default_value='6.0')
+    arg_z_min = DeclareLaunchArgument('z_min', default_value='3.0')
+    arg_z_max = DeclareLaunchArgument('z_max', default_value='10.0')
+    arg_vz_max = DeclareLaunchArgument('vz_max', default_value='1.0')
+    arg_w_alt = DeclareLaunchArgument('w_alt', default_value='50.0')
+    arg_sigma_z = DeclareLaunchArgument('sigma_z', default_value='3.0')
+
+    # Phase 2: Tube MPC / Event Trigger Params
+    arg_alpha_min = DeclareLaunchArgument('alpha_min', default_value='0.5')
+    arg_alpha_max = DeclareLaunchArgument('alpha_max', default_value='2.0')
+    arg_tr_min = DeclareLaunchArgument('tr_min', default_value='0.005')
+    arg_tr_max = DeclareLaunchArgument('tr_max', default_value='0.15')
+    arg_tr_spike = DeclareLaunchArgument('tr_spike_threshold', default_value='0.12')
+    arg_kappa = DeclareLaunchArgument('kappa_thresh', default_value='0.4')
+    arg_drift = DeclareLaunchArgument('drift_threshold', default_value='0.07')
+    arg_tmin = DeclareLaunchArgument('T_min', default_value='3.0')
+    
+    # Sanity Check Arguments
+    arg_block = DeclareLaunchArgument('block_aruco', default_value='false')
+    arg_bstart = DeclareLaunchArgument('block_aruco_start', default_value='25.0')
+    arg_bend = DeclareLaunchArgument('block_aruco_end', default_value='30.0')
 
     # Environment
     gz_sim_path = SetEnvironmentVariable(name='GZ_SIM_RESOURCE_PATH', 
@@ -118,7 +183,7 @@ def generate_launch_description():
 
     gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(pkg_gz, 'launch', 'gz_sim.launch.py')),
-        launch_arguments={'gz_args': f'-r -s {os.path.join(pkg_ugv, "worlds", "path_following.world")}'}.items(),
+        launch_arguments={'gz_args': f'-r {os.path.join(pkg_ugv, "worlds", "path_following.world")}'}.items(),
     )
 
     return LaunchDescription([
@@ -127,6 +192,25 @@ def generate_launch_description():
         arg_fallback,
         arg_dur,
         arg_name,
+        arg_use_timer,
+        arg_use_ancillary,
+        arg_z_opt,
+        arg_z_min,
+        arg_z_max,
+        arg_vz_max,
+        arg_w_alt,
+        arg_sigma_z,
+        arg_alpha_min,
+        arg_alpha_max,
+        arg_tr_min,
+        arg_tr_max,
+        arg_tr_spike,
+        arg_kappa,
+        arg_drift,
+        arg_tmin,
+        arg_block,
+        arg_bstart,
+        arg_bend,
         gz_sim_path,
         gz_sim,
         OpaqueFunction(function=launch_setup)

@@ -47,12 +47,12 @@ source install/setup.bash
 ```
 
 ### Running the System
-**Full Belief-Space MPC (Recommended):**
+**Full Phase 2 Tube MPC (Recommended):**
 ```bash
-ros2 launch ugv_uav_control middle_path_follower.launch.py controller:=belief_mpc
+ros2 launch ugv_uav_control middle_path_follower.launch.py controller:=belief_mpc use_timer:=false use_ancillary:=true
 ```
 
-**Baseline Evaluation (Centroid Fallback):**
+**Phase 1 Baseline Evaluation (Fixed 1Hz rate, no tube):**
 ```bash
-ros2 launch ugv_uav_control middle_path_follower.launch.py controller:=belief_mpc force_fallback:=true
+ros2 launch ugv_uav_control middle_path_follower.launch.py controller:=belief_mpc use_timer:=true use_ancillary:=false
 ```

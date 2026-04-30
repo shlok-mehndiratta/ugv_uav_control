@@ -91,17 +91,17 @@ Nodes find their weights in the `ugv_uav_control` namespace:
 
 ## 11. Deployment Instructions
 
-### Launching the Full System
+### Launching the Full Phase 2 System (Tube MPC)
 ```bash
-ros2 launch ugv_uav_control middle_path_follower.launch.py controller:=belief_mpc
+ros2 launch ugv_uav_control middle_path_follower.launch.py controller:=belief_mpc use_timer:=false use_ancillary:=true
 ```
 
 ### Running Evaluation Conditions
-To toggle between the optimizer and the simple baseline:
+To toggle between the full Phase 2 optimizer and the Phase 1 simple baseline:
 ```bash
-# Full MPC
-ros2 launch ugv_uav_control middle_path_follower.launch.py force_fallback:=false
+# Full Phase 2 Tube MPC (Event-Triggered + Ancillary)
+ros2 launch ugv_uav_control middle_path_follower.launch.py controller:=belief_mpc use_timer:=false use_ancillary:=true
 
-# Baseline Only
-ros2 launch ugv_uav_control middle_path_follower.launch.py force_fallback:=true
+# Phase 1 Baseline Only (1Hz Fixed Rate, No Ancillary)
+ros2 launch ugv_uav_control middle_path_follower.launch.py controller:=belief_mpc use_timer:=true use_ancillary:=false
 ```

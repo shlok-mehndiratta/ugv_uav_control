@@ -55,7 +55,6 @@ class BeliefMPCNode(Node):
         self.fov_angle = 1.047  # 60 degrees
 
         # Compute FoV radius
-        self.fov_radius = self.uav_z * np.tan(self.fov_angle / 2)  # ~2.89 m
 
         # Observability smoothing parameter
         self.gamma_k = 5.0  # Sigmoid sharpness
@@ -65,14 +64,12 @@ class BeliefMPCNode(Node):
         self.R_obs_base = np.diag([0.0025, 0.0025, 0.01, 0.0004, 0.0025])
         
         # UAV state for dynamic R_k
-        self.uav_pos = np.array([0.0, 0.0])
+        self.uav_pos = np.array([0.0, 0.0, 5.0])
         self.last_log_time_mpc = self.get_clock().now()
         self.last_log_time_sigma = self.get_clock().now()
-        
-        self.get_logger().info(f'FoV radius: {self.fov_radius:.2f} m')
+        self.fov_angle = 1.047
 
     
-        self.get_logger().info(f'FoV radius: {self.fov_radius:.2f} m')
     
     # =========================================
     # BELIEF-SPACE COST FUNCTION
@@ -111,7 +108,7 @@ class BeliefMPCNode(Node):
             if gamma > 0.01:
                 # Use shared logic for R_k and Sigma_obs
                 R_k, q_k = ugv_model.get_dynamic_R(
-                    self.uav_pos, world_mu[:2], self.R_obs_base, self.fov_radius
+                    self.uav_pos, world_mu[:2], self.R_obs_base
                 )
                 Sigma_obs = ugv_model.kalman_update(Sigma_pred, self.H_obs, R_k)
                 Sigma = (1 - gamma) * Sigma_pred + gamma * Sigma_obs
@@ -144,7 +141,8 @@ class BeliefMPCNode(Node):
             uncertainty_cost = np.trace(Sigma)
             
             # Optional: Add explicit FoV-exit penalty
-            fov_penalty = max(0, d - self.fov_radius)**2  # Penalty for leaving FoV
+            r_fov_curr = self.uav_pos[2] * np.tan(self.fov_angle / 2.0)
+            fov_penalty = max(0, d - r_fov_curr)**2  # Penalty for leaving FoV
             
             # ========================================
             # TOTAL COST
@@ -201,9 +199,12 @@ class BeliefMPCNode(Node):
     def uav_callback(self, msg):
         # Handle both Pose and PoseStamped for robustness
         if hasattr(msg, 'pose'):
-            self.uav_pos = np.array([msg.pose.position.x, msg.pose.position.y])
+            self.uav_pos = np.array([msg.pose.position.x, msg.pose.position.y, msg.pose.position.z])
         else:
-            self.uav_pos = np.array([msg.position.x, msg.position.y])
+            self.uav_pos = np.array([msg.position.x, msg.position.y, msg.position.z])
+        
+        # Keep uav_x/y/z legacy fields updated if referenced
+        self.uav_x, self.uav_y, self.uav_z = self.uav_pos
     
     def waypoint_callback(self, msg):
         """Optimize control given target waypoint in ROBOT FRAME."""
@@ -284,12 +285,10 @@ class BeliefMPCNode(Node):
         d = np.sqrt(dx**2 + dy**2)
         
         # Smooth sigmoid: γ = 1 / (1 + exp(k * (d - r)))
-        gamma = 1.0 / (1.0 + np.exp(self.gamma_k * (d - self.fov_radius)))
+        r_fov_curr = self.uav_pos[2] * np.tan(self.fov_angle / 2.0)
+        gamma = 1.0 / (1.0 + np.exp(self.gamma_k * (d - r_fov_curr)))
         
         return gamma, d
-
-
-        self.traj_pub.publish(path_msg)
 
     def publish_predicted_trajectory(self, u_opt, start_mu):
         """Perform final rollout and publish as Path message."""

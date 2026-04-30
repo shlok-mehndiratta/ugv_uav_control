@@ -68,16 +68,15 @@ def kalman_update(Sigma, H, R):
     Sigma_updated = (Sigma_updated + Sigma_updated.T) / 2.0
     return Sigma_updated
 
-def get_dynamic_R(uav_pos, ugv_pos_world, R_base, fov_radius, sharpness=5.0):
+def get_dynamic_R(uav_pos, ugv_pos_world, R_base, sharpness=5.0):
     """
     Compute dynamic measurement noise based on UAV-UGV view quality.
-    uav_pos: [x, y]
+    uav_pos: [x, y, z]
     ugv_pos_world: [x, y]
     """
     q_k = compute_view_quality(
-        uav_pos[0], uav_pos[1],
+        uav_pos[0], uav_pos[1], uav_pos[2],
         ugv_pos_world[0], ugv_pos_world[1],
-        r_fov=fov_radius,
         sharpness=sharpness
     )
     # Scale R inversely with quality (add epsilon to avoid division by zero)

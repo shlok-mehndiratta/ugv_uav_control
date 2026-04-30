@@ -37,20 +37,19 @@ class ExperimentLogger(Node):
             'cov_xx': [], 'cov_yy': [], 'cov_tt': [],
             'fov_distance': [],
             'aruco_visible': [],
-            'uav_x': [], 'uav_y': [],
+            'uav_x': [], 'uav_y': [], 'uav_z': [],
             'uav_dist': [],
             'q_k': [],
         }
 
         # UAV FoV parameters
-        self.uav_x, self.uav_y = 0.0, 0.0
-        self.fov_radius = 2.89
+        self.uav_x, self.uav_y, self.uav_z = 0.0, 0.0, 5.0
 
         # State cache
         self.current_cmd = [0.0, 0.0]
         self.current_target = [0.0, 0.0]
         self.current_pose = [0.0, 0.0, 0.0]  # x, y, theta
-        self.current_cov = [0.0, 0.0, 0.0]  # cov_xx, cov_yy, cov_tt
+        self.current_cov = [0.0, 0.0, 0.0, 0.0, 0.0]  # cov_xx, cov_yy, cov_vv, cov_ww, cov_tt
         self.aruco_visible = False
         self.has_pose = False
 
@@ -87,6 +86,7 @@ class ExperimentLogger(Node):
     # =========================================
     def belief_cb(self, msg):
         """Primary pose source when EKF is active."""
+        # print("[DEBUG] Belief received")
         self.current_pose[0] = msg.pose.pose.position.x
         self.current_pose[1] = msg.pose.pose.position.y
         q = msg.pose.pose.orientation
@@ -95,9 +95,11 @@ class ExperimentLogger(Node):
             1 - 2 * (q.y * q.y + q.z * q.z))
 
         cov = np.array(msg.pose.covariance).reshape(6, 6)
-        self.current_cov[0] = cov[0, 0]
-        self.current_cov[1] = cov[1, 1]
-        self.current_cov[2] = cov[5, 5]
+        self.current_cov[0] = cov[0, 0] # x
+        self.current_cov[1] = cov[1, 1] # y
+        self.current_cov[2] = cov[2, 2] # v (mapped to z)
+        self.current_cov[3] = cov[3, 3] # w (mapped to roll)
+        self.current_cov[4] = cov[5, 5] # theta (yaw)
         self.has_pose = True
 
     def odom_cb(self, msg):
@@ -111,8 +113,10 @@ class ExperimentLogger(Node):
                 1 - 2 * (q.y * q.y + q.z * q.z))
 
     def uav_cb(self, msg):
+        # print("[DEBUG] UAV pose received")
         self.uav_x = msg.position.x
         self.uav_y = msg.position.y
+        self.uav_z = msg.position.z
 
     def cmd_cb(self, msg):
         self.current_cmd = [msg.twist.linear.x, msg.twist.angular.z]
@@ -143,6 +147,9 @@ class ExperimentLogger(Node):
                      self.last_aruco_time).nanoseconds / 1e9
         if aruco_age > 0.5:
             self.aruco_visible = False
+            
+        if elapsed < 2.0: # Check connectivity early
+            self.get_logger().info(f"[DEBUG] has_pose: {self.has_pose}, uav_z: {self.uav_z}")
 
         x, y, theta = self.current_pose
         fov_dist = math.sqrt((x - self.uav_x)**2 + (y - self.uav_y)**2)
@@ -169,9 +176,10 @@ class ExperimentLogger(Node):
         # Enhanced Study Metrics
         self.data['uav_x'].append(self.uav_x)
         self.data['uav_y'].append(self.uav_y)
+        self.data['uav_z'].append(self.uav_z)
         self.data['uav_dist'].append(fov_dist)
         
-        qk = view_quality.compute_view_quality(self.uav_x, self.uav_y, x, y, r_fov=self.fov_radius)
+        qk = view_quality.compute_view_quality(self.uav_x, self.uav_y, self.uav_z, x, y)
         self.data['q_k'].append(qk)
 
     # =========================================
@@ -207,8 +215,11 @@ class ExperimentLogger(Node):
                     self.data['v_cmd'][:-1], self.data['w_cmd'][:-1],
                     self.data['v_cmd'][1:], self.data['w_cmd'][1:])]
 
-            fov_exits = sum(
-                1 for d in self.data['fov_distance'] if d > self.fov_radius)
+            fov_exits = 0
+            for d, z in zip(self.data['fov_distance'], self.data['uav_z']):
+                r_fov_z = z * math.tan(1.047 / 2.0)
+                if d > r_fov_z:
+                    fov_exits += 1
 
             aruco_pct = (sum(self.data['aruco_visible']) / n * 100
                          if n > 0 else 0)

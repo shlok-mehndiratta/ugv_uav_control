@@ -40,6 +40,7 @@ class EKFNode(Node):
         self.dt = 0.05  # 20 Hz prediction rate
         self.alpha_v = 2.0   # 1/τ_v (τ_v = 0.5s)
         self.alpha_w = 5.0   # 1/τ_w (τ_w = 0.2s)
+        self.start_time_ekf = self.get_clock().now()
         
         # Process Noise Q
         self.Q = np.diag([1e-4, 1e-4, 4e-4, 1e-4, 2.5e-3])
@@ -54,11 +55,13 @@ class EKFNode(Node):
         self.aruco_timeout = 2.0  # seconds
         
         # UAV state for dynamic R_k
-        self.uav_pos = np.array([0.0, 0.0])
-        self.uav_z = 5.0
-        self.fov_angle = 1.047 # 60 degrees
-        self.fov_radius = self.uav_z * np.tan(self.fov_angle / 2) # ~2.89 m
+        self.uav_pos = np.array([0.0, 0.0, 5.0])
         self.last_log_time_ekf = self.get_clock().now()
+
+        # Sanity Check: ArUco Blocking
+        self.declare_parameter('block_aruco', False)
+        self.declare_parameter('block_aruco_start', 25.0)
+        self.declare_parameter('block_aruco_end', 30.0)
         
         # === SUBSCRIBERS ===
         self.create_subscription(TwistStamped, '/cmd_vel', self.cmd_callback, 10)
@@ -135,6 +138,7 @@ class EKFNode(Node):
         """Update UAV position for view quality calculation."""
         self.uav_pos[0] = msg.position.x
         self.uav_pos[1] = msg.position.y
+        self.uav_pos[2] = msg.position.z
     
     def odom_callback(self, msg):
         """
@@ -151,12 +155,19 @@ class EKFNode(Node):
         ], dtype=float)
         
         self.update_step(z, H, self.R_odom)
-    
     def aruco_callback(self, msg):
         """
         Update with ArUco pose measurement (x, y, θ).
         Full 5-state update: pose from ArUco, velocity from current estimate.
         """
+        # --- Sanity Check: Blocking Logic ---
+        if self.get_parameter('block_aruco').value:
+            elapsed = (self.get_clock().now() - self.start_time_ekf).nanoseconds / 1e9
+            t_start = self.get_parameter('block_aruco_start').value
+            t_end = self.get_parameter('block_aruco_end').value
+            if elapsed >= t_start and elapsed <= t_end:
+                return
+
         x_aruco = msg.pose.position.x
         y_aruco = msg.pose.position.y
         q = msg.pose.orientation
@@ -170,7 +181,7 @@ class EKFNode(Node):
         
         # --- DYNAMIC R_k ---
         R_k, q_k = ugv_model.get_dynamic_R(
-            self.uav_pos, [x_aruco, y_aruco], self.R_full, self.fov_radius
+            self.uav_pos, [x_aruco, y_aruco], self.R_full
         )
         
         self.update_step(z, H, R_k)
@@ -211,15 +222,16 @@ class EKFNode(Node):
         # Covariance: 6x6 matrix (x, y, z, roll, pitch, yaw)
         # We populate the relevant entries from our 5x5 Sigma
         cov = np.zeros((6, 6))
-        cov[0, 0] = self.Sigma[0, 0]  # x-x
-        cov[0, 1] = self.Sigma[0, 1]  # x-y
-        cov[1, 0] = self.Sigma[1, 0]  # y-x
-        cov[1, 1] = self.Sigma[1, 1]  # y-y
-        cov[5, 5] = self.Sigma[2, 2]  # yaw-yaw
-        cov[0, 5] = self.Sigma[0, 2]  # x-yaw
-        cov[5, 0] = self.Sigma[2, 0]  # yaw-x
-        cov[1, 5] = self.Sigma[1, 2]  # y-yaw
-        cov[5, 1] = self.Sigma[2, 1]  # yaw-y
+        cov[0, 0] = self.Sigma[0, 0]  # x
+        cov[1, 1] = self.Sigma[1, 1]  # y
+        cov[2, 2] = self.Sigma[3, 3]  # v (mapped to z)
+        cov[3, 3] = self.Sigma[4, 4]  # w (mapped to roll)
+        cov[5, 5] = self.Sigma[2, 2]  # theta (yaw)
+        
+        # Off-diagonals for pose only
+        cov[0, 1] = self.Sigma[0, 1]; cov[1, 0] = self.Sigma[1, 0]
+        cov[0, 5] = self.Sigma[0, 2]; cov[5, 0] = self.Sigma[2, 0]
+        cov[1, 5] = self.Sigma[1, 2]; cov[5, 1] = self.Sigma[2, 1]
         
         msg.pose.covariance = cov.flatten().tolist()
         

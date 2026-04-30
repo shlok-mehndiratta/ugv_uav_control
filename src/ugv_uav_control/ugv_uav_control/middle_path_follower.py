@@ -39,7 +39,7 @@ class MiddlePathFollower(Node):
             
         self.aruco_params.minMarkerPerimeterRate = 0.01
         
-        self.camera_height = 10.0
+        self.camera_height = 5.0
         self.fov = 1.047 # 60 degrees
         self.image_width = None
         self.scale = None

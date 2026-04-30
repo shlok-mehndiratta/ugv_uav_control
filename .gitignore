@@ -25,3 +25,5 @@ Thumbs.db
 
 # --- Project specific ---
 # We keep docs/ and scripts/ as they are part of the source
+view_quality_3d_test.png
+results/
