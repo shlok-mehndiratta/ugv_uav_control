@@ -32,7 +32,7 @@ def run_simulation(T_sim=200, seed=None, disturbance_func=None, waypoints=None):
     current_wp_idx = 0
     x_ref = waypoints[current_wp_idx]
 
-    # Claude says: terminal cost uses DARE solution for proper stability certificate
+    #  terminal cost uses DARE solution for proper stability certificate
     P_terminal = la.solve_discrete_are(A_d, B_d, Q_mpc, R_mpc)
 
     X_bar = cp.Variable((6, N + 1))
@@ -44,7 +44,7 @@ def run_simulation(T_sim=200, seed=None, disturbance_func=None, waypoints=None):
     for k in range(N):
         cost += cp.quad_form(X_bar[:, k] - x_ref_param, Q_mpc)
         cost += cp.quad_form(U_bar[:, k], R_mpc)
-    # Claude says: terminal cost uses P_terminal (DARE solution) instead of Q_mpc
+    #  terminal cost uses P_terminal (DARE solution) instead of Q_mpc
     cost += cp.quad_form(X_bar[:, N] - x_ref_param, P_terminal)
 
     constraints = []
@@ -58,7 +58,7 @@ def run_simulation(T_sim=200, seed=None, disturbance_func=None, waypoints=None):
 
     problem = cp.Problem(cp.Minimize(cost), constraints)
 
-    # Claude says: disturbance model correctly separates process noise and
+    #  disturbance model correctly separates process noise and
     # measurement noise, matching Phase 1's error dynamics model exactly.
     def default_disturbance(k):
         """Returns (w_process, v_k) tuple matching Phase 1 error dynamics model."""
@@ -118,18 +118,18 @@ def run_simulation(T_sim=200, seed=None, disturbance_func=None, waypoints=None):
         u_bar_k = U_nom_traj[:, 0]
         x_bar_k = X_nom_traj[:, 0]
         
-        # Claude says: measurement noise v_k corrupts the controller's state estimate
+        #  measurement noise v_k corrupts the controller's state estimate
         w_process, v_k = disturbance_func(k)
         x_measured = x_true + v_k
         u_true = u_bar_k - K @ (x_measured - x_bar_k)
         
-        # Claude says: log clip violations as they indicate tube invariance breach
+        #  log clip violations as they indicate tube invariance breach
         u_unclipped = u_true.copy()
         u_true = np.clip(u_true, u_lb, u_ub)
         if not np.allclose(u_true, u_unclipped):
             clip_violations += 1
         
-        # Claude says: only process noise enters the plant dynamics
+        #  only process noise enters the plant dynamics
         x_true = A_d @ x_true + B_d @ u_true + w_process
         
         x_true_history[:, k + 1] = x_true

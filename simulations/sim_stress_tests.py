@@ -337,7 +337,7 @@ if __name__ == '__main__':
     # ===== Plotting Configuration =====
     COLORS = {'Standard MPC': '#e74c3c', 'Full Tube MPC': '#8e44ad', 'ET Tube MPC': '#27ae60'}
     STYLES = {'Standard MPC': ':', 'Full Tube MPC': '-.', 'ET Tube MPC': '-'}
-    WIDTHS = {'Standard MPC': 1.5, 'Full Tube MPC': 1.5, 'ET Tube MPC': 2.0}
+    WIDTHS = {'Standard MPC': 1.5, 'Full Tube MPC': 2.0, 'ET Tube MPC': 1.5}
     t_vec = np.arange(T_SIM + 1) * dt
     t_ctrl = np.arange(T_SIM) * dt
     save_dir = base_dir / "plots"
@@ -445,135 +445,198 @@ if __name__ == '__main__':
     except Exception as e:
         print(f"Could not plot initial tube: {e}")
 
-    # --- Figure 1: XY Trajectory (2x2 grid) ---
-    fig1, axes1 = plt.subplots(2, 2, figsize=(12, 10))
+    # --- Figure 1: 3D Trajectory Comparison (2x2 grid) ---
+    fig1 = plt.figure(figsize=(14, 11))
     for idx, sname in enumerate(SCENARIOS):
-        ax = axes1[idx // 2, idx % 2]
         standard, full_tube, tube = all_results[sname]
-        # Arena boundary
-        rect = plt.Rectangle((arena_x[0], arena_y[0]), arena_x[1]-arena_x[0],
-                              arena_y[1]-arena_y[0], fill=False, ec='gray',
-                              ls='--', lw=1.5, label='Arena')
-        ax.add_patch(rect)
+        ax = fig1.add_subplot(2, 2, idx + 1, projection='3d')
         for res in [standard, full_tube, tube]:
             v = ~np.isnan(res['x_hist'][0, :])
-            ax.plot(res['x_hist'][0, v], res['x_hist'][1, v],
+            ax.plot(res['x_hist'][0, v], res['x_hist'][1, v], res['x_hist'][2, v],
                     color=COLORS[res['ctrl_name']], ls=STYLES[res['ctrl_name']],
-                    lw=WIDTHS[res['ctrl_name']], label=res['ctrl_name'])
+                    lw=WIDTHS[res['ctrl_name']], label=res['ctrl_name'], alpha=0.85)
+        # Waypoints
         for i, wp in enumerate(WAYPOINTS):
-            ax.scatter(wp[0], wp[1], c='purple', s=120, marker='X', zorder=10,
+            ax.scatter(wp[0], wp[1], wp[2], c='purple', s=100, marker='X', zorder=10,
                        label='Waypoints' if i == 0 else None)
-        ax.scatter(tube['x_hist'][0, 0], tube['x_hist'][1, 0], c='cyan', s=80,
-                   marker='o', edgecolors='k', zorder=10, label='Start')
-        ax.set_xlabel('X (m)'); ax.set_ylabel('Y (m)')
+        # Start
+        ax.scatter(*tube['x_hist'][:3, 0], c='cyan', s=80, marker='o',
+                   edgecolors='k', zorder=10, label='Start')
+        # Arena wireframe (12 edges of the bounding box)
+        for xe, ye, ze in [
+            ([arena_x[0], arena_x[1]], [arena_y[0], arena_y[0]], [arena_z[0], arena_z[0]]),
+            ([arena_x[1], arena_x[1]], [arena_y[0], arena_y[1]], [arena_z[0], arena_z[0]]),
+            ([arena_x[1], arena_x[0]], [arena_y[1], arena_y[1]], [arena_z[0], arena_z[0]]),
+            ([arena_x[0], arena_x[0]], [arena_y[1], arena_y[0]], [arena_z[0], arena_z[0]]),
+            ([arena_x[0], arena_x[1]], [arena_y[0], arena_y[0]], [arena_z[1], arena_z[1]]),
+            ([arena_x[1], arena_x[1]], [arena_y[0], arena_y[1]], [arena_z[1], arena_z[1]]),
+            ([arena_x[1], arena_x[0]], [arena_y[1], arena_y[1]], [arena_z[1], arena_z[1]]),
+            ([arena_x[0], arena_x[0]], [arena_y[1], arena_y[0]], [arena_z[1], arena_z[1]]),
+            ([arena_x[0], arena_x[0]], [arena_y[0], arena_y[0]], [arena_z[0], arena_z[1]]),
+            ([arena_x[1], arena_x[1]], [arena_y[0], arena_y[0]], [arena_z[0], arena_z[1]]),
+            ([arena_x[1], arena_x[1]], [arena_y[1], arena_y[1]], [arena_z[0], arena_z[1]]),
+            ([arena_x[0], arena_x[0]], [arena_y[1], arena_y[1]], [arena_z[0], arena_z[1]]),
+        ]:
+            ax.plot(xe, ye, ze, color='gray', ls='--', lw=0.8, alpha=0.4)
+        ax.set_xlabel('X (m)', fontsize=8); ax.set_ylabel('Y (m)', fontsize=8)
+        ax.set_zlabel('Z (m)', fontsize=8)
         ax.set_title(tube['label'], fontweight='bold', fontsize=10)
-        ax.set_xlim(arena_x[0]-0.3, arena_x[1]+0.3)
-        ax.set_ylim(arena_y[0]-0.3, arena_y[1]+0.3)
-        ax.set_aspect('equal'); ax.grid(True, alpha=0.3)
-        if idx == 0: ax.legend(fontsize=7, loc='upper right')
-    fig1.suptitle('XY Trajectory Comparison', fontsize=13, fontweight='bold')
+        ax.set_xlim(arena_x); ax.set_ylim(arena_y); ax.set_zlim(arena_z)
+        ax.view_init(elev=22, azim=225)
+        ax.grid(True, alpha=0.25)
+        if idx == 0:
+            ax.legend(fontsize=6, loc='upper right')
+    fig1.suptitle('3D Trajectory Comparison Across Scenarios', fontsize=13, fontweight='bold')
     fig1.tight_layout(rect=[0, 0, 1, 0.96])
-    fig1.savefig(save_dir / 'fig1_xy_trajectory.png', dpi=200, bbox_inches='tight')
-    print("Saved fig1_xy_trajectory.png")
+    fig1.savefig(save_dir / 'fig1_3d_trajectory.png', dpi=200, bbox_inches='tight')
+    print("Saved fig1_3d_trajectory.png")
 
-    # --- Figure 2: Position Error Over Time (2x2 grid) ---
-    fig2, axes2 = plt.subplots(2, 2, figsize=(12, 8))
+    # --- Figure 2: Per-Axis Tracking Error with Tube Bounds (2×2 scenarios, 3 axes each) ---
+    # Compute per-axis tube half-widths from Omega (positional RPI bounds)
+    # The tight constraint half-widths give the maximum error the tube permits
+    hx_tight_ub = hx_tight[:6]   # upper bounds for each state
+    hx_tight_lb = -hx_tight[6:]  # lower bounds for each state
+    tube_pos_hw = [(x_ub[i] - hx_tight_ub[i] + hx_tight_lb[i] - x_lb[i]) / 2.0
+                   for i in range(3)]  # half the tightening margin = tube half-width
+
+    fig2, big_axes = plt.subplots(4, 3, figsize=(14, 14), sharex=True)
+    axis_labels = ['X Error (m)', 'Y Error (m)', 'Z Error (m)']
+    for row, sname in enumerate(SCENARIOS):
+        standard, full_tube, tube = all_results[sname]
+        # Build reference history for this scenario
+        for col, ax_i in enumerate(range(3)):
+            ax = big_axes[row, col]
+            for res in [standard, full_tube, tube]:
+                v = ~np.isnan(res['x_hist'][0, :])
+                ref_h = np.zeros(res['x_hist'].shape[1])
+                wp_idx = 0; ref_wp = WAYPOINTS[0][0:3]
+                for kk in range(res['x_hist'].shape[1]):
+                    xk = res['x_hist'][0:3, kk]
+                    if not np.isnan(xk[0]) and wp_idx < len(WAYPOINTS)-1:
+                        if np.linalg.norm(xk - ref_wp) < 0.2:
+                            wp_idx += 1; ref_wp = WAYPOINTS[wp_idx][0:3]
+                    ref_h[kk] = ref_wp[ax_i]
+                err_axis = res['x_hist'][ax_i, :] - ref_h
+                ax.plot(t_vec[v], err_axis[v], color=COLORS[res['ctrl_name']],
+                        ls=STYLES[res['ctrl_name']], lw=WIDTHS[res['ctrl_name']],
+                        label=res['ctrl_name'], alpha=0.85)
+            # Tube bound shading
+            ax.axhspan(-tube_pos_hw[ax_i], tube_pos_hw[ax_i],
+                       alpha=0.08, color='#27ae60', label='Tube Bound' if row == 0 and col == 0 else None)
+            ax.axhline(-tube_pos_hw[ax_i], color='#27ae60', ls=':', lw=1.0, alpha=0.7)
+            ax.axhline( tube_pos_hw[ax_i], color='#27ae60', ls=':', lw=1.0, alpha=0.7)
+            ax.axhline(0, color='black', ls='-', lw=0.5, alpha=0.4)
+            ax.set_ylabel(axis_labels[col], fontsize=8)
+            ax.grid(True, alpha=0.3)
+            if row == 0:
+                ax.set_title(axis_labels[col], fontweight='bold', fontsize=10)
+                if col == 0:
+                    ax.legend(fontsize=6, loc='upper right')
+            if row == len(SCENARIOS) - 1:
+                ax.set_xlabel('Time (s)', fontsize=8)
+            if col == 0:
+                ax.annotate(SCENARIOS[sname]['label'], xy=(-0.28, 0.5), xycoords='axes fraction',
+                            fontsize=8, fontweight='bold', rotation=90, va='center')
+    fig2.suptitle('Per-Axis Tracking Error with Tube Bounds (green band = RPI guarantee)',
+                  fontsize=13, fontweight='bold')
+    fig2.tight_layout(rect=[0.03, 0, 1, 0.97])
+    fig2.savefig(save_dir / 'fig2_axis_error_tube.png', dpi=200, bbox_inches='tight')
+    print("Saved fig2_axis_error_tube.png")
+
+    # --- Figure 3: Altitude (Z) Safety — All Scenarios ---
+    fig3, axes3 = plt.subplots(2, 2, figsize=(13, 9), sharex=True)
     for idx, sname in enumerate(SCENARIOS):
-        ax = axes2[idx // 2, idx % 2]
+        ax = axes3[idx // 2, idx % 2]
         standard, full_tube, tube = all_results[sname]
         for res in [standard, full_tube, tube]:
             v = ~np.isnan(res['x_hist'][0, :])
-            pos_err = np.linalg.norm(res['x_hist'][0:3, v] -
-                                     res['x_hist'][0:3, 0:1], axis=0)
-            # Compute error vs reference
-            ref_h = np.zeros((3, res['x_hist'].shape[1]))
-            wp_idx = 0; ref_wp = WAYPOINTS[0][0:3]
-            for kk in range(res['x_hist'].shape[1]):
-                xk = res['x_hist'][0:3, kk]
-                if not np.isnan(xk[0]):
-                    if wp_idx < len(WAYPOINTS)-1 and np.linalg.norm(xk - ref_wp) < 0.2:
-                        wp_idx += 1; ref_wp = WAYPOINTS[wp_idx][0:3]
-                ref_h[:, kk] = ref_wp
-            err = np.linalg.norm(res['x_hist'][0:3, v] - ref_h[:, v], axis=0)
-            ax.plot(t_vec[:len(err)], err, color=COLORS[res['ctrl_name']],
-                    ls=STYLES[res['ctrl_name']], lw=WIDTHS[res['ctrl_name']],
-                    label=res['ctrl_name'])
-        ax.set_xlabel('Time (s)'); ax.set_ylabel('Position Error (m)')
-        ax.set_title(tube['label'], fontweight='bold', fontsize=10)
+            ax.plot(t_vec[v], res['x_hist'][2, v],
+                    color=COLORS[res['ctrl_name']], ls=STYLES[res['ctrl_name']],
+                    lw=WIDTHS[res['ctrl_name']], label=res['ctrl_name'], alpha=0.9)
+        # Hard bounds
+        ax.axhline(x_lb[2], color='#c0392b', ls='--', lw=1.5, alpha=0.8, label=f'Floor ({x_lb[2]:.1f}m)')
+        ax.axhline(x_ub[2], color='#e67e22', ls='--', lw=1.5, alpha=0.8, label=f'Ceiling ({x_ub[2]:.1f}m)')
+        # Tightened bounds (what tube MPC actually plans within)
+        ax.axhline(hx_tight_lb[2], color='#27ae60', ls=':', lw=1.0, alpha=0.6,
+                   label=f'Tight floor ({hx_tight_lb[2]:.2f}m)' if idx == 0 else None)
+        ax.axhline(hx_tight_ub[2], color='#27ae60', ls=':', lw=1.0, alpha=0.6,
+                   label=f'Tight ceil ({hx_tight_ub[2]:.2f}m)' if idx == 0 else None)
+        # Waypoint Z targets
+        for i, wp in enumerate(WAYPOINTS):
+            ax.axhline(wp[2], color='purple', ls=':', lw=0.9, alpha=0.55,
+                       label=f'WP{i+1} Z={wp[2]:.1f}m' if idx == 0 else None)
+        ax.set_ylabel('Altitude Z (m)'); ax.set_title(tube['label'], fontweight='bold', fontsize=10)
+        ax.set_ylim(x_lb[2] - 0.3, x_ub[2] + 0.3)
         ax.grid(True, alpha=0.3)
-        if idx == 0: ax.legend(fontsize=7)
-    fig2.suptitle('Position Tracking Error', fontsize=13, fontweight='bold')
-    fig2.tight_layout(rect=[0, 0, 1, 0.96])
-    fig2.savefig(save_dir / 'fig2_position_error.png', dpi=200, bbox_inches='tight')
-    print("Saved fig2_position_error.png")
-
-    # --- Figure 3: Per-Axis Position Over Time (one scenario: A_wind) ---
-    fig3, axes3 = plt.subplots(3, 1, figsize=(12, 8), sharex=True)
-    axis_labels = ['X (m)', 'Y (m)', 'Z (m)']
-    sname_demo = 'A_wind'
-    standard, full_tube, tube = all_results[sname_demo]
-    for ax_i, ax in enumerate(axes3):
-        for res in [standard, full_tube, tube]:
-            v = ~np.isnan(res['x_hist'][0, :])
-            ax.plot(t_vec[v], res['x_hist'][ax_i, v], color=COLORS[res['ctrl_name']],
-                    ls=STYLES[res['ctrl_name']], lw=WIDTHS[res['ctrl_name']],
-                    label=res['ctrl_name'])
-        ax.axhline(x_lb[ax_i], color='gray', ls='--', lw=1, alpha=0.7, label='Bounds' if ax_i==0 else None)
-        ax.axhline(x_ub[ax_i], color='gray', ls='--', lw=1, alpha=0.7)
-        # Mark waypoints
-        for wp in WAYPOINTS:
-            ax.axhline(wp[ax_i], color='purple', ls=':', lw=0.8, alpha=0.5)
-        ax.set_ylabel(axis_labels[ax_i]); ax.grid(True, alpha=0.3)
-        if ax_i == 0: ax.legend(fontsize=7, ncol=4, loc='upper right')
-    axes3[-1].set_xlabel('Time (s)')
-    fig3.suptitle(f'Per-Axis Position — {SCENARIOS[sname_demo]["label"]}',
+        if idx == 0:
+            ax.legend(fontsize=7, loc='lower right', ncol=2)
+    axes3[1, 0].set_xlabel('Time (s)'); axes3[1, 1].set_xlabel('Time (s)')
+    fig3.suptitle('Altitude (Z) Safety — Hard Bounds vs Tightened Tube Bounds',
                   fontsize=13, fontweight='bold')
     fig3.tight_layout(rect=[0, 0, 1, 0.96])
-    fig3.savefig(save_dir / 'fig3_per_axis.png', dpi=200, bbox_inches='tight')
-    print("Saved fig3_per_axis.png")
+    fig3.savefig(save_dir / 'fig3_altitude_safety.png', dpi=200, bbox_inches='tight')
+    print("Saved fig3_altitude_safety.png")
 
-    # --- Figure 4: Control Effort (2x2 grid, norm of u) ---
-    fig4, axes4 = plt.subplots(2, 2, figsize=(12, 8))
+    # --- Figure 4: Velocity Smoothness (speed magnitude over time, 2x2) ---
+    fig4, axes4 = plt.subplots(2, 2, figsize=(13, 8), sharex=True)
     for idx, sname in enumerate(SCENARIOS):
         ax = axes4[idx // 2, idx % 2]
         standard, full_tube, tube = all_results[sname]
         for res in [standard, full_tube, tube]:
-            v = ~np.isnan(res['u_hist'][0, :])
-            u_norm = np.linalg.norm(res['u_hist'][:, v], axis=0)
-            ax.plot(t_ctrl[:len(u_norm)], u_norm, color=COLORS[res['ctrl_name']],
+            v = ~np.isnan(res['x_hist'][0, :])
+            speed = np.linalg.norm(res['x_hist'][3:6, v], axis=0)
+            ax.plot(t_vec[v], speed, color=COLORS[res['ctrl_name']],
                     ls=STYLES[res['ctrl_name']], lw=WIDTHS[res['ctrl_name']],
-                    label=res['ctrl_name'], alpha=0.8)
-        ax.set_xlabel('Time (s)'); ax.set_ylabel('||u|| (m/s²)')
-        ax.set_title(tube['label'], fontweight='bold', fontsize=10)
+                    label=res['ctrl_name'], alpha=0.85)
+        # Velocity bound
+        v_max = x_ub[3]
+        ax.axhline(v_max, color='gray', ls='--', lw=1.2, alpha=0.7, label=f'|v| limit ({v_max:.1f} m/s)')
+        ax.set_ylabel('Speed ||v|| (m/s)'); ax.set_title(tube['label'], fontweight='bold', fontsize=10)
+        ax.set_ylim(0, v_max + 0.3)
         ax.grid(True, alpha=0.3)
         if idx == 0: ax.legend(fontsize=7)
-    fig4.suptitle('Control Effort Magnitude', fontsize=13, fontweight='bold')
+    axes4[1, 0].set_xlabel('Time (s)'); axes4[1, 1].set_xlabel('Time (s)')
+    fig4.suptitle('Velocity Profile — Speed Magnitude Over Time', fontsize=13, fontweight='bold')
     fig4.tight_layout(rect=[0, 0, 1, 0.96])
-    fig4.savefig(save_dir / 'fig4_control_effort.png', dpi=200, bbox_inches='tight')
-    print("Saved fig4_control_effort.png")
+    fig4.savefig(save_dir / 'fig4_velocity.png', dpi=200, bbox_inches='tight')
+    print("Saved fig4_velocity.png")
 
-    # --- Figure 5: Event Trigger Timeline ---
-    fig5, axes5 = plt.subplots(len(SCENARIOS), 1, figsize=(12, 8), sharex=True)
-    for idx, sname in enumerate(SCENARIOS):
-        ax = axes5[idx]
+    # --- Figure 5: Trigger Comparison — All 3 Controllers (4 rows × 3 cols) ---
+    ctrl_names_ordered = ['Standard MPC', 'Full Tube MPC', 'ET Tube MPC']
+    fig5, axes5 = plt.subplots(len(SCENARIOS), 3, figsize=(15, 9), sharex=True, sharey='row')
+    for row, sname in enumerate(SCENARIOS):
         standard, full_tube, tube = all_results[sname]
-        # ET Tube triggers
-        if tube['triggers']:
-            trig_times = [t[0] * dt for t in tube['triggers']]
-            ax.eventplot([trig_times], lineoffsets=0.5, linelengths=0.8,
-                         colors=COLORS['ET Tube MPC'], label='ET Tube MPC')
-        n_et = len(tube['triggers'])
-        n_total = T_SIM
-        ax.text(0.98, 0.7, f'ET: {n_et}/{n_total} solves ({100*n_et/n_total:.0f}%)',
-                transform=ax.transAxes, ha='right', fontsize=8,
-                bbox=dict(boxstyle='round,pad=0.3', fc='white', ec='gray', alpha=0.8))
-        ax.set_ylabel(SCENARIOS[sname]['label'].split(':')[0], fontweight='bold', fontsize=9)
-        ax.set_yticks([]); ax.grid(True, axis='x', alpha=0.3)
-    axes5[-1].set_xlabel('Time (s)')
-    fig5.suptitle('Event Trigger Timeline (ET Tube MPC)', fontsize=13, fontweight='bold')
-    fig5.tight_layout(rect=[0, 0, 1, 0.96])
-    fig5.savefig(save_dir / 'fig5_triggers.png', dpi=200, bbox_inches='tight')
-    print("Saved fig5_triggers.png")
+        results_ordered = [standard, full_tube, tube]
+        for col, res in enumerate(results_ordered):
+            ax = axes5[row, col]
+            n_triggers = len(res['triggers'])
+            pct = 100 * n_triggers / T_SIM
+            if res['triggers']:
+                trig_times = [t[0] * dt for t in res['triggers']]
+                ax.eventplot([trig_times], lineoffsets=0.5, linelengths=0.8,
+                             colors=COLORS[res['ctrl_name']])
+            # Color the background based on solve rate
+            bg_alpha = min(0.18, 0.02 + pct / 100 * 0.16)
+            ax.set_facecolor(COLORS[res['ctrl_name']] + '22')
+            ax.text(0.5, 0.72, f'{n_triggers}/{T_SIM}\n({pct:.0f}%)',
+                    transform=ax.transAxes, ha='center', fontsize=9, fontweight='bold',
+                    color=COLORS[res['ctrl_name']],
+                    bbox=dict(boxstyle='round,pad=0.3', fc='white', ec=COLORS[res['ctrl_name']], alpha=0.9))
+            ax.set_yticks([])
+            ax.grid(True, axis='x', alpha=0.25)
+            if row == 0:
+                ax.set_title(res['ctrl_name'], fontweight='bold', fontsize=10,
+                             color=COLORS[res['ctrl_name']])
+            if row == len(SCENARIOS) - 1:
+                ax.set_xlabel('Time (s)', fontsize=8)
+            if col == 0:
+                ax.set_ylabel(SCENARIOS[sname]['label'], fontsize=8, fontweight='bold')
+    fig5.suptitle('QP Solve Trigger Timeline — All Controllers × All Scenarios\n'
+                  '(Each tick = one MPC solve; % = compute load)',
+                  fontsize=12, fontweight='bold')
+    fig5.tight_layout(rect=[0, 0, 1, 0.95])
+    fig5.savefig(save_dir / 'fig5_trigger_comparison.png', dpi=200, bbox_inches='tight')
+    print("Saved fig5_trigger_comparison.png")
 
     # --- Figure 6: Summary Bar Chart ---
     fig6, axes6 = plt.subplots(1, 3, figsize=(14, 5))

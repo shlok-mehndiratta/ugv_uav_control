@@ -1,8 +1,3 @@
-"""
-Standard MPC baseline: solves at every time step, no tube, no auxiliary controller.
-Uses original (loose) arena bounds and pins X_bar[:,0] == x_true.
-This represents the industry-standard approach that ET Tube MPC aims to beat.
-"""
 import numpy as np
 import cvxpy as cp
 import scipy.linalg as la
@@ -34,7 +29,7 @@ def run_simulation(T_sim=200, seed=None, disturbance_func=None, waypoints=None):
     current_wp_idx = 0
     x_ref = waypoints[current_wp_idx]
 
-    # Claude says: terminal cost uses DARE solution for proper stability certificate
+    # terminal cost uses DARE solution for proper stability certificate
     P_terminal = la.solve_discrete_are(A_d, B_d, Q_mpc, R_mpc)
 
     X_bar = cp.Variable((6, N + 1))
@@ -60,7 +55,7 @@ def run_simulation(T_sim=200, seed=None, disturbance_func=None, waypoints=None):
 
     problem = cp.Problem(cp.Minimize(cost), constraints)
 
-    # Claude says: disturbance returns (w_process, v_k) for API consistency.
+    # disturbance returns (w_process, v_k) for API consistency.
     # Standard MPC has no feedback controller, so v_k is unused.
     def default_disturbance(k):
         d = np.array([np.random.uniform(-1.0, 1.0), np.random.uniform(-1.0, 1.0), np.random.uniform(-1.5, 1.5)])

@@ -32,7 +32,7 @@ def run_simulation(T_sim=200, seed=None, disturbance_func=None, waypoints=None):
     current_wp_idx = 0
     x_ref = waypoints[current_wp_idx]
 
-    # Claude says: terminal cost should use the DARE solution P for a proper
+    # terminal cost should use the DARE solution P for a proper
     # Lyapunov stability certificate. Using Q_mpc as terminal cost (as before)
     # formally weakens the stability guarantee. P_terminal is the infinite-horizon
     # LQR cost-to-go for the MPC's own cost matrices (Q_mpc, R_mpc).
@@ -47,7 +47,7 @@ def run_simulation(T_sim=200, seed=None, disturbance_func=None, waypoints=None):
     for k in range(N):
         cost += cp.quad_form(X_bar[:, k] - x_ref_param, Q_mpc)
         cost += cp.quad_form(U_bar[:, k], R_mpc)
-    # Claude says: terminal cost uses P_terminal (DARE solution) instead of Q_mpc
+    # terminal cost uses P_terminal (DARE solution) instead of Q_mpc
     cost += cp.quad_form(X_bar[:, N] - x_ref_param, P_terminal)
 
     constraints = []
@@ -61,7 +61,7 @@ def run_simulation(T_sim=200, seed=None, disturbance_func=None, waypoints=None):
 
     problem = cp.Problem(cp.Minimize(cost), constraints)
 
-    # Claude says: disturbance model now correctly separates process noise
+    # disturbance model now correctly separates process noise
     # and measurement noise. Process noise (w_process) enters the plant dynamics.
     # Measurement noise (v_k) corrupts the controller's state estimate, entering
     # the error dynamics through -B_d K v_k. This matches Phase 1's W set exactly.
@@ -123,10 +123,9 @@ def run_simulation(T_sim=200, seed=None, disturbance_func=None, waypoints=None):
         x_bar_k = X_nom_traj[:, 0]
         e_k = x_true - x_bar_k
         
-        # Claude says: replaced heuristic Euclidean distance trigger (0.15m) with
+        # replaced heuristic Euclidean distance trigger (0.15m) with
         # formal RPI set membership check. The event should fire when the error
         # leaves the RPI set Omega, i.e., when any row of Omega_H @ e_k > Omega_h.
-        # This is the mathematically correct trigger for Tube MPC.
         omega_margin = Omega_H @ e_k - Omega_h
         if np.max(omega_margin) > 0:
             trigger_counter += 1
@@ -144,14 +143,14 @@ def run_simulation(T_sim=200, seed=None, disturbance_func=None, waypoints=None):
         u_bar_k = U_nom_traj[:, 0]
         x_bar_k = X_nom_traj[:, 0]
         
-        # Claude says: measurement noise v_k corrupts the controller's state
+        # measurement noise v_k corrupts the controller's state
         # estimate. The controller sees x_measured = x_true + v_k, NOT x_true.
         # This matches Phase 1's error dynamics: e_{k+1} = A_k e_k + w_process - B_d K v_k
         w_process, v_k = disturbance_func(k)
         x_measured = x_true + v_k
         u_true = u_bar_k - K @ (x_measured - x_bar_k)
         
-        # Claude says: clipping should never be active if the tube is correctly
+        # clipping should never be active if the tube is correctly
         # sized. If it fires, it signals that the error has left Omega or there
         # is a bug in constraint tightening. Log a warning instead of silent clip.
         u_unclipped = u_true.copy()
@@ -159,7 +158,7 @@ def run_simulation(T_sim=200, seed=None, disturbance_func=None, waypoints=None):
         if not np.allclose(u_true, u_unclipped):
             clip_violations += 1
         
-        # Claude says: only process noise enters the plant dynamics (not measurement noise)
+        # only process noise enters the plant dynamics (not measurement noise)
         x_true = A_d @ x_true + B_d @ u_true + w_process
         
         x_true_history[:, k + 1] = x_true

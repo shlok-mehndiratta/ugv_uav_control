@@ -26,9 +26,7 @@ print("System matrices:")
 print(f"A_d shape: {A_d.shape}")
 print(f"B_d shape: {B_d.shape}")
 
-# ==============================================================================
-# Step 2.1: Local Feedback Gain K via Discrete LQR
-# ==============================================================================
+#LQR
 # Q = diag([10, 10, 10, 1, 1, 1]) - penalize position heavily
 Q = np.diag([10.0, 10.0, 10.0, 1.0, 1.0, 1.0])
 # R = diag([1, 1, 1])
@@ -72,9 +70,7 @@ u_ub = np.array([5.66, 5.66, 4.0])
 Hu, hu = box_constraints_to_h_representation(u_lb, u_ub)
 print(f"\nInput constraint H-representation: Hu shape {Hu.shape}, hu shape {hu.shape}")
 
-# State Constraints (X): 2m x 3m x 3m arena and velocity caps
-# p_x in [-1.0, 1.0], p_y in [-1.5, 1.5], p_z in [0.0, 2.8]
-# v_x, v_y, v_z in [-1.5, 1.5]
+#Took 2m * 3m * 3m arena like the testbed avaible in lab
 x_lb = np.array([-1.0, -1.5, 0.0, -1.5, -1.5, -1.5])
 x_ub = np.array([1.0, 1.5, 2.8, 1.5, 1.5, 1.5])
 Hx, hx = box_constraints_to_h_representation(x_lb, x_ub)
@@ -83,7 +79,7 @@ print(f"State constraint H-representation: Hx shape {Hx.shape}, hx shape {hx.sha
 # ==============================================================================
 # Step 2.3: Disturbance Set (W) - CORRECTED PHYSICS
 # ==============================================================================
-# Claude says: the disturbance set W must match the EXACT error dynamics.
+#  the disturbance set W must match the EXACT error dynamics.
 # True state: x_{k+1} = A_d x_k + B_d u_true + w_process
 # Control law: u_true = u_bar - K (x_measured - x_bar)
 #            = u_bar - K (x_true + v_k - x_bar)    where v_k is measurement noise
@@ -101,7 +97,7 @@ d_vertices = [np.array(v) for v in product(*[(-b, b) for b in d_bounds])]
 # Map to 6D state space: w_process = B_d * d
 w_process_vertices = [B_d @ d for d in d_vertices]
 
-# Claude says: v_k is STATE ESTIMATION (measurement) noise. It does NOT
+#  v_k is STATE ESTIMATION (measurement) noise. It does NOT
 # enter the plant dynamics directly. It corrupts the controller's feedback
 # through the term -B_d K v_k. The Phase 2 simulation must apply v_k
 # to the measured state used by the controller, not add it to x_true.
@@ -113,7 +109,7 @@ noise_vertices = [np.array(v) for v in product(*[(-b, b) for b in noise_bounds])
 W_vertices = []
 for wp in w_process_vertices:
     for vn in noise_vertices:
-        # Claude says: v_k enters through feedback: effective_noise = -B_d K v_k
+        #  v_k enters through feedback: effective_noise = -B_d K v_k
         effective_noise = -(B_d @ K @ vn)
         W_vertices.append(wp + effective_noise)
 
@@ -125,10 +121,8 @@ W_poly = pypoman.duality.compute_polytope_halfspaces(W_vertices)
 W_H = W_poly[0]
 W_h = W_poly[1]
 
-# ==============================================================================
-# Step 2.4: RPI Calculation and Tightening
-# ==============================================================================
 
+#Step 2.4: RPI Calculation and Tightening
 def compute_minkowski_sum_polytopes(H1, h1, H2, h2):
     """
     Compute Minkowski sum of two polytopes P1 and P2 using vertex enumeration.
@@ -158,7 +152,7 @@ def compute_mRPI_support_function(A_k, W_vertices, N=10):
     Uses support function method: for each direction d, h_Omega(d) = sum h_{A_k^i W}(d)
     Uses a fixed set of directions (coordinate axes and their combinations).
     
-    Claude says: Truncation bound analysis
+     Truncation bound analysis
     The true mRPI is the infinite sum. Truncating at N introduces residual:
       residual <= rho^(N+1) / (1 - rho) * h_W(d)
     where rho = spectral_radius(A_k). With rho ≈ 0.933 and N=100:
@@ -167,7 +161,7 @@ def compute_mRPI_support_function(A_k, W_vertices, N=10):
     For safety-critical applications, scale support values by 1/(1-rho^(N+1))
     to obtain a guaranteed outer approximation.
     
-    Claude says: Direction coverage limitation
+     Direction coverage limitation
     72 directions (axis-aligned + pairwise diagonals) in 6D may miss important
     cross-coupling directions. This could cause the mRPI to be an under-
     approximation in uncovered directions, making tightened constraints
@@ -229,8 +223,7 @@ def compute_mRPI_support_function(A_k, W_vertices, N=10):
     
     support_values = np.array(support_values)
     
-    # Claude says: scale support values to compensate for truncation,
-    # yielding a guaranteed outer approximation of the true infinite mRPI
+    #we are taking a finite approximation of infinite sum, so we scale to compensate for truncation
     support_values *= (1.0 / (1.0 - rho**(N+1)))
     print(f"  Applied truncation compensation factor: {1.0/(1.0-rho**(N+1)):.6f}")
     
@@ -268,17 +261,14 @@ def compute_K_omega(K, Omega_H, Omega_h):
     K_Omega_H, K_Omega_h = pypoman.duality.compute_polytope_halfspaces(K_Omega_vertices)
     return K_Omega_H, K_Omega_h
 
-print("\nComputing mRPI set...")
 Omega_H, Omega_h = compute_mRPI_support_function(A_k, W_vertices, N=100)
 print(f"mRPI set computed: Omega has {len(Omega_h)} constraints")
 
-print("\nComputing tightened state constraints (X_tight = X ⊖ Omega)...")
+
 Hx_tight, hx_tight = compute_pontryagin_difference(Hx, hx, Omega_H, Omega_h)
 
-print("\nComputing K*Omega...")
 K_Omega_H, K_Omega_h = compute_K_omega(K, Omega_H, Omega_h)
 
-print("\nComputing tightened input constraints (U_tight = U ⊖ K*Omega)...")
 Hu_tight, hu_tight = compute_pontryagin_difference(Hu, hu, K_Omega_H, K_Omega_h)
 
 # Verify tightened constraints are valid
@@ -315,11 +305,10 @@ for i in range(n_states):
         arena_collapsed = True
 
 if arena_collapsed:
-    print("\nACTION REQUIRED: Your mRPI set is too large. You must either increase the arena size or tune Q and R to penalize position error more aggressively.")
+    print("Your mRPI set is too large. You must either increase the arena size or tune Q and R to penalize position error more aggressively.")
 else:
-    print("\nSUCCESS: The arena survived the Pontryagin difference. The constraints are mathematically feasible.")
+    print("The arena survived the Pontryagin difference. The constraints are mathematically feasible.")
 
-# Save data relative to script location
 save_path = Path(__file__).resolve().parent / 'tube_data.npz'
 np.savez(save_path,
          A_d=A_d, B_d=B_d, K=K, A_k=A_k, P=P,
