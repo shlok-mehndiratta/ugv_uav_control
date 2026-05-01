@@ -22,6 +22,14 @@ graph TD
     *   **Belief-Space MPC**: UGV path following with observability constraints.
     *   **Ancillary Tube-MPC**: UAV altitude and pose adaptation for FoV maintenance.
 
+## Codebase Overview
+The core logic is implemented in the following nodes within `src/ugv_uav_control/ugv_uav_control/`:
+*   **`belief_mpc_node.py`**: Implements the UGV's Nonlinear MPC. It incorporates the EKF covariance trace into the cost function to moderate ground velocity based on observability quality.
+*   **`middle_path_follower.py`**: Handles the vision pipeline. It uses OpenCV to extract the lane centerline heatmap and transforms pixel coordinates to world-frame waypoints.
+*   **`uav_ancillary_node.py`**: Manages the UAV's pose and altitude adaptation. It triggers altitude increases based on UGV curvature to expand the Field-of-View.
+*   **`ekf_node.py`**: A 5-state Extended Kalman Filter that fuses ArUco detections with odometry, providing the real-time "belief state" ($\Sigma$) to the controllers.
+*   **`mission.launch.py`**: The primary entry point. It launches the Gazebo simulation, spawns the TurtleBot3 and x500 drone, and initializes the ROS-GZ bridge.
+
 ## Comparative Evaluation Metrics
 These figures summarize the performance leap from the Phase 1 baseline to the full Observability-Aware System. The 'Full System' leverages the Robust Positional Invariant (RPI) Set and Constraint Tightening derived in Phase 1.
 
@@ -38,21 +46,37 @@ These figures summarize the performance leap from the Phase 1 baseline to the fu
 *   **Dynamic FoV Expansion**: The increase in visibility from 46% to 87% is driven by the Adaptive Tube-MPC climbing during high-curvature segments to expand the visual field precisely when the RPI-set boundaries are approached.
 *   **Real-Time Feasibility**: With a solve time of 16ms, the nonlinear optimization comfortably meets the 150ms real-time constraint for physical deployment, validated by the vectorized cost functions from Phase 1.
 
+## Prerequisites and Dependencies
+Ensure your environment meets the following requirements before building:
+*   **Operating System**: Linux (Ubuntu 22.04 or 24.04 recommended)
+*   **ROS 2 Distribution**: Humble or Iron
+*   **Simulator**: Gazebo Harmonic
+*   **Python Dependencies**:
+    ```bash
+    pip install numpy scipy opencv-python pandas matplotlib
+    ```
+
 ## Build Instructions
+Standard ROS 2 workspace initialization:
 ```bash
-# Ensure you are in the 03_System_Integration_ROS2 directory
-colcon build --packages-select ugv_uav_control
+# From the 03_System_Integration_ROS2 directory
+rosdep install -i --from-path src --rosdistro $ROS_DISTRO -y
+colcon build --symlink-install --packages-select ugv_uav_control
 source install/setup.bash
 ```
 
-## Execution
-To launch the full tracking mission:
+## Execution and Verification
+To launch the full tracking mission and verify the results:
 ```bash
+# Launch the integrated mission
 ros2 launch ugv_uav_control middle_path_follower.launch.py \
     duration:=60.0 \
     controller:=belief_mpc \
     use_ancillary:=true
 ```
 
+### Result Verification
+The system automatically logs telemetry to the `ugv_uav_control/data` directory. Upon mission completion, a summary CSV is generated which can be used to verify the metrics reported in the Master README and the Final Project Report.
+
 ---
-*Focus: System Integration, Perception, and Information-Aware Control.*
+*Course: LCS 334 - Linear Control Systems*

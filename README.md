@@ -27,7 +27,7 @@ This repository presents a unified research framework for autonomous multi-agent
 ## Result Verification Matrix
 The following table summarizes the integrated performance of the full framework (Phase 3) against the Phase 1 baseline.
 
-| Metric | Baseline (Phase 1) | Full System (Phase 3) | Improvement |
+| Metric | Baseline | Full System | Improvement |
 | :--- | :--- | :--- | :--- |
 | Mean Tracking Error | 1.037 m | **0.463 m** | **-55.3%** |
 | ArUco Visibility | 46.3% | **87.0%** | **+87.9%** |
@@ -36,20 +36,22 @@ The following table summarizes the integrated performance of the full framework 
 
 ---
 
-## Submission Artifacts
-*   **Research Report**: [PROJECT_REPORT.pdf](./PROJECT_REPORT.pdf)
-*   **Phase 1 Code**: [Mathematical Foundations](./01_Mathematical_Foundations/)
-*   **Phase 2 Code**: [Trajectory Engineering](./02_Trajectory_Engineering/)
-*   **Phase 3 Code**: [System Integration (ROS 2)](./03_System_Integration_ROS2/)
-
 ## Scientific Inferences
-1.  **Observability-Control Link**: We demonstrated that coupling the UGV's path-following with the UAV's visual belief state (Belief-Space MPC) significantly reduces tracking lag. Optimal control and state estimation are shown to be inseparable in robust multi-agent tracking.
-2.  **Computational Efficiency**: The implementation of an Event-Triggered law, solving the MPC only when the RPI boundary is approached, enabled a 16ms solve time, ensuring feasibility for high-frequency flight hardware.
-3.  **Robustness via Adaptation**: The UAV's adaptive altitude adjustment (Adaptive Tube) based on predicted UGV curvature is the primary factor in eliminating visual dropouts during non-linear maneuvers.
 
-## Authors
-*   **Shlok Mehndiratta** (23309)
-*   **Divyam Sood** (23112)
-*   **Prashant Gupta** (23237)
+### 1. The Observability-Control Link
+We have demonstrated that by coupling the UGV's path-following with the UAV's ground projection (Belief-Space MPC), tracking error is significantly reduced. This proves that optimal control and state estimation are inseparable in robust multi-agent systems.
 
-*Course: LCS 334 - Linear Control Systems*
+### 2. Computational Efficiency
+The implementation of an Event-Triggered law, which only re-solves the MPC when the RPI boundary is approached, allowed the system to meet real-time constraints with a 16ms solve time.
+
+### 3. Robustness via Adaptation
+The UAV's ability to adapt its altitude (Adaptive Tube) based on UGV curvature is the primary factor in eliminating visual dropouts during high-dynamic maneuvers.
+
+### 4. Theoretical Guarantees via Strict Robustness
+By decoupling the true system state into a nominal trajectory and a bounded error state within a Tube MPC framework, we established absolute mathematical safety bounds. The computation of the minimal Robust Positively Invariant (mRPI) set utilizing support functions enabled rigorous constraint tightening via the Pontryagin difference. Coupled with an infinite-horizon LQR terminal cost to provide a formal Lyapunov stability certificate, the architecture mathematically guarantees recursive feasibility and system stability, explicitly absorbing worst-case disturbances even when raw measurement noise corrupts the direct state-feedback loop.
+
+---
+**Team Members:**
+*   Shlok Mehndiratta (23309)
+*   Divyam Sood (23112)
+*   Prashant Gupta (23237)
