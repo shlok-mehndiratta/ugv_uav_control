@@ -340,8 +340,110 @@ if __name__ == '__main__':
     WIDTHS = {'Standard MPC': 1.5, 'Full Tube MPC': 1.5, 'ET Tube MPC': 2.0}
     t_vec = np.arange(T_SIM + 1) * dt
     t_ctrl = np.arange(T_SIM) * dt
-    save_dir = base_dir
+    save_dir = base_dir / "plots"
     arena_x, arena_y, arena_z = [x_lb[0], x_ub[0]], [x_lb[1], x_ub[1]], [x_lb[2], x_ub[2]]
+
+    # --- Figure 0: Tube RPI Set Visualization ---
+    import pypoman
+    from scipy.spatial import ConvexHull
+    try:
+        Omega_vertices = np.array(pypoman.compute_polytope_vertices(Omega_H, Omega_h))
+        pos_vertices = Omega_vertices[:, :3]
+
+        fig0 = plt.figure(figsize=(12, 10))
+        
+        # 3D Position RPI Set
+        ax1 = fig0.add_subplot(221, projection='3d')
+        hull_3d = ConvexHull(pos_vertices)
+        ax1.scatter(pos_vertices[:, 0], pos_vertices[:, 1], pos_vertices[:, 2], color='#27ae60', s=30, alpha=0.5, label='Vertices')
+        for s in hull_3d.simplices:
+            s = np.append(s, s[0])
+            ax1.plot(pos_vertices[s, 0], pos_vertices[s, 1], pos_vertices[s, 2], color='#27ae60', lw=1.2, alpha=0.7)
+        ax1.set_xlabel('Pos Error X (m)')
+        ax1.set_ylabel('Pos Error Y (m)')
+        ax1.set_zlabel('Pos Error Z (m)')
+        ax1.set_title('3D Positional Error Tube (RPI Set)', fontsize=11, fontweight='bold')
+        ax1.grid(True, alpha=0.3)
+        ax1.view_init(elev=20, azim=45)
+
+        # Equal aspect ratio in 3D centered on 0, incorporating arena span
+        as_x = (x_ub[0] - x_lb[0]) / 2.0
+        as_y = (x_ub[1] - x_lb[1]) / 2.0
+        as_z = (x_ub[2] - x_lb[2]) / 2.0
+
+        arena_box_edges = [
+            ([[-as_x, as_x], [-as_y, -as_y], [-as_z, -as_z]]),
+            ([[as_x, as_x], [-as_y, as_y], [-as_z, -as_z]]),
+            ([[as_x, -as_x], [as_y, as_y], [-as_z, -as_z]]),
+            ([[-as_x, -as_x], [as_y, -as_y], [-as_z, -as_z]]),
+            # Top face
+            ([[-as_x, as_x], [-as_y, -as_y], [as_z, as_z]]),
+            ([[as_x, as_x], [-as_y, as_y], [as_z, as_z]]),
+            ([[as_x, -as_x], [as_y, as_y], [as_z, as_z]]),
+            ([[-as_x, -as_x], [as_y, as_y], [as_z, as_z]]),
+            # Vertical pillars
+            ([[-as_x, -as_x], [-as_y, -as_y], [-as_z, as_z]]),
+            ([[as_x, as_x], [-as_y, -as_y], [-as_z, as_z]]),
+            ([[as_x, as_x], [as_y, as_y], [-as_z, as_z]]),
+            ([[-as_x, -as_x], [as_y, as_y], [-as_z, as_z]]),
+        ]
+
+        for idx, (ex, ey, ez) in enumerate(arena_box_edges):
+            ax1.plot(ex, ey, ez, color='gray', ls='--', lw=1.2, alpha=0.6,
+                     label='Arena Span Box' if idx == 0 else "")
+
+        max_range = max(as_x, as_y, as_z)
+        ax1.set_xlim(-max_range, max_range)
+        ax1.set_ylim(-max_range, max_range)
+        ax1.set_zlim(-max_range, max_range)
+        ax1.set_box_aspect((1, 1, 1))
+        ax1.legend(loc='upper right', fontsize=8)
+
+        # X-Y Plane Projection
+        ax2 = fig0.add_subplot(222)
+        hull_xy = ConvexHull(pos_vertices[:, [0, 1]])
+        ax2.scatter(pos_vertices[:, 0], pos_vertices[:, 1], color='#27ae60', s=30, alpha=0.5)
+        for s in hull_xy.simplices:
+            s = np.append(s, s[0])
+            ax2.plot(pos_vertices[s, 0], pos_vertices[s, 1], color='#2e7d32', lw=2)
+        ax2.set_xlabel('Pos Error X (m)')
+        ax2.set_ylabel('Pos Error Y (m)')
+        ax2.set_title('X-Y Plane Projection', fontsize=11, fontweight='bold')
+        ax2.set_aspect('equal')
+        ax2.grid(True, alpha=0.3)
+
+        # X-Z Plane Projection
+        ax3 = fig0.add_subplot(223)
+        hull_xz = ConvexHull(pos_vertices[:, [0, 2]])
+        ax3.scatter(pos_vertices[:, 0], pos_vertices[:, 2], color='#27ae60', s=30, alpha=0.5)
+        for s in hull_xz.simplices:
+            s = np.append(s, s[0])
+            ax3.plot(pos_vertices[s, 0], pos_vertices[s, 2], color='#2e7d32', lw=2)
+        ax3.set_xlabel('Pos Error X (m)')
+        ax3.set_ylabel('Pos Error Z (m)')
+        ax3.set_title('X-Z Plane Projection', fontsize=11, fontweight='bold')
+        ax3.set_aspect('equal')
+        ax3.grid(True, alpha=0.3)
+
+        # Y-Z Plane Projection
+        ax4 = fig0.add_subplot(224)
+        hull_yz = ConvexHull(pos_vertices[:, [1, 2]])
+        ax4.scatter(pos_vertices[:, 1], pos_vertices[:, 2], color='#27ae60', s=30, alpha=0.5)
+        for s in hull_yz.simplices:
+            s = np.append(s, s[0])
+            ax4.plot(pos_vertices[s, 1], pos_vertices[s, 2], color='#2e7d32', lw=2)
+        ax4.set_xlabel('Pos Error Y (m)')
+        ax4.set_ylabel('Pos Error Z (m)')
+        ax4.set_title('Y-Z Plane Projection', fontsize=11, fontweight='bold')
+        ax4.set_aspect('equal')
+        ax4.grid(True, alpha=0.3)
+
+        fig0.suptitle('Robust Positional Invariant (RPI) Tube Set Projection', fontsize=14, fontweight='bold')
+        fig0.tight_layout()
+        fig0.savefig(save_dir / 'fig0_tube_rpi.png', dpi=200, bbox_inches='tight')
+        print("Saved fig0_tube_rpi.png")
+    except Exception as e:
+        print(f"Could not plot initial tube: {e}")
 
     # --- Figure 1: XY Trajectory (2x2 grid) ---
     fig1, axes1 = plt.subplots(2, 2, figsize=(12, 10))
