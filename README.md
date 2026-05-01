@@ -1,4 +1,4 @@
-# UAV-UGV Multi-Agent Tracking: A Belief-Coupled Tube-MPC Framework
+# Robust Linear Control: A Belief-Coupled Tube-MPC Framework
 
 ### LCS 334 - Linear Control Systems
 **Final Project Submission**
@@ -15,7 +15,8 @@ This repository presents a unified research framework for autonomous multi-agent
 
 ### [02: Trajectory Engineering](./02_Trajectory_Engineering/)
 *   **Scientific Goal**: Validating high-dynamic flight trajectories for micro-UAV hardware.
-*   **Key Deliverables**: Crazyflie SITL validation logs and optimized 3D path coordinates derived from stability constraints.
+*   **Key Deliverables**: Crazyflie SITL validation logs and optimized 3D path coordinates derived from stability constraints, docker file to ensure reproducibility.
+*   *Implementation details and execution steps available in the sub-directory README.*
 
 ### [03: System Integration and Validation](./03_System_Integration_ROS2/)
 *   **Scientific Goal**: Closing the loop between perception (OpenCV), state estimation (EKF), and belief-space control.
@@ -25,7 +26,7 @@ This repository presents a unified research framework for autonomous multi-agent
 ---
 
 ## Result Verification Matrix
-The following table summarizes the integrated performance of the full framework (Phase 3) against the Phase 1 baseline.
+The following table summarizes the integrated performance of the full framework against the baseline.
 
 | Metric | Baseline | Full System | Improvement |
 | :--- | :--- | :--- | :--- |
