@@ -3,18 +3,14 @@
 Event-Triggered Tube MPC for a Crazyflie nano quadrotor in CrazySim Software-in-the-Loop.
 Drone follows **M** or **S** waypoint paths in Gazebo with the mRPI safety tube visualised live in RViz2.
 
-![M trajectory hero shot](screenshots/m_trajectory_simulation.png)
-
-*Side-by-side layout the user sees during a `phase2 M` run: Gazebo (left pane) renders the live Crazyflie; RViz (right pane) overlays the MPC's plan — green spheres are waypoints, the cyan trail is `/cf_1/odom`, and the translucent blue cylinder is the mRPI safety tube around the nominal pose. Red spheres mark ET trigger events (QP solves).*
-
-## ⏩ Easiest way to run — pull the prebuilt Docker image
+## From Docker Image
 
 The whole working stack (Gazebo + ROS 2 Humble + cf2 SITL + cflib + MPC) is published on Docker Hub:
 
 **<https://hub.docker.com/r/rebelpg/crazysim_et_mpc/tags>**
 
 ```bash
-# Pull the slim image (~2.6 GB)
+# Pull the image (~2.6 GB)
 docker pull rebelpg/crazysim_et_mpc:latest
 
 # Allow Docker root to use your X server (Linux)
@@ -35,18 +31,8 @@ Inside the container you get a banner with three commands:
 phase1        # hover test (verify SITL is working)
 phase2 M      # ET-Tube MPC follows M trajectory  (default)
 phase2 S      # ET-Tube MPC follows S trajectory
-stop_sitl     # kill all (auto-sleeps 5 s so phase2 can chain right after)
+stop_sitl     # kill all
 ```
-
-### Tag chooser
-
-| Tag | Size | Layout | When to use |
-| --- | --- | --- | --- |
-| `:latest` | ~2.6 GB | flattened single layer (slim) | recommended for end users |
-| `:slim` | ~2.6 GB | same as `:latest` | alias |
-| `:v2` | ~2.6 GB | same as `:latest` | versioned slim |
-| `:v1` | ~3.4 GB | full layered (preserves intermediate build state) | if you want to inspect the build steps |
-| `:complete` | ~3.4 GB | same as `:v1` | alias |
 
 ## ▶ Demo
 
@@ -123,43 +109,3 @@ If you skip `setup.sh` and want to do it manually, see **[`PROJECT_REPORT.md` �
 - Crazyflie firmware @ `3450c0ef` (llanesc/crazyflie-firmware fork)
 - cflib (CrazySim fork) @ `84f9d520`
 - crazyflie-clients-python @ `16a5148c`
-
-## Re-publishing the Docker image (maintainer only)
-
-Update what's inside the running `crazysim` container, then from the host:
-
-```bash
-# Inside the container — make changes, test
-phase1                  # quick sanity check
-phase2 M
-phase2 S
-stop_sitl
-
-# From the host
-docker commit \
-  --message "vN: <what changed>" \
-  --author "Your Name <email>" \
-  crazysim crazyy:vN
-
-docker tag crazyy:vN rebelpg/crazysim_et_mpc:vN
-docker tag crazyy:vN rebelpg/crazysim_et_mpc:latest
-
-docker login -u rebelpg     # paste PAT from hub.docker.com → Account Settings → Security
-docker push rebelpg/crazysim_et_mpc:vN
-docker push rebelpg/crazysim_et_mpc:latest
-docker logout              # important: clears the credential file before any future commit
-```
-
-**Never** put a PAT in a script that gets committed. **Always** rotate the PAT after a publishing session.
-
-For a slim-flattened image (smaller pull), use `docker export | docker import` instead of `docker commit` — see `PROJECT_REPORT.md` for the exact recipe.
-
-## Based on
-
-- **CrazySim** — Llanes et al., ICRA 2024 — <https://github.com/gtfactslab/CrazySim>
-- **Tube MPC** — Mayne et al., *Automatica* 2005
-- **Event-Triggered Tube MPC** — this implementation
-
-## License
-
-MIT — see [LICENSE](LICENSE).
