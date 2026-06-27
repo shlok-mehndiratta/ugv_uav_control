@@ -4,30 +4,23 @@ from setuptools import find_packages, setup
 
 package_name = 'ugv_uav_control'
 
+data_files = [
+    ('share/ament_index/resource_index/packages', ['resource/' + package_name]),
+    ('share/' + package_name, ['package.xml']),
+    (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
+    (os.path.join('share', package_name, 'worlds'), glob('worlds/*.world')),
+]
+
+for root, _, files in os.walk('models'):
+    if files:
+        data_files.append((os.path.join('share', package_name, root), 
+                           [os.path.join(root, f) for f in files]))
+
 setup(
     name=package_name,
     version='0.1.0',
     packages=find_packages(exclude=['test']),
-    data_files=[
-        ('share/ament_index/resource_index/packages',
-            ['resource/' + package_name]),
-        ('share/' + package_name, ['package.xml']),
-        (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
-        (os.path.join('share', package_name, 'worlds'), glob('worlds/*.world')),
-        
-        # Ground Plane Model
-        (os.path.join('share', package_name, 'models/path_ground_plane_v2'), glob('models/path_ground_plane_v2/model.*')),
-        (os.path.join('share', package_name, 'models/path_ground_plane_v2/materials/scripts'), glob('models/path_ground_plane_v2/materials/scripts/*')),
-        (os.path.join('share', package_name, 'models/path_ground_plane_v2/materials/textures'), glob('models/path_ground_plane_v2/materials/textures/*')),
-        (os.path.join('share', package_name, 'models/path_ground_plane_v2'), glob('models/path_ground_plane_v2/*.png')),
-        
-        # NEW: Custom Robot Model (This was missing!)
-        (os.path.join('share', package_name, 'models/turtlebot3_burger_aruco'), glob('models/turtlebot3_burger_aruco/model.*')),
-        (os.path.join('share', package_name, 'models/turtlebot3_burger_aruco/materials/textures'), glob('models/turtlebot3_burger_aruco/materials/textures/*')),
-
-        # NEW: X500 Drone Model
-        (os.path.join('share', package_name, 'models/x500_downward_camera'), glob('models/x500_downward_camera/model.*')),
-    ],
+    data_files=data_files,
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='shlok-mehndiratta',

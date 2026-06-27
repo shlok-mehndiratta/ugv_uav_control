@@ -35,3 +35,5 @@ model.config.erb
 # Repository specific
 .python-version
 requirements.txt.bak
+
+/temp/

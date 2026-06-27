@@ -7,6 +7,7 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import TwistStamped, PoseStamped, PoseWithCovarianceStamped, Pose
 from nav_msgs.msg import Odometry
+from std_msgs.msg import Bool, Float32, String
 import numpy as np
 import csv
 import os
@@ -40,10 +41,11 @@ class ExperimentLogger(Node):
             'uav_x': [], 'uav_y': [], 'uav_z': [],
             'uav_dist': [],
             'q_k': [],
+            'replan_trigger': [],
         }
 
         # UAV FoV parameters
-        self.uav_x, self.uav_y, self.uav_z = 0.0, 0.0, 5.0
+        self.uav_x, self.uav_y, self.uav_z = 0.0, 0.0, 0.0
 
         # State cache
         self.current_cmd = [0.0, 0.0]
@@ -52,6 +54,11 @@ class ExperimentLogger(Node):
         self.current_cov = [0.0, 0.0, 0.0, 0.0, 0.0]  # cov_xx, cov_yy, cov_vv, cov_ww, cov_tt
         self.aruco_visible = False
         self.has_pose = False
+        self.replan_flag = 0
+        
+        self.ugv_solve_times = []
+        self.uav_solve_times = []
+        self.replan_reasons = {}
 
         # Timing
         self.start_time = self.get_clock().now()
@@ -73,6 +80,14 @@ class ExperimentLogger(Node):
         
         # UAV Position (for q_k and distance calculations)
         self.create_subscription(Pose, '/uav_gps_pose', self.uav_cb, 10)
+        
+        # Replan trigger
+        self.create_subscription(Bool, '/uav_replan_trigger', self.replan_cb, 10)
+        self.create_subscription(String, '/uav_replan_reason', self.replan_reason_cb, 10)
+        
+        # Solve times
+        self.create_subscription(Float32, '/ugv_mpc_solve_time', self.ugv_solve_cb, 10)
+        self.create_subscription(Float32, '/uav_mpc_solve_time', self.uav_solve_cb, 10)
 
         # Timer for periodic logging
         self.create_timer(1.0 / log_rate, self.log_callback)
@@ -132,10 +147,29 @@ class ExperimentLogger(Node):
         self.last_aruco_time = now
         self.aruco_visible = True
 
+    def replan_cb(self, msg):
+        if msg.data:
+            self.replan_flag = 1
+
+    def replan_reason_cb(self, msg):
+        reason = msg.data
+        if reason not in self.replan_reasons:
+            self.replan_reasons[reason] = 0
+        self.replan_reasons[reason] += 1
+
+    def ugv_solve_cb(self, msg):
+        self.ugv_solve_times.append(msg.data)
+
+    def uav_solve_cb(self, msg):
+        self.uav_solve_times.append(msg.data)
+
     # =========================================
     # PERIODIC LOGGING
     # =========================================
     def log_callback(self):
+        if self.uav_z < 0.1:
+            return  # Wait for drone to spawn and takeoff (avoids 0.0 glitch)
+            
         elapsed = (self.get_clock().now() - self.start_time).nanoseconds / 1e9
         if elapsed > self.duration:
             if not self.saved:
@@ -181,6 +215,8 @@ class ExperimentLogger(Node):
         
         qk = view_quality.compute_view_quality(self.uav_x, self.uav_y, self.uav_z, x, y)
         self.data['q_k'].append(qk)
+        self.data['replan_trigger'].append(self.replan_flag)
+        self.replan_flag = 0
 
     # =========================================
     # SAVE AND EXIT
@@ -204,10 +240,8 @@ class ExperimentLogger(Node):
         n = len(self.data['x'])
         if n > 0:
             tracking_errors = [
-                math.sqrt((x - tx)**2 + (y - ty)**2)
-                for x, y, tx, ty in zip(
-                    self.data['x'], self.data['y'],
-                    self.data['target_x'], self.data['target_y'])]
+                abs(ty)
+                for ty in self.data['target_y']]
 
             control_changes = [
                 math.sqrt((v2 - v1)**2 + (w2 - w1)**2)
@@ -224,15 +258,33 @@ class ExperimentLogger(Node):
             aruco_pct = (sum(self.data['aruco_visible']) / n * 100
                          if n > 0 else 0)
 
+            ugv_dist_traveled = sum(math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+                                    for x1, y1, x2, y2 in zip(
+                                        self.data['x'][:-1], self.data['y'][:-1],
+                                        self.data['x'][1:], self.data['y'][1:]))
+                                        
+            uav_dist_traveled = sum(math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+                                    for x1, y1, x2, y2 in zip(
+                                        self.data['uav_x'][:-1], self.data['uav_y'][:-1],
+                                        self.data['uav_x'][1:], self.data['uav_y'][1:]))
+
             summary = {
                 'experiment': self.exp_name,
                 'total_samples': n,
+                'total_replans': sum(self.data['replan_trigger']),
+                'ugv_dist_traveled': ugv_dist_traveled,
+                'uav_dist_traveled': uav_dist_traveled,
+                'mean_ugv_solve_ms': np.mean(self.ugv_solve_times) * 1000 if self.ugv_solve_times else 0,
+                'mean_uav_solve_ms': np.mean(self.uav_solve_times) * 1000 if self.uav_solve_times else 0,
                 'mean_tracking_error': np.mean(tracking_errors),
                 'max_tracking_error': np.max(tracking_errors),
                 'control_smoothness': (
                     np.mean(control_changes) if control_changes else 0),
                 'mean_cov_trace': np.mean(self.data['cov_trace']),
                 'max_cov_trace': np.max(self.data['cov_trace']),
+                'mean_uav_z': np.mean(self.data['uav_z']),
+                'min_uav_z': np.min(self.data['uav_z']),
+                'max_uav_z': np.max(self.data['uav_z']),
                 'fov_exit_pct': fov_exits / n * 100,
                 'aruco_visible_pct': aruco_pct,
                 'aruco_dropouts': len(self.aruco_dropouts),
@@ -247,6 +299,10 @@ class ExperimentLogger(Node):
                         f.write(f'{k}: {v:.4f}\n')
                     else:
                         f.write(f'{k}: {v}\n')
+                
+                f.write('\n--- Trigger Breakdown ---\n')
+                for reason, count in sorted(self.replan_reasons.items()):
+                    f.write(f'{reason}: {count}\n')
 
             self.get_logger().info(f'Data saved to: {filename}')
 

@@ -1,7 +1,7 @@
 import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, SetEnvironmentVariable, DeclareLaunchArgument, OpaqueFunction
+from launch.actions import IncludeLaunchDescription, SetEnvironmentVariable, DeclareLaunchArgument, OpaqueFunction, TimerAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
@@ -48,7 +48,7 @@ def launch_setup(context, *args, **kwargs):
     # 4. Spawn Drone at 5m height
     drone_sdf = os.path.join(pkg_ugv, 'models', 'x500_downward_camera', 'model.sdf')
     spawn_drone = Node(package='ros_gz_sim', executable='create',
-        arguments=['-name', 'uav', '-file', drone_sdf, '-z', '5.0', '-x', '0.0', '-y', '0.0'],
+        arguments=['-name', 'uav', '-file', drone_sdf, '-z', LaunchConfiguration('z_opt'), '-x', '0.0', '-y', '0.0'],
         output='screen')
 
     # 5. Bridges
@@ -78,7 +78,13 @@ def launch_setup(context, *args, **kwargs):
     
 
     # 5. Smart Controller Selection
-    nodes_to_start = [spawn_ground, spawn_robot, bridge, robot_bridge, spawn_drone]
+    nodes_to_start = [
+        TimerAction(period=3.0, actions=[spawn_ground]),
+        TimerAction(period=4.0, actions=[spawn_robot]),
+        TimerAction(period=5.0, actions=[spawn_drone]),
+        TimerAction(period=6.0, actions=[bridge]),
+        TimerAction(period=6.0, actions=[robot_bridge])
+    ]
     
     # Perception: Original all-in-one node (ArUco + Path + Debug Window)
     nodes_to_start.append(Node(package='ugv_uav_control', executable='middle_path_follower', output='screen'))
@@ -134,6 +140,7 @@ def launch_setup(context, *args, **kwargs):
                     'kappa_thresh': LaunchConfiguration('kappa_thresh'),
                     'drift_threshold': LaunchConfiguration('drift_threshold'),
                     'T_min': LaunchConfiguration('T_min'),
+                    'z_opt': LaunchConfiguration('z_opt'),
                 }],
                 remappings=[('/uav_gps_pose', '/model/uav/pose')],
                 output='screen'
@@ -178,12 +185,16 @@ def generate_launch_description():
     arg_bend = DeclareLaunchArgument('block_aruco_end', default_value='30.0')
 
     # Environment
-    gz_sim_path = SetEnvironmentVariable(name='GZ_SIM_RESOURCE_PATH', 
-        value=[os.path.join(pkg_ugv, 'models'), ':', os.environ.get('GZ_SIM_RESOURCE_PATH', '')])
+    current_gz_path = os.environ.get('GZ_SIM_RESOURCE_PATH', '')
+    new_gz_path = os.path.join(pkg_ugv, 'models')
+    if current_gz_path:
+        new_gz_path += ':' + current_gz_path
+    gz_sim_path = SetEnvironmentVariable(name='GZ_SIM_RESOURCE_PATH', value=new_gz_path)
 
+    # Graphics environment variables removed to prevent Optimus segfaults
     gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(pkg_gz, 'launch', 'gz_sim.launch.py')),
-        launch_arguments={'gz_args': f'-r {os.path.join(pkg_ugv, "worlds", "path_following.world")}'}.items(),
+        launch_arguments={'gz_args': f'-r -v 4 "{os.path.join(pkg_ugv, "worlds", "path_following.world")}"'}.items(),
     )
 
     return LaunchDescription([

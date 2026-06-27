@@ -11,7 +11,7 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist, Pose, PoseStamped, PoseWithCovarianceStamped
 from nav_msgs.msg import Path
-from std_msgs.msg import Bool
+from std_msgs.msg import Bool, String
 import numpy as np
 import math
 import os
@@ -30,6 +30,7 @@ class UAVAncillaryNode(Node):
         self.declare_parameter('kappa_thresh', 0.4)
         self.declare_parameter('drift_threshold', 0.07)
         self.declare_parameter('T_min', 3.0)
+        self.declare_parameter('z_opt', 6.0)
         
         self.alpha_min = self.get_parameter('alpha_min').value
         self.alpha_max = self.get_parameter('alpha_max').value
@@ -39,6 +40,7 @@ class UAVAncillaryNode(Node):
         self.kappa_thresh = self.get_parameter('kappa_thresh').value
         self.drift_threshold = self.get_parameter('drift_threshold').value
         self.T_min = self.get_parameter('T_min').value
+        self.z_opt = self.get_parameter('z_opt').value
         
         # === TUBE PARAMS ===
         # Load from scratch directory where we computed them
@@ -51,8 +53,9 @@ class UAVAncillaryNode(Node):
         else:
             self.get_logger().error(f"Tube params NOT FOUND at {params_path}!")
             # Fallback defaults if file missing (K=2, P=6.86)
-            self.K = np.eye(3) * 2.0
-            self.P_0 = np.eye(3) * 6.86
+        # Base ancillary gains (reduced to prevent chattering)
+        self.K = np.diag([0.6, 0.6, 0.8])
+        self.P_0 = np.eye(3) * 0.186
             
         # === STATE VARIABLES ===
         self.uav_pos = None      # Actual state
@@ -74,11 +77,11 @@ class UAVAncillaryNode(Node):
         # === PUBLISHERS ===
         self.cmd_pub = self.create_publisher(Twist, '/model/uav/cmd_vel', 10)
         self.replan_pub = self.create_publisher(Bool, '/uav_replan_trigger', 10)
-        
+        self.reason_pub = self.create_publisher(String, '/uav_replan_reason', 10)
         # === TIMER (20Hz) ===
         self.timer = self.create_timer(0.05, self.timer_callback)
         self.state = 'TAKEOFF'
-        self.takeoff_height = 5.0
+        self.takeoff_height = self.z_opt
         self.takeoff_velocity = 0.5
         
         self.get_logger().info('UAV Ancillary Node Started (20Hz)')
@@ -112,10 +115,10 @@ class UAVAncillaryNode(Node):
         if self.nominal_traj is None or len(self.nominal_traj.poses) < 2:
             return None, None
         
-        # Trajectory assumes steps of dt=0.3s
+        # Trajectory assumes steps of dt=0.2s
         # Start time is header timestamp of nominal_traj
         t0 = rclpy.time.Time.from_msg(self.nominal_traj.header.stamp).nanoseconds / 1e9
-        idx = int((now_ts - t0) / 0.3)
+        idx = int((now_ts - t0) / 0.2)
         
         if idx < 0:
             p = self.nominal_traj.poses[0].pose.position
@@ -128,7 +131,7 @@ class UAVAncillaryNode(Node):
         # Simple interpolation
         p1 = self.nominal_traj.poses[idx].pose.position
         p2 = self.nominal_traj.poses[idx+1].pose.position
-        ratio = ((now_ts - t0) % 0.3) / 0.3
+        ratio = ((now_ts - t0) % 0.2) / 0.2
         
         x_bar = np.array([
             p1.x + ratio * (p2.x - p1.x),
@@ -138,9 +141,9 @@ class UAVAncillaryNode(Node):
         
         # Nominal velocity bar (finite difference of traj steps)
         u_bar = np.array([
-            (p2.x - p1.x) / 0.3,
-            (p2.y - p1.y) / 0.3,
-            (p2.z - p1.z) / 0.3
+            (p2.x - p1.x) / 0.2,
+            (p2.y - p1.y) / 0.2,
+            (p2.z - p1.z) / 0.2
         ])
         
         return x_bar, u_bar
@@ -164,11 +167,11 @@ class UAVAncillaryNode(Node):
 
         # 1. Initial Bootstrap Trigger (if no plan exists yet)
         if self.nominal_traj is None:
-            if not hasattr(self, 'bootstrap_sent'):
+            if not hasattr(self, 'last_bootstrap_time') or (now_ts - self.last_bootstrap_time) > 1.0:
                 self.get_logger().info("[ANC] Bootstrapping first nominal plan...")
                 out_msg = Bool(); out_msg.data = True
                 self.replan_pub.publish(out_msg)
-                self.bootstrap_sent = True
+                self.last_bootstrap_time = now_ts
             return
         
         # 2. Control Logic
@@ -207,7 +210,10 @@ class UAVAncillaryNode(Node):
         can_trigger_3 = (now_ts - self.trigger_lockouts["3"]) > 1.0
         
         # Level 1b - ArUco Spike
-        if not trigger and can_trigger_1b:
+
+        #C2 BASELINE- (No belief Space)---- Uncomment the below line
+        if False and not trigger and can_trigger_1b:
+        #if not trigger and can_trigger_1b:    #Comment out for C2 baseline
             if self.last_tr_sigma > self.tr_spike_threshold:
                 past_05 = [v for t, v in self.tr_sigma_history if (now_ts - t) >= 0.45 and (now_ts - t) <= 0.55]
                 if past_05 and self.last_tr_sigma > (1.5 * past_05[0]):
@@ -216,6 +222,8 @@ class UAVAncillaryNode(Node):
 
         # Level 2 - Curvature Anticipation
         max_kappa = 0.0
+        #C3 BASELINE- (No belief Space)---- Uncomment the below line
+        #if False and not trigger and can_trigger_2 and self.ugv_traj is not None:
         if not trigger and can_trigger_2 and self.ugv_traj is not None:
             poses = self.ugv_traj.poses
             for i in range(min(2, len(poses)-1)):
@@ -238,10 +246,24 @@ class UAVAncillaryNode(Node):
                 trigger = True; replan_reason = "Drift Maintenance"; level = "3"
                 self.trigger_lockouts["3"] = now_ts
                 
+        # Level 4 - Plan Expiry
+        if not trigger and self.nominal_traj is not None:
+            t0 = rclpy.time.Time.from_msg(self.nominal_traj.header.stamp).nanoseconds / 1e9
+            idx = int((now_ts - t0) / 0.2)
+            if idx >= len(self.nominal_traj.poses) - 2:
+                trigger = True; replan_reason = "Plan Expiry"; level = "4"
+
+        # FOR C1 BASELINE : NAIVE TUBE MPC (without event-trigerring conditions)
+        #trigger = True 
+
         if trigger:
             self.get_logger().info(f"[TRIGGER] Level {level}: {replan_reason} | tr(Sigma): {self.last_tr_sigma:.4f} | UAV_Z: {self.uav_pos[2]:.2f}")
             out_msg = Bool(); out_msg.data = True
             self.replan_pub.publish(out_msg)
+            
+            reason_msg = String()
+            reason_msg.data = replan_reason
+            self.reason_pub.publish(reason_msg)
         elif (now_ts % 2.0) < 0.05: # Heartbeat every 2s
             e_norm = np.linalg.norm(e_k)
             self.get_logger().info(f"[ANC_HB] State: {self.state} | e_norm: {e_norm:.3f} | Alpha: {alpha_k:.2f} | Inside: {inside_tube}")

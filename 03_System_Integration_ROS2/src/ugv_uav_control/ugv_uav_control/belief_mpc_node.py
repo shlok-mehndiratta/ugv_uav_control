@@ -11,10 +11,12 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import TwistStamped, Pose, PoseStamped, PoseWithCovarianceStamped
 from nav_msgs.msg import Path
+from std_msgs.msg import Float32
 from scipy.optimize import minimize
 from ugv_uav_control import ugv_model
 import numpy as np
 import math
+import time
 
 class BeliefMPCNode(Node):
     def __init__(self):
@@ -28,6 +30,7 @@ class BeliefMPCNode(Node):
         # === PUBLISHERS ===
         self.publisher = self.create_publisher(TwistStamped, '/cmd_vel', 10)
         self.traj_pub = self.create_publisher(Path, '/ugv_predicted_traj', 10)
+        self.solve_time_pub = self.create_publisher(Float32, '/ugv_mpc_solve_time', 10)
         
         # === MPC PARAMETERS ===
         self.horizon = 5
@@ -252,6 +255,10 @@ class BeliefMPCNode(Node):
             options={'ftol': 1e-3, 'maxiter': 20}
         )
         solve_time_ms = (self.get_clock().now() - start_time).nanoseconds / 1e6
+        
+        msg = Float32()
+        msg.data = float(solve_time_ms / 1000.0) # publish in seconds to be consistent with uav
+        self.solve_time_pub.publish(msg)
         
         if result.success:
             u_opt = result.x.reshape((self.horizon, 2))

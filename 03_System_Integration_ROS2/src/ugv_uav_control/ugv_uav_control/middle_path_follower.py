@@ -10,7 +10,7 @@ Outputs: /waypoints (PoseStamped), /aruco_pose (PoseStamped)
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
-from geometry_msgs.msg import Twist, Point, PoseStamped
+from geometry_msgs.msg import Twist, Point, PoseStamped, Pose
 from cv_bridge import CvBridge
 import cv2
 import numpy as np
@@ -34,6 +34,7 @@ class MiddlePathFollower(Node):
         self.get_logger().info('Initializing MiddlePathFollower...')
         
         self.subscription = self.create_subscription(Image, 'overhead_camera/image', self.image_callback, 10)
+        self.create_subscription(Pose, '/model/uav/pose', self.uav_pose_cb, 10)
         self.debug_pub = self.create_publisher(Image, '/middle_path/debug_image', 10)
         self.waypoint_pub = self.create_publisher(PoseStamped, '/waypoints', 10) 
         self.nearest_pub = self.create_publisher(PoseStamped, '/nearest_point', 10)
@@ -49,11 +50,23 @@ class MiddlePathFollower(Node):
         self.aruco_params.minMarkerPerimeterRate = 0.01
         
         self.camera_height = 5.0
+        self.uav_x = 0.0
+        self.uav_y = 0.0
         self.fov = 1.047 # 60 degrees
         self.image_width = None
         self.scale = None
         self.frame_count = 0
         self.get_logger().info('Middle Path Follower Node Started')
+        
+    def uav_pose_cb(self, msg):
+        # Dynamically update camera height, position, and pixel scale
+        self.uav_x = msg.position.x
+        self.uav_y = msg.position.y
+        self.camera_height = msg.position.z
+        if self.image_width is not None:
+            world_width = 2 * self.camera_height * math.tan(self.fov / 2)
+            self.scale = world_width / self.image_width
+
     def image_callback(self, msg):
         try:
             cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
@@ -75,6 +88,11 @@ class MiddlePathFollower(Node):
 
             for i in range(len(ids)):
                 if ids[i][0] == 55: # Robot Marker ID
+                    # --- SIMULATE OCCLUSION FOR C2 BASELINE---
+                    if 250 < self.frame_count < 310: 
+                        self.get_logger().warn("SIMULATING OCCLUSION: Hiding ArUco Marker!")
+                        continue
+                    # --------------TILL HERE [Uncomment for C2 Baseline]-------------------
                     c = corners[i][0]
                     cx = int(np.mean(c[:, 0]))
                     cy = int(np.mean(c[:, 1]))
@@ -89,9 +107,9 @@ class MiddlePathFollower(Node):
             aruco_msg = PoseStamped()
             aruco_msg.header.stamp = self.get_clock().now().to_msg()
             aruco_msg.header.frame_id = 'world'
-            # Convert pixel to world coordinates
-            aruco_msg.pose.position.x = (robot_pos[0] - self.image_width/2) * self.scale
-            aruco_msg.pose.position.y = (robot_pos[1] - self.image_height/2) * self.scale
+            # Convert pixel to world coordinates by adding UAV world position
+            aruco_msg.pose.position.x = self.uav_x + (robot_pos[0] - self.image_width/2) * self.scale
+            aruco_msg.pose.position.y = self.uav_y + (robot_pos[1] - self.image_height/2) * self.scale
             q = quaternion_from_euler(0, 0, robot_angle)
             aruco_msg.pose.orientation.x, aruco_msg.pose.orientation.y = q[0], q[1]
             aruco_msg.pose.orientation.z, aruco_msg.pose.orientation.w = q[2], q[3]

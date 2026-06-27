@@ -2,11 +2,11 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist, Pose, PoseStamped, PoseWithCovarianceStamped
 from nav_msgs.msg import Path
-from std_msgs.msg import Bool
+from std_msgs.msg import Bool, Float32
 import numpy as np
 import math
 import time
-from scipy.optimize import minimize
+from scipy.optimize import minimize, LinearConstraint
 
 # Shared utilities
 import ugv_uav_control.ugv_model as ugv_model
@@ -31,7 +31,11 @@ class UAVMPCNode(Node):
         self.vz_max = self.get_parameter('vz_max').value
         self.w_alt = self.get_parameter('w_alt').value
         self.sigma_z = self.get_parameter('sigma_z').value
-        self.use_timer = self.get_parameter('use_timer').value
+        use_timer_val = self.get_parameter('use_timer').value
+        if isinstance(use_timer_val, str):
+            self.use_timer = (use_timer_val.lower() == 'true')
+        else:
+            self.use_timer = bool(use_timer_val)
         
         # MPC Constants
         self.N = 10  # Hardware budget: <150ms
@@ -55,6 +59,7 @@ class UAVMPCNode(Node):
         
         # === PUBLISHERS ===
         self.traj_pub = self.create_publisher(Path, '/uav_nominal_traj', 10)
+        self.solve_time_pub = self.create_publisher(Float32, '/uav_mpc_solve_time', 10)
         
         if self.use_timer:
             self.create_timer(1.0, self.solve_mpc)
@@ -93,7 +98,7 @@ class UAVMPCNode(Node):
         
         # 1. Goal Tracking (Targeting the UGV's predicted state at end of horizon)
         # Using a simplified distance to the last known UGV traj point
-        dist_sq = np.sum((traj_pos - ugv_goal)**2, axis=1)
+        dist_sq = np.sum((traj_pos[:, :2] - ugv_goal[:2])**2, axis=1)
         cost = np.sum(dist_sq * self.Q_vec)
         
         # 2. Optimal Altitude Cost
@@ -129,18 +134,33 @@ class UAVMPCNode(Node):
         u0 = np.roll(self.u_prev, -1, axis=0)
         u0[-1] = [0.0, 0.0, 0.0]
         
+        # Height Constraints: z_min <= z_start + sum(vz * dt) <= z_max
+        A = np.zeros((self.N, 3 * self.N))
+        for k in range(self.N):
+            for i in range(k + 1):
+                A[k, 3 * i + 2] = self.dt
+        
+        lb = np.full(self.N, self.z_min - self.uav_pos[2])
+        ub = np.full(self.N, self.z_max - self.uav_pos[2])
+        z_constraint = LinearConstraint(A, lb, ub)
+        
         res = minimize(
             self.cost_function, 
             u0.flatten(), 
             args=(self.uav_pos, ugv_goal),
             method='SLSQP',
             bounds=bounds,
+            constraints=[z_constraint],
             options={'maxiter': 15, 'ftol': 1e-3}
         )
         
         solve_duration = time.time() - start_time
         self.solve_times.append(solve_duration)
         self.total_solves += 1
+        
+        msg = Float32()
+        msg.data = float(solve_duration)
+        self.solve_time_pub.publish(msg)
         
         if res.success:
             u_opt = res.x.reshape(self.N, 3)

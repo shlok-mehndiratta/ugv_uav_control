@@ -23,7 +23,8 @@
       <!-- CUSTOM ARUCO MARKER PLATE -->
       <visual name="aruco_visual">
         <pose>0 0 0.2 0 0 0</pose> <!-- Positioned 20cm up (above LIDAR) -->
-        <geometry><box><size>0.5 0.5 0.001</size></box></geometry> <!-- 50cm x 50cm Plate -->
+        <cast_shadows>false</cast_shadows>
+        <geometry><box><size>0.5 0.5 0.01</size></box></geometry> <!-- 50cm x 50cm Plate (Thicker for rendering stability) -->
         <material>
           <ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse><specular>0 0 0 1</specular>
           <pbr><metal>
@@ -49,7 +50,7 @@
         <geometry><mesh><uri>model://turtlebot3_common/meshes/sensors/lds.stl</uri><scale>0.001 0.001 0.001</scale></mesh></geometry>
         <material><ambient>0.2 0.2 0.2 1.0</ambient><diffuse>0.2 0.2 0.2 1.0</diffuse></material>
       </visual>
-      <sensor name="hls_lfcd_lds" type="gpu_lidar">
+      <sensor name="hls_lfcd_lds" type="lidar">
         <always_on>true</always_on><visualize>true</visualize><pose>-0.032 0 0.171 0 0 0</pose><topic>scan</topic><gz_frame_id>base_scan</gz_frame_id>
         <lidar><scan><horizontal><samples>360</samples><resolution>1</resolution><min_angle>0</min_angle><max_angle>6.28</max_angle></horizontal></scan><range><min>0.12</min><max>3.5</max></range></lidar>
       </sensor>
