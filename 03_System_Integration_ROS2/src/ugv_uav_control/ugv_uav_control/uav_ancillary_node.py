@@ -213,7 +213,7 @@ class UAVAncillaryNode(Node):
 
         #C2 BASELINE- (No belief Space)---- Uncomment the below line
         if False and not trigger and can_trigger_1b:
-        #if not trigger and can_trigger_1b:    #Comment out for C2 baseline
+        # if not trigger and can_trigger_1b:    #Comment out for C2 baseline
             if self.last_tr_sigma > self.tr_spike_threshold:
                 past_05 = [v for t, v in self.tr_sigma_history if (now_ts - t) >= 0.45 and (now_ts - t) <= 0.55]
                 if past_05 and self.last_tr_sigma > (1.5 * past_05[0]):
@@ -223,7 +223,7 @@ class UAVAncillaryNode(Node):
         # Level 2 - Curvature Anticipation
         max_kappa = 0.0
         #C3 BASELINE- (No belief Space)---- Uncomment the below line
-        #if False and not trigger and can_trigger_2 and self.ugv_traj is not None:
+        # if False and not trigger and can_trigger_2 and self.ugv_traj is not None:
         if not trigger and can_trigger_2 and self.ugv_traj is not None:
             poses = self.ugv_traj.poses
             for i in range(min(2, len(poses)-1)):
@@ -254,7 +254,7 @@ class UAVAncillaryNode(Node):
                 trigger = True; replan_reason = "Plan Expiry"; level = "4"
 
         # FOR C1 BASELINE : NAIVE TUBE MPC (without event-trigerring conditions)
-        #trigger = True 
+        trigger = True 
 
         if trigger:
             self.get_logger().info(f"[TRIGGER] Level {level}: {replan_reason} | tr(Sigma): {self.last_tr_sigma:.4f} | UAV_Z: {self.uav_pos[2]:.2f}")

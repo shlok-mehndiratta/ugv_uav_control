@@ -68,6 +68,7 @@ class MiddlePathFollower(Node):
             self.scale = world_width / self.image_width
 
     def image_callback(self, msg):
+        self.frame_count += 1
         try:
             cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
         except Exception as e:
@@ -88,11 +89,6 @@ class MiddlePathFollower(Node):
 
             for i in range(len(ids)):
                 if ids[i][0] == 55: # Robot Marker ID
-                    # --- SIMULATE OCCLUSION FOR C2 BASELINE---
-                    if 250 < self.frame_count < 310: 
-                        self.get_logger().warn("SIMULATING OCCLUSION: Hiding ArUco Marker!")
-                        continue
-                    # --------------TILL HERE [Uncomment for C2 Baseline]-------------------
                     c = corners[i][0]
                     cx = int(np.mean(c[:, 0]))
                     cy = int(np.mean(c[:, 1]))
@@ -116,6 +112,11 @@ class MiddlePathFollower(Node):
             self.aruco_pose_pub.publish(aruco_msg)
         
         if robot_pos is None:
+            # CRITICAL: Must pump OpenCV events even when ArUco is lost,
+            # otherwise the window manager marks the window as unresponsive.
+            try:
+                cv2.waitKey(1)
+            except: pass
             return
         gray = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY)
         _, thresh = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY)
@@ -126,7 +127,15 @@ class MiddlePathFollower(Node):
         # Seed search ahead of robot
         seed_point = robot_pos
         found_seed = False
-        search_dists = [40, 50, 60, 30, 70] 
+        # Dynamically scale search distances based on altitude
+        if self.scale is not None and self.scale > 0:
+            # Originally at z=6.0m (scale~0.01), 40px was ~0.4m. 
+            search_dists = [int(d / self.scale) for d in [0.4, 0.5, 0.6, 0.3, 0.7]]
+            mask_radius = int(0.6 / self.scale)
+        else:
+            search_dists = [40, 50, 60, 30, 70]
+            mask_radius = 60
+
         search_angles = [0, 0.2, -0.2, 0.4, -0.4, 0.6, -0.6]
         
         for dist in search_dists:
@@ -156,13 +165,17 @@ class MiddlePathFollower(Node):
         heatmap = cv2.applyColorMap((dist_norm * 255).astype(np.uint8), cv2.COLORMAP_JET)
         final_img = cv2.addWeighted(cv_image, 0.6, heatmap, 0.4, 0)
         
-        # Calculate Target
-        lookahead_dist = 50
+        # Calculate Target (Target is always 0.5 meters ahead physically)
+        if self.scale is not None and self.scale > 0:
+            lookahead_dist = int(0.5 / self.scale)
+        else:
+            lookahead_dist = 50
+
         proj_x = robot_pos[0] + lookahead_dist * math.cos(robot_angle)
         proj_y = robot_pos[1] + lookahead_dist * math.sin(robot_angle)
         
         mask = np.zeros_like(gray)
-        cv2.circle(mask, (int(proj_x), int(proj_y)), 60, 255, -1)
+        cv2.circle(mask, (int(proj_x), int(proj_y)), mask_radius, 255, -1)
         
         masked_dist = dist_map.copy()
         masked_dist[mask == 0] = 0
@@ -174,7 +187,6 @@ class MiddlePathFollower(Node):
         cv2.circle(final_img, target_point, 8, (0, 255, 255), -1) 
         cv2.line(final_img, robot_pos, target_point, (255, 0, 255), 2)
         
-        self.frame_count += 1
         if self.frame_count % 5 == 0:
             h, w = cv_image.shape[:2]
             half_h, half_w = h // 3, w // 3

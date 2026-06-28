@@ -32,6 +32,8 @@ class ExperimentLogger(Node):
         self.data = {
             'timestamp': [],
             'x': [], 'y': [], 'theta': [],
+            'odom_x': [], 'odom_y': [], 'odom_theta': [],
+            'true_ugv_x': [], 'true_ugv_y': [], 'true_ugv_theta': [],
             'v_cmd': [], 'w_cmd': [],
             'target_x': [], 'target_y': [],
             'cov_trace': [],
@@ -51,6 +53,8 @@ class ExperimentLogger(Node):
         self.current_cmd = [0.0, 0.0]
         self.current_target = [0.0, 0.0]
         self.current_pose = [0.0, 0.0, 0.0]  # x, y, theta
+        self.current_odom = [0.0, 0.0, 0.0]  # odom_x, odom_y, odom_theta
+        self.current_true_ugv = [0.5, 0.0, 0.0]  # true_ugv_x, true_ugv_y, true_ugv_theta
         self.current_cov = [0.0, 0.0, 0.0, 0.0, 0.0]  # cov_xx, cov_yy, cov_vv, cov_ww, cov_tt
         self.aruco_visible = False
         self.has_pose = False
@@ -81,6 +85,9 @@ class ExperimentLogger(Node):
         # UAV Position (for q_k and distance calculations)
         self.create_subscription(Pose, '/uav_gps_pose', self.uav_cb, 10)
         
+        # UGV Ground Truth Position directly from Gazebo
+        self.create_subscription(Pose, '/model/turtlebot3_burger/pose', self.true_ugv_cb, 10)
+        
         # Replan trigger
         self.create_subscription(Bool, '/uav_replan_trigger', self.replan_cb, 10)
         self.create_subscription(String, '/uav_replan_reason', self.replan_reason_cb, 10)
@@ -99,6 +106,14 @@ class ExperimentLogger(Node):
     # =========================================
     # CALLBACKS
     # =========================================
+    def true_ugv_cb(self, msg):
+        self.current_true_ugv[0] = msg.position.x
+        self.current_true_ugv[1] = msg.position.y
+        q = msg.orientation
+        self.current_true_ugv[2] = math.atan2(
+            2 * (q.w * q.z + q.x * q.y),
+            1 - 2 * (q.y * q.y + q.z * q.z))
+
     def belief_cb(self, msg):
         """Primary pose source when EKF is active."""
         # print("[DEBUG] Belief received")
@@ -118,14 +133,19 @@ class ExperimentLogger(Node):
         self.has_pose = True
 
     def odom_cb(self, msg):
-        """Fallback pose source if belief_state is not available."""
+        """Log true physical pose from odometry."""
+        q = msg.pose.pose.orientation
+        yaw = math.atan2(
+            2 * (q.w * q.z + q.x * q.y),
+            1 - 2 * (q.y * q.y + q.z * q.z))
+        self.current_odom[0] = msg.pose.pose.position.x
+        self.current_odom[1] = msg.pose.pose.position.y
+        self.current_odom[2] = yaw
+        
         if not self.has_pose:
             self.current_pose[0] = msg.pose.pose.position.x
             self.current_pose[1] = msg.pose.pose.position.y
-            q = msg.pose.pose.orientation
-            self.current_pose[2] = math.atan2(
-                2 * (q.w * q.z + q.x * q.y),
-                1 - 2 * (q.y * q.y + q.z * q.z))
+            self.current_pose[2] = yaw
 
     def uav_cb(self, msg):
         # print("[DEBUG] UAV pose received")
@@ -196,6 +216,12 @@ class ExperimentLogger(Node):
         self.data['x'].append(x)
         self.data['y'].append(y)
         self.data['theta'].append(theta)
+        self.data['odom_x'].append(self.current_odom[0])
+        self.data['odom_y'].append(self.current_odom[1])
+        self.data['odom_theta'].append(self.current_odom[2])
+        self.data['true_ugv_x'].append(self.current_true_ugv[0])
+        self.data['true_ugv_y'].append(self.current_true_ugv[1])
+        self.data['true_ugv_theta'].append(self.current_true_ugv[2])
         self.data['v_cmd'].append(self.current_cmd[0])
         self.data['w_cmd'].append(self.current_cmd[1])
         self.data['target_x'].append(self.current_target[0])
@@ -223,7 +249,8 @@ class ExperimentLogger(Node):
     # =========================================
     def save_and_exit(self):
         self.saved = True
-        output_dir = os.path.expanduser('~/experiment_logs')
+        # Save directly to the results folder in the workspace
+        output_dir = os.path.join(os.getcwd(), 'results')
         os.makedirs(output_dir, exist_ok=True)
 
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
