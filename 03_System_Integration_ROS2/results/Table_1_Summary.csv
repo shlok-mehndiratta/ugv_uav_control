@@ -1,0 +1,4 @@
+Condition,Replans,Mean Error (m),Max Error (m),Control Jerk,Mean tr(Σ),ArUco (%)
+C1 (Continuous MPC),1116,0.0568,0.5997,0.0214,0.0070,99.9
+C2 (Reactive Tube-MPC),107,0.0595,0.5994,0.0161,0.0101,99.2
+C3 (Proposed Belief-MPC),102,0.0591,0.5975,0.0303,0.0069,99.9

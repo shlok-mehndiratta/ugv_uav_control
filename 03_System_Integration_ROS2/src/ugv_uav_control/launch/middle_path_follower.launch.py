@@ -28,7 +28,7 @@ def launch_setup(context, *args, **kwargs):
         sdf_content = f.read()
     
     # Replace default track with user argument
-    modified_sdf = sdf_content.replace('track4.png', track_name)
+    modified_sdf = sdf_content.replace('track2.png', track_name)
     # WRITE TO TEMP FILE (The Fix)
     import tempfile
     temp_sdf_path = os.path.join(tempfile.gettempdir(), 'temp_ground_plane.sdf')
@@ -42,7 +42,7 @@ def launch_setup(context, *args, **kwargs):
     # 3. Standard Robot Spawning
     robot_sdf = os.path.join(pkg_ugv, 'models', 'turtlebot3_burger_aruco', 'model.sdf')
     spawn_robot = Node(package='ros_gz_sim', executable='create',
-        arguments=['-name', 'turtlebot3_burger', '-file', robot_sdf, '-z', '0.01'],
+        arguments=['-name', 'turtlebot3_burger', '-file', robot_sdf, '-z', '0.01', '-x', '0.5'],
         output='screen')
 
     # 4. Spawn Drone at 5m height
@@ -57,7 +57,8 @@ def launch_setup(context, *args, **kwargs):
             '/drone/camera/image@sensor_msgs/msg/Image@gz.msgs.Image',
             '/drone/camera/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo',
             '/model/uav/pose@geometry_msgs/msg/Pose@gz.msgs.Pose',
-            '/model/uav/cmd_vel@geometry_msgs/msg/Twist@gz.msgs.Twist'
+            '/model/uav/cmd_vel@geometry_msgs/msg/Twist@gz.msgs.Twist',
+            '/model/turtlebot3_burger/pose@geometry_msgs/msg/Pose@gz.msgs.Pose'
         ],
         remappings=[
             ('/drone/camera/image', '/overhead_camera/image'),
@@ -141,6 +142,8 @@ def launch_setup(context, *args, **kwargs):
                     'drift_threshold': LaunchConfiguration('drift_threshold'),
                     'T_min': LaunchConfiguration('T_min'),
                     'z_opt': LaunchConfiguration('z_opt'),
+                    'c1_baseline': LaunchConfiguration('use_timer'),
+                    'controller_type': LaunchConfiguration('controller'),
                 }],
                 remappings=[('/uav_gps_pose', '/model/uav/pose')],
                 output='screen'
@@ -153,7 +156,7 @@ def generate_launch_description():
     pkg_gz = get_package_share_directory('ros_gz_sim')
     
     # Define Arguments
-    arg_track = DeclareLaunchArgument('track_name', default_value='track4.png', description='Texture file to usage')
+    arg_track = DeclareLaunchArgument('track_name', default_value='track2.png', description='Texture file to usage')
     arg_ctrl = DeclareLaunchArgument('controller', default_value='belief_mpc', description='Controller node to launch')
     arg_fallback = DeclareLaunchArgument('force_fallback', default_value='false', description='Force UAV fallback policy')
     arg_dur = DeclareLaunchArgument('duration', default_value='60.0', description='Experiment duration in seconds')

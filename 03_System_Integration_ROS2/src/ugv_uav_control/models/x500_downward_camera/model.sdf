@@ -3,9 +3,29 @@
   <model name="x500_downward_camera">
     <static>false</static>
     
-    <!-- Camera Link (The Anchor) -->
+    <!-- Base Link (The Canonical Anchor aligned with the world) -->
+    <link name="base_link">
+      <pose>0 0 0 0 0 0</pose> 
+      <gravity>0</gravity>
+      <inertial>
+        <mass>1.5</mass>
+        <inertia><ixx>0.015</ixx><ixy>0</ixy><ixz>0</ixz><iyy>0.015</iyy><iyz>0</iyz><izz>0.02</izz></inertia>
+      </inertial>
+      
+      <visual name="base_link_visual">
+        <pose>0 0 .025 0 0 3.141592654</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://x500/meshes/NXP-HGD-CF.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+
+    <!-- Camera Link (Pitched pointing down) -->
     <link name="camera_link">
-      <pose>0 0 0 0 1.5707 0</pose> 
+      <pose>0 0 0 0 1.5707 0</pose>
       <gravity>0</gravity>
       <inertial>
         <mass>0.1</mass>
@@ -30,26 +50,14 @@
       </sensor>
     </link>
 
-    <!-- Visual representation of the drone body (Physics disabled to prevent VelocityControl explosion) -->
-    <link name="drone_visual_link">
-      <pose>0 0 0 0 0 0</pose>
-      <visual name="base_link_visual">
-          <pose>0 0 .025 0 0 3.141592654</pose>
-          <geometry>
-              <mesh>
-                  <scale>1 1 1</scale>
-                  <uri>model://x500/meshes/NXP-HGD-CF.dae</uri>
-              </mesh>
-          </geometry>
-      </visual>
-    </link>
-    <joint name="visual_joint" type="fixed">
-      <parent>camera_link</parent>
-      <child>drone_visual_link</child>
+    <joint name="camera_joint" type="fixed">
+      <parent>base_link</parent>
+      <child>camera_link</child>
     </joint>
+
     <!-- Movement and Telemetry Plugins -->
     <plugin filename="gz-sim-pose-publisher-system" name="gz::sim::systems::PosePublisher">
-      <publish_link_pose>true</publish_link_pose>
+      <publish_link_pose>false</publish_link_pose>
       <publish_model_pose>true</publish_model_pose>
       <update_frequency>20</update_frequency>
     </plugin>

@@ -1,0 +1,21 @@
+experiment: C2_Reactive
+total_samples: 1094
+total_replans: 107
+ugv_dist_traveled: 25.1625
+uav_dist_traveled: 23.6902
+mean_ugv_solve_ms: 0
+mean_uav_solve_ms: 0
+mean_tracking_error: 0.0595
+max_tracking_error: 0.5994
+control_smoothness: 0.0161
+mean_cov_trace: 0.0101
+max_cov_trace: 0.4039
+mean_uav_z: 6.0000
+min_uav_z: 6.0000
+max_uav_z: 6.0000
+fov_exit_pct: 0.0000
+aruco_visible_pct: 99.1773
+aruco_dropouts: 1
+max_dropout_s: 6.8028
+
+--- Trigger Breakdown ---

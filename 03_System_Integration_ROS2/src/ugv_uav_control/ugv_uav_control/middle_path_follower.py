@@ -103,10 +103,21 @@ class MiddlePathFollower(Node):
             aruco_msg = PoseStamped()
             aruco_msg.header.stamp = self.get_clock().now().to_msg()
             aruco_msg.header.frame_id = 'world'
-            # Convert pixel to world coordinates by adding UAV world position
-            aruco_msg.pose.position.x = self.uav_x + (robot_pos[0] - self.image_width/2) * self.scale
-            aruco_msg.pose.position.y = self.uav_y + (robot_pos[1] - self.image_height/2) * self.scale
-            q = quaternion_from_euler(0, 0, robot_angle)
+            # Convert pixel to world coordinates by adding UAV world position:
+            # - Column offset (robot_pos[0] - image_width/2) maps to negative world Y
+            # - Row offset (robot_pos[1] - image_height/2) maps to negative world X
+            dx_world = -(robot_pos[1] - self.image_height/2) * self.scale
+            dy_world = -(robot_pos[0] - self.image_width/2) * self.scale
+            aruco_msg.pose.position.x = self.uav_x + dx_world
+            aruco_msg.pose.position.y = self.uav_y + dy_world
+            
+            # Correct yaw transformation:
+            # - In image frame: angle is relative to column axis (pointing right, which is world -Y)
+            # - World yaw = -robot_angle - pi/2
+            world_yaw = -robot_angle - math.pi/2
+            world_yaw = math.atan2(math.sin(world_yaw), math.cos(world_yaw))
+            
+            q = quaternion_from_euler(0, 0, world_yaw)
             aruco_msg.pose.orientation.x, aruco_msg.pose.orientation.y = q[0], q[1]
             aruco_msg.pose.orientation.z, aruco_msg.pose.orientation.w = q[2], q[3]
             self.aruco_pose_pub.publish(aruco_msg)

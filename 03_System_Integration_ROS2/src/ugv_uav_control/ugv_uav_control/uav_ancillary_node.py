@@ -31,6 +31,8 @@ class UAVAncillaryNode(Node):
         self.declare_parameter('drift_threshold', 0.07)
         self.declare_parameter('T_min', 3.0)
         self.declare_parameter('z_opt', 6.0)
+        self.declare_parameter('c1_baseline', False)
+        self.declare_parameter('controller_type', 'belief_mpc')
         
         self.alpha_min = self.get_parameter('alpha_min').value
         self.alpha_max = self.get_parameter('alpha_max').value
@@ -41,6 +43,15 @@ class UAVAncillaryNode(Node):
         self.drift_threshold = self.get_parameter('drift_threshold').value
         self.T_min = self.get_parameter('T_min').value
         self.z_opt = self.get_parameter('z_opt').value
+        self.controller_type = self.get_parameter('controller_type').value
+        self.enable_belief = (self.controller_type == 'belief_mpc')
+        
+        # Support string/bool for c1_baseline
+        c1_val = self.get_parameter('c1_baseline').value
+        if isinstance(c1_val, str):
+            self.c1_baseline = (c1_val.lower() == 'true')
+        else:
+            self.c1_baseline = bool(c1_val)
         
         # === TUBE PARAMS ===
         # Load from scratch directory where we computed them
@@ -210,10 +221,7 @@ class UAVAncillaryNode(Node):
         can_trigger_3 = (now_ts - self.trigger_lockouts["3"]) > 1.0
         
         # Level 1b - ArUco Spike
-
-        #C2 BASELINE- (No belief Space)---- Uncomment the below line
-        if False and not trigger and can_trigger_1b:
-        # if not trigger and can_trigger_1b:    #Comment out for C2 baseline
+        if self.enable_belief and not trigger and can_trigger_1b:
             if self.last_tr_sigma > self.tr_spike_threshold:
                 past_05 = [v for t, v in self.tr_sigma_history if (now_ts - t) >= 0.45 and (now_ts - t) <= 0.55]
                 if past_05 and self.last_tr_sigma > (1.5 * past_05[0]):
@@ -222,9 +230,7 @@ class UAVAncillaryNode(Node):
 
         # Level 2 - Curvature Anticipation
         max_kappa = 0.0
-        #C3 BASELINE- (No belief Space)---- Uncomment the below line
-        # if False and not trigger and can_trigger_2 and self.ugv_traj is not None:
-        if not trigger and can_trigger_2 and self.ugv_traj is not None:
+        if self.enable_belief and not trigger and can_trigger_2 and self.ugv_traj is not None:
             poses = self.ugv_traj.poses
             for i in range(min(2, len(poses)-1)):
                 p1 = poses[i].pose.position; p2 = poses[i+1].pose.position
@@ -240,7 +246,7 @@ class UAVAncillaryNode(Node):
                 self.trigger_lockouts["2"] = now_ts
                 
         # Level 3 - Drift Maintenance
-        if not trigger and can_trigger_3:
+        if self.enable_belief and not trigger and can_trigger_3:
             time_since_replan = (self.get_clock().now() - self.last_replan_time).nanoseconds / 1e9
             if self.last_tr_sigma > self.drift_threshold and time_since_replan > self.T_min:
                 trigger = True; replan_reason = "Drift Maintenance"; level = "3"
@@ -254,7 +260,10 @@ class UAVAncillaryNode(Node):
                 trigger = True; replan_reason = "Plan Expiry"; level = "4"
 
         # FOR C1 BASELINE : NAIVE TUBE MPC (without event-trigerring conditions)
-        trigger = True 
+        if self.c1_baseline:
+            trigger = True
+            replan_reason = "C1 Baseline Continuous"
+            level = "C1"
 
         if trigger:
             self.get_logger().info(f"[TRIGGER] Level {level}: {replan_reason} | tr(Sigma): {self.last_tr_sigma:.4f} | UAV_Z: {self.uav_pos[2]:.2f}")
