@@ -63,7 +63,7 @@ class BeliefMPCNode(Node):
         # UAV parameters (static for now)
         self.uav_x = 0.0
         self.uav_y = 0.0
-        self.uav_z = 5.0
+        self.uav_z = 6.0
         self.fov_angle = 1.047  # 60 degrees
 
         # Compute FoV radius
@@ -76,7 +76,7 @@ class BeliefMPCNode(Node):
         self.R_obs_base = np.diag([0.0025, 0.0025, 0.01, 0.0004, 0.0025])
         
         # UAV state for dynamic R_k
-        self.uav_pos = np.array([0.0, 0.0, 5.0])
+        self.uav_pos = np.array([0.0, 0.0, 6.0])
         self.last_log_time_mpc = self.get_clock().now()
         self.last_log_time_sigma = self.get_clock().now()
         self.fov_angle = 1.047

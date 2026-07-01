@@ -62,11 +62,10 @@ class UAVAncillaryNode(Node):
             self.P_0 = data['P_0']
             self.get_logger().info(f"Loaded tube params: K={self.K.diagonal()}, P_0_eig={np.linalg.eigvals(self.P_0)[0]:.2f}")
         else:
-            self.get_logger().error(f"Tube params NOT FOUND at {params_path}!")
-            # Fallback defaults if file missing (K=2, P=6.86)
-        # Base ancillary gains (reduced to prevent chattering)
-        self.K = np.diag([0.6, 0.6, 0.8])
-        self.P_0 = np.eye(3) * 0.186
+            self.get_logger().warn(f"Tube params NOT FOUND at {params_path}! Using tuned fallback.")
+            # Tuned fallback gains (reduced to prevent chattering)
+            self.K = np.diag([0.6, 0.6, 0.8])
+            self.P_0 = np.eye(3) * 0.186
             
         # === STATE VARIABLES ===
         self.uav_pos = None      # Actual state

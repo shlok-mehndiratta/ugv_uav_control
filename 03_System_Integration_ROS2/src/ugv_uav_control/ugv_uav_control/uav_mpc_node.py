@@ -17,7 +17,7 @@ class UAVMPCNode(Node):
         super().__init__('uav_mpc_node')
         
         # === PARAMETERS ===
-        self.declare_parameter('z_opt', 5.0)
+        self.declare_parameter('z_opt', 6.0)
         self.declare_parameter('z_min', 3.0)
         self.declare_parameter('z_max', 10.0)
         self.declare_parameter('vz_max', 1.0)

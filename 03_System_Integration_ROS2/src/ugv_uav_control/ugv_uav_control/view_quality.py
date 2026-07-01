@@ -23,7 +23,7 @@ def compute_view_quality(
     ugv_y: float,
     fov_angle: float = 1.047,
     sharpness: float = 5.0,
-    z_opt: float = 5.0,
+    z_opt: float = 6.0,
     sigma_z: float = 3.0,
 ) -> float:
     """
@@ -112,9 +112,9 @@ if __name__ == '__main__':
 
     ugv = (0.0, 0.0)
     
-    # --- Test A: Radial sweep at fixed z=5.0 ---
+    # --- Test A: Radial sweep at fixed z=6.0 ---
     offsets = np.linspace(0.0, 6.0, 200)
-    scores_radial = [compute_view_quality(d, 0.0, 5.0, *ugv) for d in offsets]
+    scores_radial = [compute_view_quality(d, 0.0, 6.0, *ugv) for d in offsets]
     
     # --- Test B: Altitude sweep at fixed offset=0.0 ---
     altitudes = np.linspace(1.0, 12.0, 200)
@@ -125,8 +125,8 @@ if __name__ == '__main__':
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8))
 
     # Radial Plot
-    ax1.plot(offsets, scores_radial, 'b-', label='q(d) at z=5.0')
-    ax1.axvline(5.0 * np.tan(1.047/2), color='r', linestyle='--', label='r_fov at 5m')
+    ax1.plot(offsets, scores_radial, 'b-', label='q(d) at z=6.0')
+    ax1.axvline(6.0 * np.tan(1.047/2), color='r', linestyle='--', label='r_fov at 6m')
     ax1.set_xlabel('Horizontal Offset (m)')
     ax1.set_ylabel('Quality q')
     ax1.set_title('View Quality vs. Horizontal Offset')
@@ -136,7 +136,7 @@ if __name__ == '__main__':
     # Altitude Plot
     ax2.plot(altitudes, scores_alt, 'g-', label='q(z) centered')
     ax2.plot(altitudes, grads_alt, 'm--', label='dq/dz centered')
-    ax2.axvline(5.0, color='k', linestyle=':', label='z_opt = 5.0')
+    ax2.axvline(6.0, color='k', linestyle=':', label='z_opt = 6.0')
     ax2.set_xlabel('Altitude z (m)')
     ax2.set_ylabel('Quality / Gradient')
     ax2.set_title('View Quality vs. Altitude (Predictive Scale)')
@@ -144,17 +144,17 @@ if __name__ == '__main__':
     ax2.grid(True, alpha=0.3)
 
     plt.tight_layout()
-    out_path = '/home/shlok-mehndiratta/Desktop/Project_ws/view_quality_3d_test.png'
+    out_path = 'view_quality_3d_test.png'
     plt.savefig(out_path, dpi=150)
-    print(f'Test plots saved to {out_path}')
+    print(f'Test plots saved to {os.path.abspath(out_path)}')
 
     # --- Verification ---
     print('\n=== 3D View Quality Verification ===')
-    q_opt = compute_view_quality(0,0, 5, 0,0)
+    q_opt = compute_view_quality(0,0, 6, 0,0)
     q_low = compute_view_quality(0,0, 2, 0,0)
     q_high = compute_view_quality(0,0, 10, 0,0)
     
-    print(f'q at z_opt (5.0m): {q_opt:.4f}')
+    print(f'q at z_opt (6.0m): {q_opt:.4f}')
     print(f'q at z_low (2.0m): {q_low:.4f}')
     print(f'q at z_high (10.0m): {q_high:.4f}')
     

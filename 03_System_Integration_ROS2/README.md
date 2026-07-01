@@ -28,23 +28,24 @@ The core logic is implemented in the following nodes within `src/ugv_uav_control
 *   **`middle_path_follower.py`**: Handles the vision pipeline. It uses OpenCV to extract the lane centerline heatmap and transforms pixel coordinates to world-frame waypoints.
 *   **`uav_ancillary_node.py`**: Manages the UAV's pose and altitude adaptation. It triggers altitude increases based on UGV curvature to expand the Field-of-View.
 *   **`ekf_node.py`**: A 5-state Extended Kalman Filter that fuses ArUco detections with odometry, providing the real-time "belief state" ($\Sigma$) to the controllers.
-*   **`mission.launch.py`**: The primary entry point. It launches the Gazebo simulation, spawns the TurtleBot3 and x500 drone, and initializes the ROS-GZ bridge.
+*   **`middle_path_follower.launch.py`**: The primary entry point. It launches the Gazebo simulation, spawns the UGV and UAV, and sets up all core control, EKF, and vision nodes.
 
 ## Comparative Evaluation Metrics
-These figures summarize the performance leap from the Phase 1 baseline to the full Observability-Aware System. The 'Full System' leverages the Robust Positional Invariant (RPI) Set and Constraint Tightening derived in Phase 1.
+These figures summarize the performance comparison between the continuous baseline (C1), the standard reactive event-triggered Tube-MPC (C2), and the proposed Belief-MPC (C3) under nominal conditions:
 
-| Metric | Phase 1 Baseline | Phase 3 (Full System) | Improvement |
+| Metric | C1 (Continuous MPC) | C2 (Reactive Tube-MPC) | C3 (Proposed Belief-MPC) |
 | :--- | :--- | :--- | :--- |
-| **Mean Tracking Error (m)** | 1.037 m | 0.463 m | **-55.3%** |
-| **Max Tracking Error (m)** | 1.725 m | 1.180 m | **-31.6%** |
-| **ArUco Visibility (%)** | 46.3% | 87.0% | **+87.9%** |
-| **ArUco Dropouts (#)** | 55 | 7 | **-87.2%** |
-| **MPC Solve Time (ms)** | ~50.0 ms | ~16.0 ms | **3.1x Faster** |
+| **Number of Replans** | 1,102 | 105 | **99 (-91.0%)** |
+| **Mean Tracking Offset (m)** | 0.6395 m | 0.4811 m | 0.6888 m |
+| **Max Tracking Offset (m)** | 1.0458 m | 0.5774 m | 1.1232 m |
+| **Control Jerk** | 0.0195 | 0.0151 | 0.0286 |
+| **Mean Covariance Trace $tr(\Sigma)$** | 0.0067 | 0.0065 | 0.0065 |
+| **ArUco Visibility (%)** | 100.0% | 100.0% | 100.0% |
 
 ## Scientific Inferences
-*   **Proactive Cooperation**: The 55.3% reduction in tracking error is achieved because the UGV's MPC is "Belief-Coupled"—it slows down and steers into the drone's FoV proactively, maintaining the state within the Phase 1 Tube.
-*   **Dynamic FoV Expansion**: The increase in visibility from 46% to 87% is driven by the Adaptive Tube-MPC climbing during high-curvature segments to expand the visual field precisely when the RPI-set boundaries are approached.
-*   **Real-Time Feasibility**: With a solve time of 16ms, the nonlinear optimization comfortably meets the 150ms real-time constraint for physical deployment, validated by the vectorized cost functions from Phase 1.
+*   **Significant Compute Savings**: Both event-triggered formulations (C2 and C3) reduce the optimization load by over 90% compared to Continuous MPC (C1), saving onboard compute while maintaining stable tracking.
+*   **Uncertainty-Aware Adaptive Envelope**: Under nominal conditions where uncertainty is low, the proposed Belief-MPC (C3) expands the allowed tracking bounds (up to 1.12m), saving control actions, while contracting the bounds to safeguard the system when uncertainty rises.
+*   **Decoupled Local Tracking**: The local waypoint generation in the UGV base frame ensures that UGV path tracking remains stable even in the event of EKF state drift.
 
 ## Prerequisites and Dependencies
 Ensure your environment meets the following requirements before building:
@@ -75,8 +76,7 @@ ros2 launch ugv_uav_control middle_path_follower.launch.py \
     use_ancillary:=true
 ```
 
-### Result Verification
-The system automatically logs telemetry to the `ugv_uav_control/data` directory. Upon mission completion, a summary CSV is generated which can be used to verify the metrics reported in the Master README and the Final Project Report.
+The system automatically logs telemetry to the `results` directory in the workspace. Upon mission completion, a summary CSV is generated which can be used to verify the metrics reported in the Master README and the Final Project Report.
 
 ---
 *Course: LCS 334 - Linear Control Systems*
