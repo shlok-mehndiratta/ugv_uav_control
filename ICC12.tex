@@ -559,7 +559,7 @@ changing control gains or vehicle speeds. (b) The regime that does shrink the
 margin --- flying lower to reduce the footprint --- is \emph{not
 trajectory-reproducible}: with no seedable RNG and a wall-clock-paced, non-lockstep
 ROS\,2/Gazebo loop, scheduling jitter in the closed perception--control--physics
-loop forks the UGV path by $2.8$\,m on average ($4.9$\,m max) between
+loop forks the UGV path by $2.7$\,m on average ($4.9$\,m max) between
 identical-configuration runs (target visibility $100\%$ vs.\ $27\%$), so a fair
 perception-vs-baseline comparison cannot be run. Establishing the observability
 benefit is future work requiring (i) a controllable-lag regime (UAV speed/gain)
