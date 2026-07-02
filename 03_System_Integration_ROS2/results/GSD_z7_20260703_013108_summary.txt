@@ -1,0 +1,39 @@
+experiment: GSD_z7
+total_samples: 339
+total_replans: 29
+ugv_dist_traveled: 7.3391
+uav_dist_traveled: 7.2636
+mean_ugv_solve_ms: 28.0847
+mean_uav_solve_ms: 8.0382
+mean_tracking_error: 0.0874
+max_tracking_error: 0.5844
+control_smoothness: 0.0242
+mean_cov_trace: 0.0106
+max_cov_trace: 0.0419
+mean_uav_z: 7.0000
+min_uav_z: 7.0000
+max_uav_z: 7.0000
+fov_exit_pct: 0.0000
+aruco_visible_pct: 100.0000
+aruco_dropouts: 1
+max_dropout_s: 6.0692
+
+--- Trigger Breakdown ---
+Curvature (0.41): 1
+Curvature (0.43): 1
+Curvature (0.44): 2
+Curvature (0.45): 2
+Curvature (0.46): 1
+Curvature (0.48): 2
+Curvature (0.50): 2
+Curvature (0.51): 1
+Curvature (0.56): 2
+Curvature (0.61): 1
+Curvature (0.69): 2
+Curvature (0.74): 1
+Curvature (0.89): 1
+Curvature (0.91): 1
+Curvature (1.24): 1
+Curvature (1.77): 1
+Curvature (5.36): 1
+Plan Expiry: 5

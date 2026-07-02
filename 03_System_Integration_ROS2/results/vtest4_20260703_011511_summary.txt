@@ -1,0 +1,21 @@
+experiment: vtest4
+total_samples: 196
+total_replans: 0
+ugv_dist_traveled: 4.4940
+uav_dist_traveled: 4.1278
+mean_ugv_solve_ms: 28.4909
+mean_uav_solve_ms: 0
+mean_tracking_error: 0.0831
+max_tracking_error: 0.5383
+control_smoothness: 0.0184
+mean_cov_trace: 0.0076
+max_cov_trace: 0.0248
+mean_uav_z: 3.0000
+min_uav_z: 3.0000
+max_uav_z: 3.0000
+fov_exit_pct: 0.0000
+aruco_visible_pct: 100.0000
+aruco_dropouts: 1
+max_dropout_s: 6.0700
+
+--- Trigger Breakdown ---

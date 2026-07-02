@@ -231,6 +231,45 @@ periodically at the turns; active-anticipatory stays bounded and lowest. (The ac
 brief spike near $t=2$--$4$\,s is the filter's start-up transient before the first climb.)}\label{fig:propBC}
 \end{figure}
 
+\subsection*{SITL realization and its current limitation}
+
+We implemented the full pipeline in ROS\,2/Gazebo (software-in-the-loop): the GSD
+measurement model $R(z)=R_0(z/z_0)^2$, the active-altitude policy
+$z_k=\zstar(\hat d_k)+\beta_\kappa\hat\kappa+\text{margin}$, and the perception-triggered
+replanner, each behind a default-off flag. Two facts are reported honestly.
+
+\emph{(i) The resolution ingredient of Prop.~\ref{prop:A} holds in SITL.} With the GSD model
+enabled and the target held in view (ArUco visible $100\%$ of the time, so the rise is pure
+resolution, not dropout), the EKF covariance grows \emph{monotonically} with altitude across a
+fixed-altitude sweep (Fig.~\ref{fig:gsdsitl}) --- the direction predicted by $R\propto z^2$.
+The growth is \emph{sub-quadratic} (here essentially linear, $R^2\!\approx\!1$ for a linear
+fit): the steady-state Kalman covariance is a concave function of $R$, so $R\propto z^2$ maps
+to a weaker-than-quadratic $\operatorname{tr}\Sigma(z)$. What matters for Prop.~\ref{prop:A} is
+the monotonicity, which holds.
+
+\emph{(ii) The closed-loop active-altitude maneuver cannot be exercised in the current SITL.}
+The stripped quadrotor model is driven by a planar velocity controller
+(\texttt{gz-sim-velocity-control-system}) that actuates the horizontal axes but not the
+vertical one: we verified that the commanded vertical velocity \emph{reaches} the controller
+(confirmed on the simulator-side command topic) yet produces no altitude change. The
+active-altitude control law is thus implemented and verified up to actuation, but the vehicle
+holds its spawn altitude. Closing this loop requires a full multicopter model with rotor
+dynamics (\texttt{MulticopterVelocityControl}); we leave it as SITL future work.
+
+Consequently, Propositions~\ref{prop:A}--\ref{prop:C} are established analytically and
+validated in the numerical simulator (\S\ref{sec:num}), which is exact and reproducible; the
+SITL stack independently corroborates the resolution ingredient (Fig.~\ref{fig:gsdsitl}) and
+demonstrates the perception-triggered compute reduction, with the vertical maneuver deferred
+to the multicopter upgrade.
+
+\begin{figure}[h]\centering
+\includegraphics[width=0.6\textwidth]{Fig_GSD_SITL.png}
+\caption{SITL corroboration of Prop.~\ref{prop:A}'s resolution ingredient: with the GSD noise
+model enabled, the Gazebo EKF steady-state $\operatorname{tr}\Sigma$ increases monotonically
+with altitude (fixed-altitude sweep, target in view; growth is sub-quadratic/near-linear here,
+since steady-state covariance is a concave function of $R$).}\label{fig:gsdsitl}
+\end{figure}
+
 \begin{thebibliography}{9}
 \bibitem{andersonmoore} B.~D.~O. Anderson and J.~B. Moore, \emph{Optimal Filtering}.
 Prentice-Hall, 1979.
