@@ -36,7 +36,25 @@ class UAVMPCNode(Node):
             self.use_timer = (use_timer_val.lower() == 'true')
         else:
             self.use_timer = bool(use_timer_val)
-        
+
+        # --- Active-altitude perception control (DEFAULT OFF -> fixed altitude z_opt) ---
+        # When enabled, the altitude target follows the minimum-safe-altitude policy of
+        # the theory: z_eff = clip( d/tan(phi/2) + kappa_gain*kappa_ahead + margin, z_min, z_max ),
+        # i.e. descend on straights (sharp/low R under GSD) and climb into turns (keep the
+        # target in the footprint). kappa_gain=0 => reactive (current lag only); >0 => anticipatory.
+        self.declare_parameter('active_altitude', False)
+        self.declare_parameter('altitude_margin', 0.4)
+        self.declare_parameter('altitude_kappa_gain', 0.0)
+        av = self.get_parameter('active_altitude').value
+        self.active_altitude = (av.lower() == 'true') if isinstance(av, str) else bool(av)
+        self.alt_margin = float(self.get_parameter('altitude_margin').value)
+        self.kappa_gain = float(self.get_parameter('altitude_kappa_gain').value)
+        self.fov_angle = 1.047
+        self._z_eff = self.z_opt          # dynamic altitude target used by the cost
+        self.get_logger().info(f"[UAVMPC] active_altitude={self.active_altitude} "
+                               f"kappa_gain={self.kappa_gain} margin={self.alt_margin} "
+                               f"z_opt={self.z_opt} z_min={self.z_min} z_max={self.z_max}")
+
         # MPC Constants
         self.N = 10  # Hardware budget: <150ms
         self.dt = 0.2
@@ -102,7 +120,7 @@ class UAVMPCNode(Node):
         cost = np.sum(dist_sq * self.Q_vec)
         
         # 2. Optimal Altitude Cost
-        alt_err_sq = (traj_pos[:, 2] - self.z_opt)**2
+        alt_err_sq = (traj_pos[:, 2] - self._z_eff)**2
         cost += self.sigma_z * np.sum(alt_err_sq * self.Q_vec)
         
         # 3. Fast Visibility Heuristic (Minimize lateral distance relative to altitude)
@@ -124,7 +142,25 @@ class UAVMPCNode(Node):
         # Target is the UGV position at the end of our horizon (or last available)
         idx = min(self.N, len(self.ugv_traj) - 1)
         ugv_goal = self.ugv_traj[idx] if idx >= 0 else self.ugv_mu
-        
+
+        # --- Active-altitude target (min-safe-altitude policy). Fixed z_opt if disabled. ---
+        if self.active_altitude:
+            tanh = math.tan(self.fov_angle / 2.0)
+            d_now = float(np.hypot(self.uav_pos[0] - self.ugv_mu[0],
+                                   self.uav_pos[1] - self.ugv_mu[1]))
+            kappa_ahead = 0.0                      # anticipatory: max curvature of predicted UGV path
+            tj = self.ugv_traj
+            for i in range(min(4, len(tj) - 2)):
+                v1 = tj[i + 1, :2] - tj[i, :2]; v2 = tj[i + 2, :2] - tj[i + 1, :2]
+                n1 = np.linalg.norm(v1); n2 = np.linalg.norm(v2)
+                if n1 > 1e-3 and n2 > 1e-3:
+                    dth = abs(math.atan2(v1[0]*v2[1]-v1[1]*v2[0], v1[0]*v2[0]+v1[1]*v2[1]))
+                    kappa_ahead = max(kappa_ahead, dth / (n1 + 1e-6))
+            z_target = d_now / tanh + self.kappa_gain * kappa_ahead + self.alt_margin
+            self._z_eff = float(np.clip(z_target, self.z_min, self.z_max))
+        else:
+            self._z_eff = self.z_opt
+
         # Bounds: [vx, vy, vz]
         b_xy = (-1.5, 1.5)
         b_z = (0.0, 0.0) if self.use_timer else (-self.vz_max, self.vz_max)
@@ -169,7 +205,10 @@ class UAVMPCNode(Node):
         else:
             self.get_logger().warn(f'MPC Solve Failed: {res.message}')
 
-        if self.total_solves % 10 == 0:
+        if self.total_solves % 10 == 0 and res.success:
+            planz = self.uav_pos[2] + np.cumsum(u_opt[:, 2]) * self.dt
+            self.get_logger().info(f"[UAVMPC] z_eff={self._z_eff:.2f} uav_z={self.uav_pos[2]:.2f} "
+                                   f"plan_z[end]={planz[-1]:.2f} vz0={u_opt[0,2]:.2f} (active={self.active_altitude})")
             avg_ms = np.mean(self.solve_times[-10:]) * 1000
             self.get_logger().info(f'[MPC] PHASE 2 SUMMARY | Solve: {avg_ms:.1f}ms | Goal Dist: {np.linalg.norm(self.uav_pos - ugv_goal):.2f}m')
 

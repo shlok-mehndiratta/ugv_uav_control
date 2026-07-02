@@ -1,0 +1,22 @@
+experiment: TRIO_C_cont
+total_samples: 588
+total_replans: 588
+ugv_dist_traveled: 17.7273
+uav_dist_traveled: 12.6848
+mean_ugv_solve_ms: 27.8220
+mean_uav_solve_ms: 8.7348
+mean_tracking_error: 0.1593
+max_tracking_error: 0.6034
+control_smoothness: 0.1805
+mean_cov_trace: 0.0224
+max_cov_trace: 0.1323
+mean_uav_z: 2.5000
+min_uav_z: 2.5000
+max_uav_z: 2.5000
+fov_exit_pct: 0.0000
+aruco_visible_pct: 86.7347
+aruco_dropouts: 4
+max_dropout_s: 6.1162
+
+--- Trigger Breakdown ---
+C1 Baseline Continuous: 1176

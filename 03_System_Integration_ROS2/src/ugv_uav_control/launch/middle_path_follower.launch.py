@@ -96,6 +96,7 @@ def launch_setup(context, *args, **kwargs):
                                    'block_aruco': LaunchConfiguration('block_aruco'),
                                    'block_aruco_start': LaunchConfiguration('block_aruco_start'),
                                    'block_aruco_end': LaunchConfiguration('block_aruco_end'),
+                                   'use_gsd_noise': LaunchConfiguration('use_gsd_noise'),
                                }],
                                remappings=[('/uav_gps_pose', '/model/uav/pose')]))
     nodes_to_start.append(Node(package='ugv_uav_control', executable='uav_mpc_node', output='screen',
@@ -107,7 +108,10 @@ def launch_setup(context, *args, **kwargs):
                                    'vz_max': LaunchConfiguration('vz_max'),
                                    'w_alt': LaunchConfiguration('w_alt'),
                                    'sigma_z': LaunchConfiguration('sigma_z'),
-                                   'use_timer': LaunchConfiguration('use_timer')
+                                   'use_timer': LaunchConfiguration('use_timer'),
+                                   'active_altitude': LaunchConfiguration('active_altitude'),
+                                   'altitude_margin': LaunchConfiguration('altitude_margin'),
+                                   'altitude_kappa_gain': LaunchConfiguration('altitude_kappa_gain'),
                                }],
                                remappings=[('/uav_gps_pose', '/model/uav/pose'),
                                            ('/uav_cmd_vel', '/model/uav/cmd_vel')]))
@@ -124,7 +128,11 @@ def launch_setup(context, *args, **kwargs):
         nodes_to_start.append(Node(package='ugv_uav_control', executable='mpc_node', output='screen'))
     elif controller_type == 'belief_mpc':
         nodes_to_start.append(Node(package='ugv_uav_control', executable='belief_mpc_node', output='screen',
-                                   remappings=[('/uav_gps_pose', '/model/uav/pose')])) 
+                                   parameters=[{
+                                       'use_gsd_noise': LaunchConfiguration('use_gsd_noise'),
+                                       'ugv_max_v': LaunchConfiguration('ugv_max_v'),
+                                   }],
+                                   remappings=[('/uav_gps_pose', '/model/uav/pose')]))
 
     # Ancillary Controller (High-frequency correction)
     if use_ancillary:
@@ -144,6 +152,8 @@ def launch_setup(context, *args, **kwargs):
                     'z_opt': LaunchConfiguration('z_opt'),
                     'c1_baseline': LaunchConfiguration('use_timer'),
                     'controller_type': LaunchConfiguration('controller'),
+                    'freeze_alpha': LaunchConfiguration('freeze_alpha'),
+                    'error_only': LaunchConfiguration('error_only'),
                 }],
                 remappings=[('/uav_gps_pose', '/model/uav/pose')],
                 output='screen'
@@ -162,6 +172,8 @@ def generate_launch_description():
     arg_dur = DeclareLaunchArgument('duration', default_value='60.0', description='Experiment duration in seconds')
     arg_name = DeclareLaunchArgument('experiment_name', default_value='study_run', description='Experiment name')
     arg_use_timer = DeclareLaunchArgument('use_timer', default_value='false', description='Enable 1Hz timer in MPC (legacy)')
+    arg_freeze_alpha = DeclareLaunchArgument('freeze_alpha', default_value='false', description='Day-1: freeze 1a tube-test radius at alpha_max (perception-free trigger boundary)')
+    arg_error_only = DeclareLaunchArgument('error_only', default_value='false', description='Day-1: disable perception triggers 1b/2/3 (keep belief_mpc running)')
     arg_use_ancillary = DeclareLaunchArgument('use_ancillary', default_value='true', description='Launch Ancillary node')
 
     # New 3D Trajectory Parameters
@@ -171,6 +183,12 @@ def generate_launch_description():
     arg_vz_max = DeclareLaunchArgument('vz_max', default_value='1.0')
     arg_w_alt = DeclareLaunchArgument('w_alt', default_value='50.0')
     arg_sigma_z = DeclareLaunchArgument('sigma_z', default_value='3.0')
+    # Realism / active-perception (all DEFAULT-OFF -> unchanged behavior)
+    arg_gsd = DeclareLaunchArgument('use_gsd_noise', default_value='false', description='GSD measurement noise R~z^2')
+    arg_actalt = DeclareLaunchArgument('active_altitude', default_value='false', description='perception-driven active altitude')
+    arg_altmargin = DeclareLaunchArgument('altitude_margin', default_value='0.4')
+    arg_altkappa = DeclareLaunchArgument('altitude_kappa_gain', default_value='0.0', description='>0 = anticipatory climb')
+    arg_ugvv = DeclareLaunchArgument('ugv_max_v', default_value='0.22', description='UGV top speed (raise for FoV-constrained regime)')
 
     # Phase 2: Tube MPC / Event Trigger Params
     arg_alpha_min = DeclareLaunchArgument('alpha_min', default_value='0.5')
@@ -207,6 +225,13 @@ def generate_launch_description():
         arg_dur,
         arg_name,
         arg_use_timer,
+        arg_freeze_alpha,
+        arg_error_only,
+        arg_gsd,
+        arg_actalt,
+        arg_altmargin,
+        arg_altkappa,
+        arg_ugvv,
         arg_use_ancillary,
         arg_z_opt,
         arg_z_min,

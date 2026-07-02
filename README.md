@@ -26,30 +26,42 @@ This repository presents a unified research framework for autonomous multi-agent
 ---
 
 ## Result Verification Matrix
-The following table summarizes the integrated performance of the full framework against the baseline.
-
-| Metric | Baseline | Full System | Improvement |
-| :--- | :--- | :--- | :--- |
-| Mean Tracking Error | 1.037 m | **0.463 m** | **-55.3%** |
-| ArUco Visibility | 46.3% | **87.0%** | **+87.9%** |
-| MPC Solve Time | ~50.0 ms | **~16.0 ms** | **3.1x Faster** |
-| Tube Stability | Standard | **RPI-Bounded** | **Robust** |
+Quantitative results are **regenerated from fresh simulation logs** (see
+`03_System_Integration_ROS2/results/` and the plotting scripts) and must not be hand-edited here.
+The headline, reproducible finding is computational: the perception-driven event trigger reduces the
+number of online planner solves by roughly an order of magnitude relative to continuous replanning, at
+statistically comparable tracking accuracy. Belief-coupling and adaptive-tube effects are exercised only
+under the adversarial scenarios (injected occlusion, high curvature) in the simulation study; the
+certified mRPI set is an **offline** design artifact and is not wired into the online loop. See
+`AUDIT_REPORT.md` for the full claim-status ledger (proven-offline / implemented / simulation / future).
 
 ---
 
 ## Scientific Inferences
 
 ### 1. The Observability-Control Link
-We have demonstrated that by coupling the UGV's path-following with the UAV's ground projection (Belief-Space MPC), tracking error is significantly reduced. This proves that optimal control and state estimation are inseparable in robust multi-agent systems.
+The UGV controller couples path-following with estimation quality by penalizing the predicted covariance
+trace and FoV exit (belief-space NMPC). This is a genuine bidirectional mechanism; its measurable benefit,
+however, appears only when the scenario actually stresses observability (occlusion, high curvature) — under
+a benign track all methods coincide.
 
 ### 2. Computational Efficiency
-The implementation of an Event-Triggered law, which only re-solves the MPC when the RPI boundary is approached, allowed the system to meet real-time constraints with a 16ms solve time.
+The event-triggered law re-solves the UAV planner only when the adaptive ellipsoidal tube is exited or a
+perception condition fires, reducing the number of online solves by roughly an order of magnitude versus
+continuous replanning. Per-solve timings are logged (`*_solve_time`) rather than asserted.
 
 ### 3. Robustness via Adaptation
-The UAV's ability to adapt its altitude (Adaptive Tube) based on UGV curvature is the primary factor in eliminating visual dropouts during high-dynamic maneuvers.
+The UAV tube radius scales with the EKF covariance and the trigger anticipates high curvature. Whether this
+prevents visual dropouts is an empirical, scenario-dependent question evaluated under injected occlusion —
+not a guarantee.
 
-### 4. Theoretical Guarantees via Strict Robustness
-By decoupling the true system state into a nominal trajectory and a bounded error state within a Tube MPC framework, we established absolute mathematical safety bounds. The computation of the minimal Robust Positively Invariant (mRPI) set utilizing support functions enabled rigorous constraint tightening via the Pontryagin difference. Coupled with an infinite-horizon LQR terminal cost to provide a formal Lyapunov stability certificate, the architecture mathematically guarantees recursive feasibility and system stability, explicitly absorbing worst-case disturbances even when raw measurement noise corrupts the direct state-feedback loop.
+### 4. Theoretical Scope (offline vs. online)
+A minimal Robust Positively Invariant (mRPI) set is computed **offline** via a support-function/Minkowski
+construction with a certified truncation bound, and constitutes a valid robust bound for the idealized design.
+The **online** controller uses an ellipsoidal invariant-set surrogate with an adaptive radius; it does **not**
+re-derive the mRPI online, does not enforce constraint tightening or a terminal set, and therefore carries
+**no online recursive-feasibility certificate**. Recursive feasibility and Lyapunov stability hold for the
+idealized formulation and are assumed, not verified, for the running code. See `AUDIT_REPORT.md`.
 
 ---
 **Team Members:**

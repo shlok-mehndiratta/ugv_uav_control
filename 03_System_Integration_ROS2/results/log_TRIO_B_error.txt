@@ -1,0 +1,1555 @@
+[INFO] [launch]: All log files can be found below /home/omen/.ros/log/2026-07-02-02-40-55-004459-omen-hp-291449
+[INFO] [launch]: Default logging verbosity is set to INFO
+[LAUNCH_DEBUG] controller_type: belief_mpc
+[INFO] [gazebo-1]: process started with pid [291452]
+[INFO] [middle_path_follower-2]: process started with pid [291453]
+[INFO] [ekf_node-3]: process started with pid [291454]
+[INFO] [uav_mpc_node-4]: process started with pid [291456]
+[INFO] [experiment_logger-5]: process started with pid [291457]
+[INFO] [belief_mpc_node-6]: process started with pid [291458]
+[INFO] [uav_ancillary_node-7]: process started with pid [291459]
+[uav_ancillary_node-7] [WARN] [1782940255.927018070] [uav_ancillary_node]: Tube params NOT FOUND at /home/shlok-mehndiratta/.gemini/antigravity/scratch/tube_params.npz! Using tuned fallback.
+[uav_ancillary_node-7] [INFO] [1782940255.933210178] [uav_ancillary_node]: UAV Ancillary Node Started (20Hz)
+[experiment_logger-5] [INFO] [1782940255.936454505] [experiment_logger]: Experiment Logger: "TRIO_B_error" | Duration: 65.0s | Rate: 10.0 Hz
+[ekf_node-3] [INFO] [1782940255.937302921] [ekf_node]: EKF Node Started (5-state: x, y, θ, v, ω)
+[gazebo-1] [1;36m[Dbg] [gz.cc:166] [0m[1;36mSubscribing to [[0m[1;36m/gazebo/starting_world[0m[1;36m].[0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [gz.cc:168] [0m[1;36mWaiting for a world to be set from the GUI...[0m[1;36m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mReceived world [[0m[1;32m/home/omen/CRAZYFLY_SITL/ugv_uav_control/03_System_Integration_ROS2/install/ugv_uav_control/share/ugv_uav_control/worlds/path_following.world[0m[1;32m] from the GUI.[0m[1;32m[0m
+[gazebo-1] [1;36m[Dbg] [gz.cc:172] [0m[1;36mUnsubscribing from [[0m[1;36m/gazebo/starting_world[0m[1;36m].[0m[1;36m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mGazebo Sim Server v[0m[1;32m8.11.0[0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mLoading SDF world file[[0m[1;32m/home/omen/CRAZYFLY_SITL/ugv_uav_control/03_System_Integration_ROS2/install/ugv_uav_control/share/ugv_uav_control/worlds/path_following.world[0m[1;32m].[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mServing entity system service on [[0m[1;32m/[0m[1;32mentity/system/add[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;36m[Dbg] [Physics.cc:906] [0m[1;36mLoaded [[0m[1;36mgz::physics::dartsim::Plugin[0m[1;36m] from library [[0m[1;36m/opt/ros/jazzy/opt/gz_physics_vendor/lib/gz-physics-7/engine-plugins/libgz-physics-dartsim-plugin.so[0m[1;36m][0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [SystemManager.cc:80] [0m[1;36mLoaded system [[0m[1;36mgz::sim::systems::Physics[0m[1;36m] for entity [[0m[1;36m1[0m[1;36m][0m[1;36m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mCreate[0m[1;32m service on [[0m[1;32m/world/default/create_multiple[0m[1;32m] (async)[0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mCreate[0m[1;32m service on [[0m[1;32m/world/default/create_multiple/blocking[0m[1;32m] (blocking)[0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mRemove[0m[1;32m service on [[0m[1;32m/world/default/remove[0m[1;32m] (async)[0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mRemove[0m[1;32m service on [[0m[1;32m/world/default/remove/blocking[0m[1;32m] (blocking)[0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mPose[0m[1;32m service on [[0m[1;32m/world/default/set_pose[0m[1;32m] (async)[0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mPose[0m[1;32m service on [[0m[1;32m/world/default/set_pose/blocking[0m[1;32m] (blocking)[0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mPose[0m[1;32m service on [[0m[1;32m/world/default/set_pose_vector[0m[1;32m] (async)[0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mPose[0m[1;32m service on [[0m[1;32m/world/default/set_pose_vector/blocking[0m[1;32m] (blocking)[0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mLight configuration[0m[1;32m service on [[0m[1;32m/world/default/light_config[0m[1;32m] (async)[0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mLight configuration[0m[1;32m service on [[0m[1;32m/world/default/light_config/blocking[0m[1;32m] (blocking)[0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mPhysics[0m[1;32m service on [[0m[1;32m/world/default/set_physics[0m[1;32m] (async)[0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mPhysics[0m[1;32m service on [[0m[1;32m/world/default/set_physics/blocking[0m[1;32m] (blocking)[0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mSphericalCoordinates[0m[1;32m service on [[0m[1;32m/world/default/set_spherical_coordinates[0m[1;32m] (async)[0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mSphericalCoordinates[0m[1;32m service on [[0m[1;32m/world/default/set_spherical_coordinates/blocking[0m[1;32m] (blocking)[0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mEnable collision[0m[1;32m service on [[0m[1;32m/world/default/enable_collision[0m[1;32m] (async)[0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mEnable collision[0m[1;32m service on [[0m[1;32m/world/default/enable_collision/blocking[0m[1;32m] (blocking)[0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mDisable collision[0m[1;32m service on [[0m[1;32m/world/default/disable_collision[0m[1;32m] (async)[0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mDisable collision[0m[1;32m service on [[0m[1;32m/world/default/disable_collision/blocking[0m[1;32m] (blocking)[0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mMaterial[0m[1;32m service on [[0m[1;32m/world/default/visual_config[0m[1;32m] (async)[0m[1;32m[0m
+[belief_mpc_node-6] [INFO] [1782940256.018376757] [belief_mpc_node]: Belief-Space MPC Node Started (λ = 1.00)
+[uav_mpc_node-4] [INFO] [1782940256.018417327] [uav_mpc_node]: UAV MPC Node: Optimized 3D Event-Triggered Planner Ready
+[belief_mpc_node-6] [INFO] [1782940256.027101696] [belief_mpc_node]: Belief Received: x=0.00, y=0.00
+[gazebo-1] [1;33m[GUI] [Wrn] [Application.cc:908] [0m[1;33m[QT] file:///usr/lib/x86_64-linux-gnu/qt5/qml/QtQuick/Dialogs/DefaultFileDialog.qml:413:17: QML ToolButton: Binding loop detected for property "implicitHeight"[0m[1;33m[0m
+[gazebo-1] [1;33m[GUI] [Wrn] [Application.cc:908] [0m[1;33m[QT] file:///usr/lib/x86_64-linux-gnu/qt5/qml/QtQuick/Dialogs/DefaultFileDialog.qml:309:21: QML Button: Binding loop detected for property "implicitHeight"[0m[1;33m[0m
+[gazebo-1] [1;33m[GUI] [Wrn] [Application.cc:908] [0m[1;33m[QT] file:///usr/lib/x86_64-linux-gnu/qt5/qml/QtQuick/Dialogs/DefaultFileDialog.qml:309:21: QML Button: Binding loop detected for property "implicitHeight"[0m[1;33m[0m
+[gazebo-1] [1;33m[GUI] [Wrn] [Application.cc:908] [0m[1;33m[QT] file:///usr/lib/x86_64-linux-gnu/qt5/qml/QtQuick/Dialogs/DefaultFileDialog.qml:413:17: QML ToolButton: Binding loop detected for property "implicitHeight"[0m[1;33m[0m
+[gazebo-1] [1;33m[GUI] [Wrn] [Application.cc:908] [0m[1;33m[QT] file:///usr/lib/x86_64-linux-gnu/qt5/qml/QtQuick/Dialogs/DefaultFileDialog.qml:309:21: QML Button: Binding loop detected for property "implicitHeight"[0m[1;33m[0m
+[gazebo-1] [1;33m[GUI] [Wrn] [Application.cc:908] [0m[1;33m[QT] file:///usr/lib/x86_64-linux-gnu/qt5/qml/QtQuick/Dialogs/DefaultFileDialog.qml:309:21: QML Button: Binding loop detected for property "implicitHeight"[0m[1;33m[0m
+[middle_path_follower-2] [INFO] [1782940256.079111268] [middle_path_follower]: Initializing MiddlePathFollower...
+[middle_path_follower-2] [INFO] [1782940256.112189367] [middle_path_follower]: Middle Path Follower Node Started
+[gazebo-1] [1;33m[GUI] [Wrn] [Application.cc:908] [0m[1;33m[QT] file:///usr/lib/x86_64-linux-gnu/qt5/qml/QtQuick/Dialogs/DefaultFileDialog.qml:413:17: QML ToolButton: Binding loop detected for property "implicitHeight"[0m[1;33m[0m
+[gazebo-1] [1;33m[GUI] [Wrn] [Application.cc:908] [0m[1;33m[QT] file:///usr/lib/x86_64-linux-gnu/qt5/qml/QtQuick/Dialogs/DefaultFileDialog.qml:309:21: QML Button: Binding loop detected for property "implicitHeight"[0m[1;33m[0m
+[gazebo-1] [1;33m[GUI] [Wrn] [Application.cc:908] [0m[1;33m[QT] file:///usr/lib/x86_64-linux-gnu/qt5/qml/QtQuick/Dialogs/DefaultFileDialog.qml:309:21: QML Button: Binding loop detected for property "implicitHeight"[0m[1;33m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mMateria[1;32m[Msg] [0m[1;32mGazebo Sim GUI    v[0m[1;32m8.11.0[0m[1;32m[0m
+[gazebo-1] [1;36m[Dbg] [Gui.cc:275] [0m[1;36mWaiting for subscribers to [[0m[1;36m/gazebo/starting_world[0m[1;36m]...[0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [Application.cc:96] [0m[1;36mInitializing application.[0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [Application.cc:170] [0m[1;36mQt using OpenGL graphics interface[0m[1;36m[0m
+[gazebo-1] [1;36m[GUI] [Dbg] [Application.cc:657] [0m[1;36mCreate main window[0m[1;36m[0m
+[gazebo-1] [1;36m[GUI] [Dbg] [PathManager.cc:68] [0m[1;36mRequesting resource paths through [[0m[1;36m/gazebo/resource_paths/get[0m[1;36m][0m[1;36m[0m
+[gazebo-1] [1;36m[GUI] [Dbg] [Gui.cc:355] [0m[1;36mGUI requesting list of world names. The server may be busy [0m[1;36mdownloading resources. Please be patient.[0m[1;36m[0m
+[gazebo-1] [1;36m[GUI] [Dbg] [PathManager.cc:57] [0m[1;36mReceived resource paths.[0m[1;36m[0m
+[gazebo-1] [1;36m[GUI] [Dbg] [Gui.cc:413] [0m[1;36mRequesting GUI from [[0m[1;36m/world/default/gui/info[0m[1;36m]...[0m[1;36m[0m
+[gazebo-1] [1;36m[GUI] [Dbg] [GuiRunner.cc:149] [0m[1;36mRequesting initial state from [[0m[1;36m/world/default/state[0m[1;36m]...[0m[1;36m[0m
+[gazebo-1] [1;36m[GUI] [Dbg] [Application.cc:528] [0m[1;36mLoading plugin [[0m[1;36mMinimalScene[0m[1;36m][0m[1;36m[0m
+[gazebo-1] [1;36m[GUI] [Dbg] [MinimalScene.cc:802] [0m[1;36mCreating gz-rendering interface for OpenGL[0m[1;36m[0m
+[gazebo-1] [1;36m[GUI] [Dbg] [MinimalScene.cc:802] [0m[1;36mCreating gz-rendering interface for OpenGL[0m[1;36m[0m
+[gazebo-1] [1;36m[GUI] [Dbg] [MinimalScene.cc:986] [0m[1;36mCreating render thread interface for OpenGL[0m[1;36m[0m
+[gazebo-1] [1;36m[GUI] [Dbg] [MinimalScene.cc:802] [0m[1;36mCreating gz-rendering interface for OpenGL[0m[1;36m[0m
+[gazebo-1] [1;36m[GUI] [Dbg] [MinimalScene.cc:986] [0m[1;36mCreating render thread interface for OpenGL[0m[1;36m[0m
+[gazebo-1] [1;32m[GUI] [0m[1;32m[Msg] [0m[1;32mAdded plugin [[0m[1;32m3D View[0m[1;32m] to main window[0m[1;32m[0m
+[gazebo-1] [1;32m[GUI] [0m[1;32m[Msg] [0m[1;32mLoaded plugin [[0m[1;32mMinimalScene[0m[1;32m] from path [[0m[1;32m/opt/ros/jazzy/opt/gz_gui_vendor/lib/gz-gui-8/plugins/libMinimalScene.so[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;36m[GUI] [Dbg] [Application.cc:528] [0m[1;36mLoading plugin [[0m[1;36mGzSceneManager[0m[1;36m][0m[1;36m[0m
+[gazebo-1] [1;32m[GUI] [0m[1;32m[Msg] [0m[1;32mAdded plugin [[0m[1;32mScene Manager[0m[1;32m] to main window[0m[1;32m[0m
+[gazebo-1] [1;32m[GUI] [0m[1;32m[Msg] [0m[1;32mLoaded plugin [[0m[1;32mGzSceneManager[0m[1;32m] from path [[0m[1;32m/opt/ros/jazzy/opt/gz_sim_vendor/lib/gz-sim-8/plugins/gui/libGzSceneManager.so[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;36m[GUI] [Dbg] [Application.cc:528] [0m[1;36mLoading plugin [[0m[1;36mInteractiveViewControl[0m[1;36m][0m[1;36m[0m
+[gazebo-1] [1;32m[GUI] [0m[1;32m[Msg] [0m[1;32mCamera view controller topic advertised on [[0m[1;32m/gui/camera/view_control[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;32m[GUI] [0m[1;32m[Msg] [0m[1;32mCamera reference visual topic advertised on [[0m[1;32m/gui/camera/view_control/reference_visual[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;32m[GUI] [0m[1;32m[Msg] [0m[1;32mCamera view control sensitivity advertised on [[0m[1;32m/gui/camera/view_control/sensitivity[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;32m[GUI] [0m[1;32m[Msg] [0m[1;32mAdded plugin [[0m[1;32mInteractive view control[0m[1;32m] to main window[0m[1;32m[0m
+[gazebo-1] [1;32m[GUI] [0m[1;32m[Msg] [0m[1;32mLoaded plugin [[0m[1;32mInteractiveViewControl[0m[1;32m] from path [[0m[1;32m/opt/ros/jazzy/opt/gz_gui_vendor/lib/gz-gui-8/plugins/libInteractiveViewControl.so[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;36m[GUI] [Dbg] [Application.cc:528] [0m[1;36mLoading plugin [[0m[1;36mCameraTracking[0m[1;36m][0m[1;36m[0m
+[gazebo-1] [1;32m[GUI] [0m[1;32m[Msg] [0m[1;32mAdded plugin [[0m[1;32mCamera tracking[0m[1;32m] to main window[0m[1;32m[0m
+[gazebo-1] [1;32m[GUI] [0m[1;32m[Msg] [0m[1;32mLoaded plugin [[0m[1;32mCameraTracking[0m[1;32m] from path [[0m[1;32m/opt/ros/jazzy/opt/gz_gui_vendor/lib/gz-gui-8/plugins/libCameraTracking.so[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;33m[GUI] [Wrn] [Application.cc:908] [0m[1;33m[QT] file::/WorldStats/WorldStats.qml:53:3: QML RowLayout: Binding loop detected for property "x"[0m[1;33m[0m
+[gazebo-1] [1;36m[GUI] [Dbg] [Application.cc:528] [0m[1l[0m[1;32m service on [[0m[1;32m/world/default/visual_config/blocking[0m[1;32m] (blocking)[0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mMaterial[0m[1;32m service on [[0m[1;32m/world/default/wheel_slip[0m[1;32m] (async)[0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mMaterial[0m[1;32m service on [[0m[1;32m/world/default/wheel_slip/blocking[0m[1;32m] (blocking)[0m[1;32m[0m
+[gazebo-1] [1;36m[Dbg] [SystemManager.cc:80] [0m[1;36mLoaded system [[0m[1;36mgz::sim::systems::UserCommands[0m[1;36m] for entity [[0m[1;36m1[0m[1;36m][0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [SystemManager.cc:80] [0m[1;36mLoaded system [[0m[1;36mgz::sim::systems::SceneBroadcaster[0m[1;36m] for entity [[0m[1;36m1[0m[1;36m][0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [Sensors.cc:697] [0m[1;36mConfiguring Sensors system[0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [Sensors.cc:557] [0m[1;36mSensorsPrivate::Run[0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [SystemManager.cc:80] [0m[1;36mLoaded system [[0m[1;36mgz::sim::systems::Sensors[0m[1;36m] for entity [[0m[1;36m1[0m[1;36m][0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [Sensors.cc:532] [0m[1;36mSensorsPrivate::RenderThread started[0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [Sensors.cc:337] [0m[1;36mWaiting for init[0m[1;36m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mLoaded level [[0m[1;32mdefault[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mServing world controls on [[0m[1;32m/world/default[0m[1;32m/control], [[0m[1;32m/world/default[0m[1;32m/control/state] and [[0m[1;32m/world/default[0m[1;32m/playback/control][0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mServing GUI information on [[0m[1;32m/world/default[0m[1;32m/[0m[1;32mgui/info[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mWorld [[0m[1;32mdefault[0m[1;32m] initialized with [[0m[1;32mdefault_physics[0m[1;32m] physics profile.[0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mServing world SDF generation service on [[0m[1;32m/world/default[0m[1;32m/[0m[1;32mgenerate_world_sdf[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mServing world names on [[0m[1;32m/gazebo/worlds[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mResource path add service on [[0m[1;32m/gazebo/resource_paths/add[0m[1;32m].[0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mResource path get service on [[0m[1;32m/gazebo/resource_paths/get[0m[1;32m].[0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mResource path resolve service on [[0m[1;32m/gazebo/resource_paths/resolve[0m[1;32m].[0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mResource paths published on [[0m[1;32m/gazebo/resource_paths[0m[1;32m].[0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mServer control service on [[0m[1;32m/server_control[0m[1;32m].[0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mFound no publishers on /stats, adding root stats topic[0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mFound no publishers on /clock, adding root clock topic[0m[1;32m[0m
+[gazebo-1] [1;36m[Dbg] [SimulationRunner.cc:551] [0m[1;36mCreating PostUpdate worker threads: [0m[1;36m3[0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [SimulationRunner.cc:562] [0m[1;36mCreating postupdate worker thread ([0m[1;36m0[0m[1;36m)[0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [SimulationRunner.cc:562] [0m[1;36mCreating postupdate worker thread ([0m[1;36m1[0m[1;36m)[0m[1;36m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mServing scene information on [[0m[1;32m/world/default[0m[1;32m/[0m[1;32mscene/info[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mServing graph information on [[0m[1;32m/world/default[0m[1;32m/[0m[1;32mscene/graph[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mServing full state on [[0m[1;32m/world/default[0m[1;32m/[0m[1;32mstate[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mServing full state (async) on [[0m[1;32m/world/default[0m[1;32m/[0m[1;32mstate_async[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mPublishing scene information on [[0m[1;32m/world/default/scene/info[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mPublishing entity deletions on [[0m[1;32m/world/default/scene/deletion[0m[1;32m][0m[1;32m[0m
+[INFO] [create-8]: process started with pid [291637]
+[create-8] [INFO] [1782940258.660726079] [ros_gz_sim]: Requesting list of world names.
+[create-8] [INFO] [1782940258.864187265] [ros_gz_sim]: Entity creation successful.
+[INFO] [create-8]: process has finished cleanly [pid 291637]
+[INFO] [create-9]: process started with pid [291659]
+[create-9] [INFO] [1782940259.602394660] [ros_gz_sim]: Requesting list of world names.
+[create-9] [INFO] [1782940259.831754757] [ros_gz_sim]: Entity creation successful.
+[gazebo-1] [1;32m[Msg] [0m[1;32mPublishing state changes on [[0m[1;32m/world/default/state[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mPublishing pose messages on [[0m[1;32m/world/default[0m[1;32m/[0m[1;32mpose/info[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mPublishing dynamic pose messages on [[0m[1;32m/world/default[0m[1;32m/[0m[1;32mdynamic_pose/info[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;36m[Dbg] [EntityComponentManager.cc:1656] [0m[1;36mUpdated state thread iterators: [0m[1;36m5[0m[1;36m threads processing around [0m[1;36m1[0m[1;36m entities each.[0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [UserCommands.cc:1094] [0m[1;36mCreated entity [[0m[1;36m6[0m[1;36m] named [[0m[1;36mpath_ground_plane[0m[1;36m][0m[1;36m[0m
+[gazebo-1] [1;33mWarning [Utils.cc:132][0m [/sdf/model[@name="turtlebot3_burger"]/link[@name="base_scan"]/sensor[@name="hls_lfcd_lds"]/gz_frame_id:/home/omen/CRAZYFLY_SITL/ugv_uav_control/03_System_Integration_ROS2/install/ugv_uav_control/share/ugv_uav_control/models/turtlebot3_burger_aruco/model.sdf:L54]: XML Element[gz_frame_id], child of element[sensor], not defined in SDF. Copying[gz_frame_id] as children of [sensor].
+[gazebo-1] [1;33m[Wrn] [SdfEntityCreator.cc:1097] [0m[1;33mSensor type LIDAR not supported yet. Try using[0m[1;33ma GPU LIDAR instead.[0m[1;33m[0m
+[INFO] [create-9]: process has finished cleanly [pid 291659]
+[gazebo-1] ;36mLoading plugin [[0m[1;36mWorldControl[0m[1;36m][0m[1;36m[0m
+[gazebo-1] [1;32m[GUI] [0m[1;32m[Msg] [0m[1;32mUsing world control service [[0m[1;32m/world/default/control[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;32m[GUI] [0m[1;32m[Msg] [0m[1;32mListening to stats on [[0m[1;32m/world/default/stats[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;36m[GUI] [Dbg] [WorldControl.cc:237] [0m[1;36mUsing an event to share WorldControl msgs with the server[0m
+[gazebo-1] [1;32m[GUI] [0m[1;32m[Msg] [0m[1;32mAdded plugin [[0m[1;32mWorld control[0m[1;32m] to main window[0m[1;32m[0m
+[gazebo-1] [1;32m[GUI] [0m[1;32m[Msg] [0m[1;32mLoaded plugin [[0m[1;32mWorldControl[0m[1;32m] from path [[0m[1;32m/opt/ros/jazzy/opt/gz_gui_vendor/lib/gz-gui-8/plugins/libWorldControl.so[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;36m[GUI] [Dbg] [Application.cc:528] [0m[1;36mLoading plugin [[0m[1;36mWorldStats[0m[1;36m][0m[1;36m[0m
+[gazebo-1] [1;32m[GUI] [0m[1;32m[Msg] [0m[1;32mListening to stats on [[0m[1;32m/world/default/stats[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;32m[GUI] [0m[1;32m[Msg] [0m[1;32mAdded plugin [[0m[1;32mWorld stats[0m[1;32m] to main window[0m[1;32m[0m
+[gazebo-1] [1;32m[GUI] [0m[1;32m[Msg] [0m[1;32mLoaded plugin [[0m[1;32mWorldStats[0m[1;32m] from path [[0m[1;32m/opt/ros/jazzy/opt/gz_gui_vendor/lib/gz-gui-8/plugins/libWorldStats.so[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;36m[GUI] [Dbg] [MinimalScene.cc:802] [0m[1;36mCreating gz-rendering interface for OpenGL[0m[1;36m[0m
+[gazebo-1] [1;36m[GUI] [Dbg] [MinimalScene.cc:986] [0m[1;36mCreating render thread interface for OpenGL[0m[1;36m[0m
+[gazebo-1] [1;32m[GUI] [0m[1;32m[Msg] [0m[1;32mLoading plugin [[0m[1;32mgz-rendering-ogre[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;36m[GUI] [Dbg] [MinimalScene.cc:749] [0m[1;36mCreate scene [[0m[1;36mscene[0m[1;36m][0m[1;36m[0m
+[gazebo-1] [1;36m[GUI] [Dbg] [MinimalScene.cc:1037] [0m[1;36mCreating texture node render interface for OpenGL[0m[1;36m[0m
+[gazebo-1] [1;36m[GUI] [Dbg] [CameraTracking.cc:205] [0m[1;36mCameraTrackingPrivate plugin is moving camera [[0m[1;36mscene::Camera(65527)[0m[1;36m][0m[1;36m[0m
+[gazebo-1] [1;32m[GUI] [0m[1;32m[Msg] [0m[1;32mMove to service on [[0m[1;32m/gui/move_to[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;32m[GUI] [0m[1;32m[Msg] [0m[1;32mFollow service on [[0m[1;32m/gui/follow[0m[1;32m] (deprecated)[0m[1;32m[0m
+[gazebo-1] [1;32m[GUI] [0m[1;32m[Msg] [0m[1;32mTracking topic on [[0m[1;32m/gui/track[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;32m[GUI] [0m[1;32m[Msg] [0m[1;32mTracking status topic on [[0m[1;32m/gui/currently_tracked[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;32m[GUI] [0m[1;32m[Msg] [0m[1;32mMove to pose service on [[0m[1;32m/gui/move_to/pose[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;32m[GUI] [0m[1;32m[Msg] [0m[1;32mCamera pose topic advertised on [[0m[1;32m/gui/camera/pose[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;32m[GUI] [0m[1;32m[Msg] [0m[1;32mFollow offset service on [[0m[1;32m/gui/follow/offset[0m[1;32m] (deprecated)[0m[1;32m[0m
+[gazebo-1] [1;36m[GUI] [Dbg] [InteractiveViewControl.cc:176] [0m[1;36mInteractiveViewControl plugin is moving camera [[0m[1;36mscene::Camera(65527)[0m[1;36m][0m[1;36m[0m
+[gazebo-1] [1;33mWarning [Utils.cc:132][0m [/sdf/model[@name="turtlebot3_burger"]/link[@name="base_scan"]/sensor[@name="hls_lfcd_lds"]/gz_frame_id:<data-string>:L135]: XML Element[gz_frame_id], child of element[sensor], not defined in SDF. Copying[gz_frame_id] as children of [sensor].
+[INFO] [create-10]: process started with pid [291686]
+[create-10] [INFO] [1782940260.583559525] [ros_gz_sim]: Requesting list of world names.
+[create-10] [INFO] [1782940260.832323725] [ros_gz_sim]: Entity creation successful.
+[gazebo-1] [1;32m[Msg] [0m[1;32mDiffDrive subscribing to twist messages on [[0m[1;32m/cmd_vel[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;36m[Dbg] [SystemManager.cc:80] [0m[1;36mLoaded system [[0m[1;36mgz::sim::systems::DiffDrive[0m[1;36m] for entity [[0m[1;36m10[0m[1;36m][0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [SystemManager.cc:80] [0m[1;36mLoaded system [[0m[1;36mgz::sim::systems::JointStatePublisher[0m[1;36m] for entity [[0m[1;36m10[0m[1;36m][0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [SystemManager.cc:80] [0m[1;36mLoaded system [[0m[1;36mgz::sim::systems::PosePublisher[0m[1;36m] for entity [[0m[1;36m10[0m[1;36m][0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [UserCommands.cc:1094] [0m[1;36mCreated entity [[0m[1;36m10[0m[1;36m] named [[0m[1;36mturtlebot3_burger[0m[1;36m][0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [SimulationRunner.cc:578] [0m[1;36mExiting postupdate worker thread ([0m[1;36m1[Dbg] [SimulationRunner.cc:578] [0m[1;36m1[0m[1;36mExiting postupdate worker thread ([0m[1;36m0[0m[1;36m)[0m[1;36m
+[gazebo-1] )[0m[1;36m[0m
+[gazebo-1] [1;36m[0m
+[gazebo-1] [1;36m[Dbg] [SimulationRunner.cc:551] [0m[1;36mCreating PostUpdate worker threads: [0m[1;36m6[0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [SimulationRunner.cc:562] [0m[1;36mCreating postupdate worker thread ([0m[1;36m0[0m[1;36m)[0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [SimulationRunner.cc:562] [0m[1;36mCreating postupdate worker thread ([0m[1;36m1[0m[1;36m)[0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [SimulationRunner.cc:562] [0m[1;36mCreating postupdate worker thread ([0m[1;36m2[0m[1;36m)[0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [SimulationRunner.cc:562] [0m[1;36mCreating postupdate worker thread ([0m[1;36m3[0m[1;36m)[0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [SimulationRunner.cc:562] [0m[1;36mCreating postupdate worker thread ([0m[1;36m4[0m[1;36m)[0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [SystemManager.cc:80] [0m[1;36mLoaded system [[0m[1;36mgz::sim::systems::PosePublisher[0m[1;36m] for entity [[0m[1;36m36[0m[1;36m][0m[1;36m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mVelocityControl subscribing to twist messages on [[0m[1;32mcmd_vel[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;36m[Dbg] [SystemManager.cc:80] [0m[1;36mLoaded system [[0m[1;36mgz::sim::systems::VelocityControl[0m[1;36m] for entity [[0m[1;36m36[0m[1;36m][0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [UserCommands.cc:1094] [0m[1;36mCreated entity [[0m[1;36m36[0m[1;36m] named [[0m[1;36muav[0m[1;36m][0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [Sensors.cc:953] [0m[1;36mInitialization needed[0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [Sensors.cc:349] [0m[1;36mInitializing render context[0m[1;36m[0m
+[gazebo-1] [1;32m[Msg] [0m[1;32mLoading plugin [[0m[1;32mgz-rendering-ogre[0m[1;32m][0m[1;32m[0m
+[gazebo-1] [1;36m[Dbg] [SimulationRunner.cc:578] [0m[1;36mExiting postupdate worker thread ([0m[1;36m0[0m[1;36m)[0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [SimulationRunner.cc:578] [0m[1;36mExiting postupdate worker thread ([0m[1;36mExiting postupdate worker thread ([Dbg] [SimulationRunner.cc:578] [Dbg] [SimulationRunner.cc:578] [0m[1;36mExiting postupdate worker thread ([Dbg] [SimulationRunner.cc:578] [0m[1;36mExiting postupdate worker thread ([0m[1;36m1[0m[1;36m)[0m[1;36m[0m
+[gazebo-1] [1;36mExiting postupdate worker thread ([0m[1;36m4[0m[1;36m)[0m[1;36m[0m
+[gazebo-1] [1;36mExiting postupdate worker thread ([0m[1;36m3[0m[1;36m2[0m[1;36m)[0m[1;36m[0m
+[gazebo-1] [1;36m)[0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [SimulationRunner.cc:551] [0m[1;36mCreating PostUpdate worker threads: [0m[1;36m8[0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [SimulationRunner.cc:562] [0m[1;36mCreating postupdate worker thread ([0m[1;36m0[0m[1;36m)[0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [SimulationRunner.cc:562] [0m[1;36mCreating postupdate worker thread ([0m[1;36m1[0m[1;36m)[0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [SimulationRunner.cc:562] [0m[1;36mCreating postupdate worker thread ([0m[1;36m2[0m[1;36m)[0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [SimulationRunner.cc:562] [0m[1;36mCreating postupdate worker thread ([0m[1;36m3[0m[1;36m)[0m[1;36m[0m
+[gazebo-1] [1;36m[Dbg] [SimulationRunner.cc:562] [0m[1;36mCreating postupdate worker thread ([0m[1;36m4[0m[1;36m)[0m[1;36m[0m
+[INFO] [create-10]: process has finished cleanly [pid 291686]
+[belief_mpc_node-6] [INFO] [1782940261.028349396] [belief_mpc_node]: [MPC] Sigma updated. Trace: 0.575910
+[INFO] [parameter_bridge-11]: process started with pid [291743]
+[INFO] [parameter_bridge-12]: process started with pid [291744]
+[parameter_bridge-11] [INFO] [1782940261.574344056] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/drone/camera/image (gz.msgs.Image) -> /drone/camera/image (sensor_msgs/msg/Image)] (Lazy 0)
+[parameter_bridge-11] [INFO] [1782940261.577529263] [ros_gz_bridge]: Creating ROS->GZ Bridge: [/drone/camera/image (sensor_msgs/msg/Image) -> /drone/camera/image (gz.msgs.Image)] (Lazy 0)
+[parameter_bridge-11] [INFO] [1782940261.578147072] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/drone/camera/camera_info (gz.msgs.CameraInfo) -> /drone/camera/camera_info (sensor_msgs/msg/CameraInfo)] (Lazy 0)
+[parameter_bridge-11] [INFO] [1782940261.578678391] [ros_gz_bridge]: Creating ROS->GZ Bridge: [/drone/camera/camera_info (sensor_msgs/msg/CameraInfo) -> /drone/camera/camera_info (gz.msgs.CameraInfo)] (Lazy 0)
+[parameter_bridge-11] [INFO] [1782940261.579096987] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/model/uav/pose (gz.msgs.Pose) -> /model/uav/pose (geometry_msgs/msg/Pose)] (Lazy 0)
+[parameter_bridge-11] [INFO] [1782940261.579650419] [ros_gz_bridge]: Creating ROS->GZ Bridge: [/model/uav/pose (geometry_msgs/msg/Pose) -> /model/uav/pose (gz.msgs.Pose)] (Lazy 0)
+[parameter_bridge-11] [INFO] [1782940261.580126098] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/model/uav/cmd_vel (gz.msgs.Twist) -> /model/uav/cmd_vel (geometry_msgs/msg/Twist)] (Lazy 0)
+[parameter_bridge-11] [INFO] [1782940261.580537971] [ros_gz_bridge]: Creating ROS->GZ Bridge: [/model/uav/cmd_vel (geometry_msgs/msg/Twist) -> /model/uav/cmd_vel (gz.msgs.Twist)] (Lazy 0)
+[parameter_bridge-11] [INFO] [1782940261.580923783] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/model/turtlebot3_burger/pose (gz.msgs.Pose) -> /model/turtlebot3_burger/pose (geometry_msgs/msg/Pose)] (Lazy 0)
+[parameter_bridge-11] [INFO] [1782940261.581199036] [ros_gz_bridge]: Creating ROS->GZ Bridge: [/model/turtlebot3_burger/pose (geometry_msgs/msg/Pose) -> /model/turtlebot3_burger/pose (gz.msgs.Pose)] (Lazy 0)
+[middle_path_follower-2] [INFO] [1782940262.099641376] [middle_path_follower]: Camera Calibrated. Scale: 0.00902 m/px
+[middle_path_follower-2] [INFO] [1782940262.101861167] [middle_path_follower]: DETECTED IDS: [[55]]
+[ekf_node-3] [INFO] [1782940262.103270990] [ekf_node]: [EKF] Dynamic R_k: q=0.707, tr(R)=0.0253
+[middle_path_follower-2] [INFO] [1782940262.110288539] [middle_path_follower]: Publishing Waypoint: dist=0.373m, angle=-0.553rad
+[belief_mpc_node-6] [INFO] [1782940262.112110686] [belief_mpc_node]: [MPC] Dynamic R_k: q=1.000, tr(R)=0.0179
+[middle_path_follower-2] [INFO] [1782940262.115868863] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940262.122576812] [middle_path_follower]: Publishing Waypoint: dist=0.373m, angle=-0.553rad
+[uav_ancillary_node-7] [INFO] [1782940262.133788198] [uav_ancillary_node]: [ANC] Takeoff Complete. Switching to TRACKING.
+[uav_ancillary_node-7] [INFO] [1782940262.134046188] [uav_ancillary_node]: [ANC] Bootstrapping first nominal plan...
+[belief_mpc_node-6] [INFO] [1782940262.153045745] [belief_mpc_node]: [MPC] Optimized in 41.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940262.153970029] [belief_mpc_node]: UGV CMD Published: v=0.149, w=-0.600
+[middle_path_follower-2] [INFO] [1782940262.163351795] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940262.171388295] [middle_path_follower]: Publishing Waypoint: dist=0.798m, angle=0.850rad
+[belief_mpc_node-6] [INFO] [1782940262.189843849] [belief_mpc_node]: [MPC] Optimized in 34.6ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940262.190250372] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.924
+[middle_path_follower-2] [INFO] [1782940262.214128337] [middle_path_follower]: DETECTED IDS: [[55]]
+[belief_mpc_node-6] [INFO] [1782940262.220434593] [belief_mpc_node]: [MPC] Optimized in 28.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940262.220980901] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.642
+[middle_path_follower-2] [INFO] [1782940262.221660953] [middle_path_follower]: Publishing Waypoint: dist=0.798m, angle=0.850rad
+[belief_mpc_node-6] /usr/lib/python3/dist-packages/scipy/optimize/_optimize.py:404: RuntimeWarning: Values in x were outside bounds during a minimize step, clipping to bounds
+[belief_mpc_node-6]   warnings.warn("Values in x were outside bounds during a "
+[belief_mpc_node-6] [INFO] [1782940262.255327438] [belief_mpc_node]: [MPC] Optimized in 32.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940262.255917993] [belief_mpc_node]: UGV CMD Published: v=0.220, w=1.189
+[middle_path_follower-2] [INFO] [1782940262.262347642] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940262.437531565] [middle_path_follower]: Publishing Waypoint: dist=0.798m, angle=0.850rad
+[middle_path_follower-2] [INFO] [1782940262.439974296] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940262.445580530] [middle_path_follower]: Publishing Waypoint: dist=0.798m, angle=0.850rad
+[middle_path_follower-2] [INFO] [1782940262.448787139] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940262.454556194] [middle_path_follower]: Publishing Waypoint: dist=0.798m, angle=0.850rad
+[middle_path_follower-2] [INFO] [1782940262.458486231] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940262.464502214] [middle_path_follower]: Publishing Waypoint: dist=0.798m, angle=0.850rad
+[middle_path_follower-2] [INFO] [1782940262.467469590] [middle_path_follower]: DETECTED IDS: [[55]]
+[belief_mpc_node-6] [INFO] [1782940262.472082454] [belief_mpc_node]: [MPC] Optimized in 33.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940262.472502653] [belief_mpc_node]: UGV CMD Published: v=0.220, w=1.375
+[middle_path_follower-2] [INFO] [1782940262.473531835] [middle_path_follower]: Publishing Waypoint: dist=0.798m, angle=0.850rad
+[belief_mpc_node-6] [INFO] [1782940262.501888519] [belief_mpc_node]: [MPC] Optimized in 27.7ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940262.502271034] [belief_mpc_node]: UGV CMD Published: v=0.220, w=1.440
+[middle_path_follower-2] [INFO] [1782940262.511402135] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940262.526049704] [middle_path_follower]: Publishing Waypoint: dist=0.798m, angle=0.850rad
+[belief_mpc_node-6] [INFO] [1782940262.536526962] [belief_mpc_node]: [MPC] Optimized in 32.9ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940262.536904156] [belief_mpc_node]: UGV CMD Published: v=0.220, w=1.462
+[middle_path_follower-2] [INFO] [1782940262.561563714] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940262.566843504] [middle_path_follower]: Publishing Waypoint: dist=0.798m, angle=0.850rad
+[belief_mpc_node-6] [INFO] [1782940262.567657330] [belief_mpc_node]: [MPC] Optimized in 28.6ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940262.568174421] [belief_mpc_node]: UGV CMD Published: v=0.220, w=1.470
+[parameter_bridge-12] [INFO] [1782940262.585274589] [ros_gz_bridge]: Creating GZ->ROS Bridge: [clock (gz.msgs.Clock) -> clock (rosgraph_msgs/msg/Clock)] (Lazy 0)
+[parameter_bridge-12] [INFO] [1782940262.587311590] [ros_gz_bridge]: Creating GZ->ROS Bridge: [joint_states (gz.msgs.Model) -> joint_states (sensor_msgs/msg/JointState)] (Lazy 0)
+[parameter_bridge-12] [INFO] [1782940262.589660836] [ros_gz_bridge]: Creating GZ->ROS Bridge: [odom (gz.msgs.Odometry) -> odom (nav_msgs/msg/Odometry)] (Lazy 0)
+[parameter_bridge-12] [INFO] [1782940262.591660132] [ros_gz_bridge]: Creating GZ->ROS Bridge: [tf (gz.msgs.Pose_V) -> tf (tf2_msgs/msg/TFMessage)] (Lazy 0)
+[parameter_bridge-12] [INFO] [1782940262.593225030] [ros_gz_bridge]: Creating ROS->GZ Bridge: [cmd_vel (geometry_msgs/msg/TwistStamped) -> cmd_vel (gz.msgs.Twist)] (Lazy 0)
+[parameter_bridge-12] [INFO] [1782940262.594049027] [ros_gz_bridge]: Creating GZ->ROS Bridge: [imu (gz.msgs.IMU) -> imu (sensor_msgs/msg/Imu)] (Lazy 0)
+[parameter_bridge-12] [INFO] [1782940262.594641516] [ros_gz_bridge]: Creating GZ->ROS Bridge: [scan (gz.msgs.LaserScan) -> scan (sensor_msgs/msg/LaserScan)] (Lazy 0)
+[parameter_bridge-12] [INFO] [1782940262.601121064] [ros_gz_bridge]: Passing message from ROS geometry_msgs/msg/TwistStamped to Gazebo gz.msgs.Twist (showing msg only once per type)
+[belief_mpc_node-6] [INFO] [1782940262.601607194] [belief_mpc_node]: [MPC] Optimized in 31.5ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940262.602041992] [belief_mpc_node]: UGV CMD Published: v=0.220, w=1.473
+[middle_path_follower-2] [INFO] [1782940262.621820376] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940262.627289229] [middle_path_follower]: Publishing Waypoint: dist=0.798m, angle=0.850rad
+[belief_mpc_node-6] [INFO] [1782940262.634613104] [belief_mpc_node]: [MPC] Optimized in 31.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940262.634996761] [belief_mpc_node]: UGV CMD Published: v=0.220, w=1.474
+[middle_path_follower-2] [INFO] [1782940262.660805357] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940262.665906955] [middle_path_follower]: Publishing Waypoint: dist=0.804m, angle=0.842rad
+[belief_mpc_node-6] [INFO] [1782940262.667090641] [belief_mpc_node]: [MPC] Optimized in 30.4ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940262.667471824] [belief_mpc_node]: UGV CMD Published: v=0.220, w=1.474
+[belief_mpc_node-6] [INFO] [1782940262.697186138] [belief_mpc_node]: [MPC] Optimized in 28.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940262.697678349] [belief_mpc_node]: UGV CMD Published: v=0.220, w=1.474
+[middle_path_follower-2] [INFO] [1782940262.712776096] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940262.717922062] [middle_path_follower]: Publishing Waypoint: dist=0.813m, angle=0.830rad
+[belief_mpc_node-6] [INFO] [1782940262.736057123] [belief_mpc_node]: [MPC] Optimized in 36.9ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940262.736439377] [belief_mpc_node]: UGV CMD Published: v=0.220, w=1.465
+[middle_path_follower-2] [INFO] [1782940262.760452901] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940262.769746993] [middle_path_follower]: Publishing Waypoint: dist=0.820m, angle=0.822rad
+[belief_mpc_node-6] [INFO] [1782940262.771102719] [belief_mpc_node]: [MPC] Optimized in 32.9ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940262.771494111] [belief_mpc_node]: UGV CMD Published: v=0.220, w=1.448
+[belief_mpc_node-6] [INFO] [1782940262.808209072] [belief_mpc_node]: [MPC] Optimized in 34.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940262.808660302] [belief_mpc_node]: UGV CMD Published: v=0.220, w=1.432
+[middle_path_follower-2] [INFO] [1782940262.810944591] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940262.815810434] [middle_path_follower]: Publishing Waypoint: dist=0.826m, angle=0.807rad
+[belief_mpc_node-6] [INFO] [1782940262.846744014] [belief_mpc_node]: [MPC] Optimized in 29.3ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940262.847131028] [belief_mpc_node]: UGV CMD Published: v=0.220, w=1.404
+[middle_path_follower-2] [INFO] [1782940262.860954079] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940262.865430844] [middle_path_follower]: Publishing Waypoint: dist=0.835m, angle=0.795rad
+[belief_mpc_node-6] [INFO] [1782940262.899640550] [belief_mpc_node]: [MPC] Optimized in 32.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940262.900194043] [belief_mpc_node]: UGV CMD Published: v=0.220, w=1.386
+[middle_path_follower-2] [INFO] [1782940262.910911605] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940262.916418093] [middle_path_follower]: Publishing Waypoint: dist=0.848m, angle=0.771rad
+[belief_mpc_node-6] [INFO] [1782940262.947180285] [belief_mpc_node]: [MPC] Optimized in 29.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940262.947578060] [belief_mpc_node]: UGV CMD Published: v=0.220, w=1.352
+[middle_path_follower-2] [INFO] [1782940262.960793802] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940262.966272725] [middle_path_follower]: Publishing Waypoint: dist=0.858m, angle=0.753rad
+[belief_mpc_node-6] [INFO] [1782940262.995040111] [belief_mpc_node]: [MPC] Optimized in 27.3ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940262.995403708] [belief_mpc_node]: UGV CMD Published: v=0.220, w=1.318
+[middle_path_follower-2] [INFO] [1782940263.011454494] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940263.020316052] [middle_path_follower]: Publishing Waypoint: dist=0.869m, angle=0.735rad
+[belief_mpc_node-6] [INFO] [1782940263.049757823] [belief_mpc_node]: [MPC] Optimized in 28.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940263.050193132] [belief_mpc_node]: UGV CMD Published: v=0.220, w=1.286
+[middle_path_follower-2] [INFO] [1782940263.061297686] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940263.066339816] [middle_path_follower]: Publishing Waypoint: dist=0.868m, angle=0.712rad
+[belief_mpc_node-6] [INFO] [1782940263.092396446] [belief_mpc_node]: [MPC] Optimized in 24.8ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940263.092772488] [belief_mpc_node]: UGV CMD Published: v=0.220, w=1.250
+[middle_path_follower-2] [INFO] [1782940263.110295880] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940263.115145790] [middle_path_follower]: Publishing Waypoint: dist=0.865m, angle=0.656rad
+[belief_mpc_node-6] [INFO] [1782940263.145017540] [belief_mpc_node]: [MPC] Optimized in 28.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940263.145387189] [belief_mpc_node]: UGV CMD Published: v=0.220, w=1.173
+[middle_path_follower-2] [INFO] [1782940263.160487448] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940263.165618514] [middle_path_follower]: Publishing Waypoint: dist=0.861m, angle=0.566rad
+[uav_ancillary_node-7] [INFO] [1782940263.183408230] [uav_ancillary_node]: [ANC] Bootstrapping first nominal plan...
+[belief_mpc_node-6] [INFO] [1782940263.197511903] [belief_mpc_node]: [MPC] Optimized in 30.3ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940263.198092048] [belief_mpc_node]: UGV CMD Published: v=0.220, w=1.045
+[middle_path_follower-2] [INFO] [1782940263.209566041] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940263.214687588] [middle_path_follower]: Publishing Waypoint: dist=0.853m, angle=0.475rad
+[parameter_bridge-11] [INFO] [1782940263.233249789] [ros_gz_bridge]: Passing message from ROS geometry_msgs/msg/Twist to Gazebo gz.msgs.Twist (showing msg only once per type)
+[belief_mpc_node-6] [INFO] [1782940263.243629522] [belief_mpc_node]: [MPC] Optimized in 27.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940263.244175059] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.898
+[middle_path_follower-2] [INFO] [1782940263.261421273] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940263.270081884] [middle_path_follower]: Publishing Waypoint: dist=0.849m, angle=0.384rad
+[belief_mpc_node-6] [INFO] [1782940263.296819618] [belief_mpc_node]: [MPC] Optimized in 25.4ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940263.297230018] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.743
+[middle_path_follower-2] [INFO] [1782940263.310765600] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940263.316986817] [middle_path_follower]: Publishing Waypoint: dist=0.850m, angle=0.309rad
+[belief_mpc_node-6] [INFO] [1782940263.344466826] [belief_mpc_node]: [MPC] Optimized in 25.9ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940263.345307756] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.606
+[middle_path_follower-2] [INFO] [1782940263.359989118] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940263.365343945] [middle_path_follower]: Publishing Waypoint: dist=0.850m, angle=0.234rad
+[belief_mpc_node-6] [INFO] [1782940263.401266666] [belief_mpc_node]: [MPC] Optimized in 34.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940263.401840098] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.474
+[middle_path_follower-2] [INFO] [1782940263.410247409] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940263.415375128] [middle_path_follower]: Publishing Waypoint: dist=0.855m, angle=0.159rad
+[belief_mpc_node-6] [INFO] [1782940263.450927898] [belief_mpc_node]: [MPC] Optimized in 33.4ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940263.451298870] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.343
+[middle_path_follower-2] [INFO] [1782940263.462499885] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940263.467531895] [middle_path_follower]: Publishing Waypoint: dist=0.858m, angle=0.091rad
+[belief_mpc_node-6] [INFO] [1782940263.502327972] [belief_mpc_node]: [MPC] Optimized in 32.7ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940263.502827768] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.222
+[middle_path_follower-2] [INFO] [1782940263.512087792] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940263.520441578] [middle_path_follower]: Publishing Waypoint: dist=0.862m, angle=0.020rad
+[belief_mpc_node-6] [INFO] [1782940263.554717999] [belief_mpc_node]: [MPC] Optimized in 32.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940263.555131465] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.097
+[middle_path_follower-2] [INFO] [1782940263.560890951] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940263.566106564] [middle_path_follower]: Publishing Waypoint: dist=0.865m, angle=-0.035rad
+[belief_mpc_node-6] [INFO] [1782940263.597963831] [belief_mpc_node]: [MPC] Optimized in 30.7ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940263.598341396] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.007
+[middle_path_follower-2] [INFO] [1782940263.610769552] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940263.616139099] [middle_path_follower]: Publishing Waypoint: dist=0.866m, angle=-0.086rad
+[belief_mpc_node-6] [INFO] [1782940263.646963989] [belief_mpc_node]: [MPC] Optimized in 29.5ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940263.647342526] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.100
+[middle_path_follower-2] [INFO] [1782940263.661080106] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940263.666440604] [middle_path_follower]: Publishing Waypoint: dist=0.876m, angle=-0.108rad
+[belief_mpc_node-6] [INFO] [1782940263.698939288] [belief_mpc_node]: [MPC] Optimized in 30.6ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940263.699441970] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.155
+[middle_path_follower-2] [INFO] [1782940263.711797683] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940263.716478039] [middle_path_follower]: Publishing Waypoint: dist=0.885m, angle=-0.148rad
+[belief_mpc_node-6] [INFO] [1782940263.747198483] [belief_mpc_node]: [MPC] Optimized in 28.5ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940263.747628953] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.226
+[middle_path_follower-2] [INFO] [1782940263.761840017] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940263.770851120] [middle_path_follower]: Publishing Waypoint: dist=0.883m, angle=-0.171rad
+[belief_mpc_node-6] [INFO] [1782940263.801211303] [belief_mpc_node]: [MPC] Optimized in 28.6ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940263.801638576] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.272
+[middle_path_follower-2] [INFO] [1782940263.810445226] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940263.815546513] [middle_path_follower]: Publishing Waypoint: dist=0.882m, angle=-0.185rad
+[belief_mpc_node-6] [INFO] [1782940263.847177273] [belief_mpc_node]: [MPC] Optimized in 30.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940263.847583585] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.303
+[middle_path_follower-2] [INFO] [1782940263.859677481] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940263.865373602] [middle_path_follower]: Publishing Waypoint: dist=0.884m, angle=-0.207rad
+[belief_mpc_node-6] [INFO] [1782940263.894971290] [belief_mpc_node]: [MPC] Optimized in 28.3ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940263.895450957] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.342
+[middle_path_follower-2] [INFO] [1782940263.912125132] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940263.917250426] [middle_path_follower]: Publishing Waypoint: dist=0.882m, angle=-0.195rad
+[belief_mpc_node-6] [INFO] [1782940263.949093867] [belief_mpc_node]: [MPC] Optimized in 30.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940263.949464739] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.340
+[middle_path_follower-2] [INFO] [1782940263.961934727] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940263.967008821] [middle_path_follower]: Publishing Waypoint: dist=0.876m, angle=-0.185rad
+[belief_mpc_node-6] [INFO] [1782940264.003856155] [belief_mpc_node]: [MPC] Optimized in 35.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940264.004272957] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.328
+[middle_path_follower-2] [INFO] [1782940264.021854601] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940264.030744553] [middle_path_follower]: Publishing Waypoint: dist=0.883m, angle=-0.169rad
+[uav_ancillary_node-7] [INFO] [1782940264.033724843] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 0.548 | Alpha: 0.50 | Inside: True
+[middle_path_follower-2] [INFO] [1782940264.060426963] [middle_path_follower]: DETECTED IDS: [[55]]
+[belief_mpc_node-6] [INFO] [1782940264.062036058] [belief_mpc_node]: [MPC] Optimized in 29.9ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940264.062404345] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.306
+[middle_path_follower-2] [INFO] [1782940264.065584179] [middle_path_follower]: Publishing Waypoint: dist=0.883m, angle=-0.141rad
+[belief_mpc_node-6] [INFO] [1782940264.092042508] [belief_mpc_node]: [MPC] Optimized in 25.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940264.092415083] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.266
+[middle_path_follower-2] [INFO] [1782940264.110515820] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940264.115307455] [middle_path_follower]: Publishing Waypoint: dist=0.883m, angle=-0.132rad
+[belief_mpc_node-6] [INFO] [1782940264.147340564] [belief_mpc_node]: [MPC] Optimized in 30.7ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940264.147709121] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.242
+[middle_path_follower-2] [INFO] [1782940264.170570252] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940264.175858426] [middle_path_follower]: Publishing Waypoint: dist=0.880m, angle=-0.129rad
+[belief_mpc_node-6] [INFO] [1782940264.208466220] [belief_mpc_node]: [MPC] Optimized in 30.3ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940264.209101052] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.229
+[middle_path_follower-2] [INFO] [1782940264.210696921] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940264.215480971] [middle_path_follower]: Publishing Waypoint: dist=0.878m, angle=-0.122rad
+[belief_mpc_node-6] [INFO] [1782940264.246002167] [belief_mpc_node]: [MPC] Optimized in 28.8ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940264.246496642] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.215
+[middle_path_follower-2] [INFO] [1782940264.260442591] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940264.268326287] [middle_path_follower]: Publishing Waypoint: dist=0.881m, angle=-0.101rad
+[belief_mpc_node-6] [INFO] [1782940264.300307254] [belief_mpc_node]: [MPC] Optimized in 29.9ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940264.300769676] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.186
+[middle_path_follower-2] [INFO] [1782940264.320257741] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940264.325401951] [middle_path_follower]: Publishing Waypoint: dist=0.879m, angle=-0.098rad
+[belief_mpc_node-6] [INFO] [1782940264.354401715] [belief_mpc_node]: [MPC] Optimized in 27.5ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940264.354786764] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.173
+[middle_path_follower-2] [INFO] [1782940264.360671877] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940264.365613178] [middle_path_follower]: Publishing Waypoint: dist=0.882m, angle=-0.092rad
+[belief_mpc_node-6] [INFO] [1782940264.397666837] [belief_mpc_node]: [MPC] Optimized in 30.3ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940264.398185972] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.162
+[middle_path_follower-2] [INFO] [1782940264.420949139] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940264.426186964] [middle_path_follower]: Publishing Waypoint: dist=0.883m, angle=-0.076rad
+[belief_mpc_node-6] [INFO] [1782940264.457739064] [belief_mpc_node]: [MPC] Optimized in 29.7ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940264.458244461] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.141
+[middle_path_follower-2] [INFO] [1782940264.460452829] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940264.465779380] [middle_path_follower]: Publishing Waypoint: dist=0.880m, angle=-0.077rad
+[belief_mpc_node-6] [INFO] [1782940264.494477317] [belief_mpc_node]: [MPC] Optimized in 27.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940264.495197518] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.134
+[middle_path_follower-2] [INFO] [1782940264.513453532] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940264.522315018] [middle_path_follower]: Publishing Waypoint: dist=0.882m, angle=-0.068rad
+[belief_mpc_node-6] [INFO] [1782940264.549264285] [belief_mpc_node]: [MPC] Optimized in 25.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940264.549641359] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.129
+[middle_path_follower-2] [INFO] [1782940264.571472497] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940264.576897622] [middle_path_follower]: Publishing Waypoint: dist=0.882m, angle=-0.068rad
+[belief_mpc_node-6] [INFO] [1782940264.603999611] [belief_mpc_node]: [MPC] Optimized in 25.4ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940264.604426223] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.127
+[middle_path_follower-2] [INFO] [1782940264.610230536] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940264.614997242] [middle_path_follower]: Publishing Waypoint: dist=0.885m, angle=-0.063rad
+[belief_mpc_node-6] [INFO] [1782940264.643185053] [belief_mpc_node]: [MPC] Optimized in 26.5ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940264.643632576] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.120
+[middle_path_follower-2] [INFO] [1782940264.662383697] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940264.667660008] [middle_path_follower]: Publishing Waypoint: dist=0.887m, angle=-0.050rad
+[belief_mpc_node-6] [INFO] [1782940264.696653569] [belief_mpc_node]: [MPC] Optimized in 26.8ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940264.697042436] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.097
+[middle_path_follower-2] [INFO] [1782940264.712858225] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940264.718812333] [middle_path_follower]: Publishing Waypoint: dist=0.890m, angle=-0.049rad
+[belief_mpc_node-6] [INFO] [1782940264.749264874] [belief_mpc_node]: [MPC] Optimized in 29.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940264.749681596] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.086
+[middle_path_follower-2] [INFO] [1782940264.760202356] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940264.768968474] [middle_path_follower]: Publishing Waypoint: dist=0.890m, angle=-0.041rad
+[belief_mpc_node-6] [INFO] [1782940264.802891492] [belief_mpc_node]: [MPC] Optimized in 31.8ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940264.803286060] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.076
+[middle_path_follower-2] [INFO] [1782940264.810378285] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940264.815078109] [middle_path_follower]: Publishing Waypoint: dist=0.894m, angle=-0.032rad
+[belief_mpc_node-6] [INFO] [1782940264.847449044] [belief_mpc_node]: [MPC] Optimized in 30.8ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940264.847897129] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.063
+[middle_path_follower-2] [INFO] [1782940264.860392866] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940264.865363694] [middle_path_follower]: Publishing Waypoint: dist=0.891m, angle=-0.040rad
+[belief_mpc_node-6] [INFO] [1782940264.901087566] [belief_mpc_node]: [MPC] Optimized in 33.9ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940264.901518977] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.067
+[middle_path_follower-2] [INFO] [1782940264.912373746] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940264.917186894] [middle_path_follower]: Publishing Waypoint: dist=0.895m, angle=-0.027rad
+[belief_mpc_node-6] [INFO] [1782940264.950537843] [belief_mpc_node]: [MPC] Optimized in 31.5ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940264.950930869] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.054
+[middle_path_follower-2] [INFO] [1782940264.960783169] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940264.965847993] [middle_path_follower]: Publishing Waypoint: dist=0.897m, angle=-0.030rad
+[belief_mpc_node-6] [INFO] [1782940264.994101314] [belief_mpc_node]: [MPC] Optimized in 27.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940264.994478248] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.053
+[middle_path_follower-2] [INFO] [1782940265.010060113] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940265.018956777] [middle_path_follower]: Publishing Waypoint: dist=0.899m, angle=-0.025rad
+[uav_ancillary_node-7] [INFO] [1782940265.033940360] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 0.0016 | UAV_Z: 2.50
+[belief_mpc_node-6] [INFO] [1782940265.051406502] [belief_mpc_node]: [MPC] Optimized in 30.4ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940265.051789417] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.048
+[middle_path_follower-2] [INFO] [1782940265.070084835] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940265.074772745] [middle_path_follower]: Publishing Waypoint: dist=0.901m, angle=-0.036rad
+[belief_mpc_node-6] [INFO] [1782940265.109162428] [belief_mpc_node]: [MPC] Optimized in 32.9ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940265.109521747] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.057
+[middle_path_follower-2] [INFO] [1782940265.120655584] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940265.125211483] [middle_path_follower]: Publishing Waypoint: dist=0.901m, angle=-0.020rad
+[belief_mpc_node-6] [INFO] [1782940265.156251567] [belief_mpc_node]: [MPC] Optimized in 29.7ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940265.156843515] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.042
+[middle_path_follower-2] [INFO] [1782940265.170490712] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940265.175300993] [middle_path_follower]: Publishing Waypoint: dist=0.902m, angle=-0.012rad
+[belief_mpc_node-6] [INFO] [1782940265.202671476] [belief_mpc_node]: [MPC] Optimized in 25.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940265.203190210] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.028
+[middle_path_follower-2] [INFO] [1782940265.209986339] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940265.214470386] [middle_path_follower]: Publishing Waypoint: dist=0.904m, angle=-0.027rad
+[belief_mpc_node-6] [INFO] [1782940265.247726753] [belief_mpc_node]: [MPC] Optimized in 31.3ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940265.248408919] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.039
+[middle_path_follower-2] [INFO] [1782940265.261771434] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940265.270992869] [middle_path_follower]: Publishing Waypoint: dist=0.908m, angle=-0.006rad
+[belief_mpc_node-6] [INFO] [1782940265.302646513] [belief_mpc_node]: [MPC] Optimized in 29.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940265.303039509] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.019
+[middle_path_follower-2] [INFO] [1782940265.310901922] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940265.315876507] [middle_path_follower]: Publishing Waypoint: dist=0.908m, angle=-0.006rad
+[belief_mpc_node-6] [INFO] [1782940265.336458607] [belief_mpc_node]: [MPC] Optimized in 18.9ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940265.336894867] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.014
+[middle_path_follower-2] [INFO] [1782940265.360476826] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940265.365387334] [middle_path_follower]: Publishing Waypoint: dist=0.910m, angle=-0.005rad
+[belief_mpc_node-6] [INFO] [1782940265.383852708] [belief_mpc_node]: [MPC] Optimized in 17.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940265.384282285] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.011
+[middle_path_follower-2] [INFO] [1782940265.411583061] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940265.416252575] [middle_path_follower]: Publishing Waypoint: dist=0.910m, angle=-0.013rad
+[belief_mpc_node-6] [INFO] [1782940265.447344551] [belief_mpc_node]: [MPC] Optimized in 29.4ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940265.447736595] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.018
+[middle_path_follower-2] [INFO] [1782940265.461390104] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940265.466636405] [middle_path_follower]: Publishing Waypoint: dist=0.910m, angle=-0.024rad
+[belief_mpc_node-6] [INFO] [1782940265.496970907] [belief_mpc_node]: [MPC] Optimized in 29.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940265.497538827] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.033
+[middle_path_follower-2] [INFO] [1782940265.512839396] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940265.521093452] [middle_path_follower]: Publishing Waypoint: dist=0.913m, angle=-0.008rad
+[belief_mpc_node-6] [INFO] [1782940265.551177379] [belief_mpc_node]: [MPC] Optimized in 28.6ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940265.551692746] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.021
+[middle_path_follower-2] [INFO] [1782940265.561363958] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940265.566149169] [middle_path_follower]: Publishing Waypoint: dist=0.913m, angle=-0.012rad
+[belief_mpc_node-6] [INFO] [1782940265.596656102] [belief_mpc_node]: [MPC] Optimized in 29.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940265.597021062] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.019
+[middle_path_follower-2] [INFO] [1782940265.619824033] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940265.624740103] [middle_path_follower]: Publishing Waypoint: dist=0.914m, angle=-0.007rad
+[belief_mpc_node-6] [INFO] [1782940265.648628125] [belief_mpc_node]: [MPC] Optimized in 22.3ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940265.649026060] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.015
+[middle_path_follower-2] [INFO] [1782940265.663194405] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940265.668673787] [middle_path_follower]: Publishing Waypoint: dist=0.916m, angle=-0.010rad
+[belief_mpc_node-6] [INFO] [1782940265.698669360] [belief_mpc_node]: [MPC] Optimized in 28.4ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940265.699046614] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.016
+[middle_path_follower-2] [INFO] [1782940265.710849321] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940265.715835349] [middle_path_follower]: Publishing Waypoint: dist=0.916m, angle=-0.022rad
+[belief_mpc_node-6] [INFO] [1782940265.742202082] [belief_mpc_node]: [MPC] Optimized in 25.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940265.742614045] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.031
+[middle_path_follower-2] [INFO] [1782940265.760522089] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940265.769320448] [middle_path_follower]: Publishing Waypoint: dist=0.918m, angle=-0.005rad
+[belief_mpc_node-6] [INFO] [1782940265.797991518] [belief_mpc_node]: [MPC] Optimized in 26.6ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940265.798453700] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.016
+[middle_path_follower-2] [INFO] [1782940265.809487280] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940265.814651650] [middle_path_follower]: Publishing Waypoint: dist=0.920m, angle=-0.005rad
+[belief_mpc_node-6] [INFO] [1782940265.836231167] [belief_mpc_node]: [MPC] Optimized in 19.7ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940265.836632870] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.011
+[middle_path_follower-2] [INFO] [1782940265.860450393] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940265.865349149] [middle_path_follower]: Publishing Waypoint: dist=0.922m, angle=-0.000rad
+[belief_mpc_node-6] [INFO] [1782940265.882188895] [belief_mpc_node]: [MPC] Optimized in 15.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940265.882556099] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.004
+[middle_path_follower-2] [INFO] [1782940265.912672771] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940265.917945264] [middle_path_follower]: Publishing Waypoint: dist=0.922m, angle=-0.012rad
+[belief_mpc_node-6] [INFO] [1782940265.946578459] [belief_mpc_node]: [MPC] Optimized in 26.8ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940265.947044458] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.015
+[middle_path_follower-2] [INFO] [1782940265.970457774] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940265.975423091] [middle_path_follower]: Publishing Waypoint: dist=0.926m, angle=-0.006rad
+[belief_mpc_node-6] [INFO] [1782940265.994424502] [belief_mpc_node]: [MPC] Optimized in 17.3ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940265.994798650] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.013
+[middle_path_follower-2] [INFO] [1782940266.010660345] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940266.018826927] [middle_path_follower]: Publishing Waypoint: dist=0.928m, angle=-0.002rad
+[uav_ancillary_node-7] [INFO] [1782940266.033615172] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 0.505 | Alpha: 0.50 | Inside: True
+[belief_mpc_node-6] [INFO] [1782940266.038856162] [belief_mpc_node]: [MPC] Optimized in 18.3ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940266.039279798] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.007
+[belief_mpc_node-6] [INFO] [1782940266.040238319] [belief_mpc_node]: [MPC] Sigma updated. Trace: 0.204694
+[middle_path_follower-2] [INFO] [1782940266.062793598] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940266.067648766] [middle_path_follower]: Publishing Waypoint: dist=0.926m, angle=-0.006rad
+[belief_mpc_node-6] [INFO] [1782940266.087768280] [belief_mpc_node]: [MPC] Optimized in 18.7ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940266.088238698] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.009
+[middle_path_follower-2] [INFO] [1782940266.112129071] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940266.116724527] [middle_path_follower]: Publishing Waypoint: dist=0.926m, angle=-0.006rad
+[belief_mpc_node-6] [INFO] [1782940266.135044009] [belief_mpc_node]: [MPC] Optimized in 16.6ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940266.135475942] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.010
+[middle_path_follower-2] [INFO] [1782940266.161356240] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940266.165963109] [middle_path_follower]: Publishing Waypoint: dist=0.930m, angle=-0.008rad
+[belief_mpc_node-6] [INFO] [1782940266.183447664] [belief_mpc_node]: [MPC] Optimized in 16.3ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940266.183827132] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.013
+[middle_path_follower-2] [INFO] [1782940266.210342444] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940266.216005657] [middle_path_follower]: Publishing Waypoint: dist=0.932m, angle=-0.004rad
+[belief_mpc_node-6] [INFO] [1782940266.234667936] [belief_mpc_node]: [MPC] Optimized in 17.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940266.235026403] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.009
+[middle_path_follower-2] [INFO] [1782940266.260832054] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940266.269204672] [middle_path_follower]: Publishing Waypoint: dist=0.932m, angle=-0.008rad
+[belief_mpc_node-6] [INFO] [1782940266.287694430] [belief_mpc_node]: [MPC] Optimized in 16.9ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940266.288246349] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.012
+[middle_path_follower-2] [INFO] [1782940266.310468260] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940266.315304732] [middle_path_follower]: Publishing Waypoint: dist=0.932m, angle=-0.003rad
+[belief_mpc_node-6] [INFO] [1782940266.334103881] [belief_mpc_node]: [MPC] Optimized in 17.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940266.334518699] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.008
+[middle_path_follower-2] [INFO] [1782940266.360479196] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940266.365612694] [middle_path_follower]: Publishing Waypoint: dist=0.938m, angle=0.006rad
+[belief_mpc_node-6] [INFO] [1782940266.383638888] [belief_mpc_node]: [MPC] Optimized in 16.5ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940266.384009479] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.003
+[middle_path_follower-2] [INFO] [1782940266.410445975] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940266.415001923] [middle_path_follower]: Publishing Waypoint: dist=0.938m, angle=0.003rad
+[belief_mpc_node-6] [INFO] [1782940266.430034581] [belief_mpc_node]: [MPC] Optimized in 13.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940266.430450982] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.003
+[middle_path_follower-2] [INFO] [1782940266.461457114] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940266.466315088] [middle_path_follower]: Publishing Waypoint: dist=0.938m, angle=0.003rad
+[belief_mpc_node-6] [INFO] [1782940266.481982578] [belief_mpc_node]: [MPC] Optimized in 14.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940266.482357317] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.003
+[middle_path_follower-2] [INFO] [1782940266.512403525] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940266.521719845] [middle_path_follower]: Publishing Waypoint: dist=0.940m, angle=0.003rad
+[belief_mpc_node-6] [INFO] [1782940266.537571518] [belief_mpc_node]: [MPC] Optimized in 14.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940266.537934585] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.004
+[middle_path_follower-2] [INFO] [1782940266.561916498] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940266.566708211] [middle_path_follower]: Publishing Waypoint: dist=0.944m, angle=0.001rad
+[belief_mpc_node-6] [INFO] [1782940266.582613561] [belief_mpc_node]: [MPC] Optimized in 14.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940266.583085271] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.012
+[middle_path_follower-2] [INFO] [1782940266.610646807] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940266.615649507] [middle_path_follower]: Publishing Waypoint: dist=0.942m, angle=-0.004rad
+[belief_mpc_node-6] [INFO] [1782940266.635573535] [belief_mpc_node]: [MPC] Optimized in 18.7ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940266.635980838] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.008
+[middle_path_follower-2] [INFO] [1782940266.660404453] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940266.665458554] [middle_path_follower]: Publishing Waypoint: dist=0.942m, angle=-0.019rad
+[belief_mpc_node-6] [INFO] [1782940266.693330592] [belief_mpc_node]: [MPC] Optimized in 26.6ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940266.693703548] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.024
+[middle_path_follower-2] [INFO] [1782940266.710509795] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940266.715852646] [middle_path_follower]: Publishing Waypoint: dist=0.940m, angle=-0.007rad
+[belief_mpc_node-6] [INFO] [1782940266.745913412] [belief_mpc_node]: [MPC] Optimized in 28.5ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940266.746541361] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.016
+[middle_path_follower-2] [INFO] [1782940266.760467175] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940266.769189182] [middle_path_follower]: Publishing Waypoint: dist=0.946m, angle=0.002rad
+[belief_mpc_node-6] [INFO] [1782940266.786712113] [belief_mpc_node]: [MPC] Optimized in 16.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940266.787164095] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.005
+[middle_path_follower-2] [INFO] [1782940266.811118905] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940266.816002740] [middle_path_follower]: Publishing Waypoint: dist=0.946m, angle=-0.001rad
+[belief_mpc_node-6] [INFO] [1782940266.830111475] [belief_mpc_node]: [MPC] Optimized in 12.9ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940266.830479782] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.003
+[middle_path_follower-2] [INFO] [1782940266.860412946] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940266.865145082] [middle_path_follower]: Publishing Waypoint: dist=0.948m, angle=-0.005rad
+[belief_mpc_node-6] [INFO] [1782940266.884201719] [belief_mpc_node]: [MPC] Optimized in 17.2ms | Result: Success
+[uav_ancillary_node-7] [INFO] [1782940266.884257499] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 0.0016 | UAV_Z: 2.50
+[belief_mpc_node-6] [INFO] [1782940266.884766783] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.007
+[middle_path_follower-2] [INFO] [1782940266.910887266] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940266.915766693] [middle_path_follower]: Publishing Waypoint: dist=0.948m, angle=-0.016rad
+[belief_mpc_node-6] [INFO] [1782940266.947971178] [belief_mpc_node]: [MPC] Optimized in 30.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940266.948477888] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.021
+[middle_path_follower-2] [INFO] [1782940266.960837833] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940266.966111978] [middle_path_follower]: Publishing Waypoint: dist=0.954m, angle=-0.007rad
+[belief_mpc_node-6] [INFO] [1782940266.990498960] [belief_mpc_node]: [MPC] Optimized in 23.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940266.990909170] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.015
+[middle_path_follower-2] [INFO] [1782940267.011766116] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940267.020236054] [middle_path_follower]: Publishing Waypoint: dist=0.954m, angle=0.005rad
+[belief_mpc_node-6] [INFO] [1782940267.042036590] [belief_mpc_node]: [MPC] Optimized in 20.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940267.042607116] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.000
+[middle_path_follower-2] [INFO] [1782940267.061157490] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940267.066080833] [middle_path_follower]: Publishing Waypoint: dist=0.954m, angle=0.005rad
+[belief_mpc_node-6] [INFO] [1782940267.084726625] [belief_mpc_node]: [MPC] Optimized in 17.3ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940267.085142396] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.006
+[middle_path_follower-2] [INFO] [1782940267.110719381] [middle_path_follower]: DETECTED IDS: [[55]]
+[ekf_node-3] [INFO] [1782940267.111762649] [ekf_node]: [EKF] Dynamic R_k: q=0.483, tr(R)=0.0370
+[middle_path_follower-2] [INFO] [1782940267.115440585] [middle_path_follower]: Publishing Waypoint: dist=0.954m, angle=0.002rad
+[belief_mpc_node-6] [INFO] [1782940267.117131290] [belief_mpc_node]: [MPC] Dynamic R_k: q=0.470, tr(R)=0.0380
+[belief_mpc_node-6] [INFO] [1782940267.131573470] [belief_mpc_node]: [MPC] Optimized in 14.4ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940267.131986295] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.004
+[middle_path_follower-2] [INFO] [1782940267.160219731] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940267.165074458] [middle_path_follower]: Publishing Waypoint: dist=0.960m, angle=0.003rad
+[belief_mpc_node-6] [INFO] [1782940267.185770946] [belief_mpc_node]: [MPC] Optimized in 16.7ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940267.186144864] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.005
+[middle_path_follower-2] [INFO] [1782940267.209951106] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940267.214449721] [middle_path_follower]: Publishing Waypoint: dist=0.960m, angle=-0.000rad
+[belief_mpc_node-6] [INFO] [1782940267.235137251] [belief_mpc_node]: [MPC] Optimized in 18.9ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940267.235525397] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.000
+[middle_path_follower-2] [INFO] [1782940267.260622055] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940267.269402416] [middle_path_follower]: Publishing Waypoint: dist=0.960m, angle=-0.012rad
+[belief_mpc_node-6] [INFO] [1782940267.290899984] [belief_mpc_node]: [MPC] Optimized in 19.3ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940267.291451152] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.014
+[middle_path_follower-2] [INFO] [1782940267.321112475] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940267.326517567] [middle_path_follower]: Publishing Waypoint: dist=0.960m, angle=0.004rad
+[belief_mpc_node-6] [INFO] [1782940267.346635434] [belief_mpc_node]: [MPC] Optimized in 18.7ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940267.347149558] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.002
+[middle_path_follower-2] [INFO] [1782940267.371413514] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940267.376598342] [middle_path_follower]: Publishing Waypoint: dist=0.966m, angle=0.013rad
+[belief_mpc_node-6] [INFO] [1782940267.394898823] [belief_mpc_node]: [MPC] Optimized in 16.9ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940267.395313091] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.016
+[middle_path_follower-2] [INFO] [1782940267.420692987] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940267.425920520] [middle_path_follower]: Publishing Waypoint: dist=0.966m, angle=0.010rad
+[middle_path_follower-2] [INFO] [1782940267.460954011] [middle_path_follower]: DETECTED IDS: [[55]]
+[belief_mpc_node-6] [INFO] [1782940267.461902351] [belief_mpc_node]: [MPC] Optimized in 33.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940267.462363341] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.016
+[middle_path_follower-2] [INFO] [1782940267.466330707] [middle_path_follower]: Publishing Waypoint: dist=0.966m, angle=0.010rad
+[belief_mpc_node-6] [INFO] [1782940267.499781917] [belief_mpc_node]: [MPC] Optimized in 31.6ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940267.500154662] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.016
+[middle_path_follower-2] [INFO] [1782940267.512693678] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940267.522065385] [middle_path_follower]: Publishing Waypoint: dist=0.966m, angle=-0.002rad
+[belief_mpc_node-6] [INFO] [1782940267.544173879] [belief_mpc_node]: [MPC] Optimized in 19.9ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940267.544585060] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.006
+[middle_path_follower-2] [INFO] [1782940267.562852837] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940267.568811060] [middle_path_follower]: Publishing Waypoint: dist=0.972m, angle=0.008rad
+[belief_mpc_node-6] [INFO] [1782940267.590802944] [belief_mpc_node]: [MPC] Optimized in 20.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940267.591213083] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.011
+[middle_path_follower-2] [INFO] [1782940267.611158229] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940267.616504936] [middle_path_follower]: Publishing Waypoint: dist=0.974m, angle=0.008rad
+[belief_mpc_node-6] [INFO] [1782940267.637338615] [belief_mpc_node]: [MPC] Optimized in 19.4ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940267.637939891] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.014
+[middle_path_follower-2] [INFO] [1782940267.661617941] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940267.666779603] [middle_path_follower]: Publishing Waypoint: dist=0.974m, angle=-0.003rad
+[belief_mpc_node-6] [INFO] [1782940267.685840976] [belief_mpc_node]: [MPC] Optimized in 16.9ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940267.686347655] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.004
+[middle_path_follower-2] [INFO] [1782940267.712437453] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940267.717722850] [middle_path_follower]: Publishing Waypoint: dist=0.972m, angle=0.008rad
+[belief_mpc_node-6] [INFO] [1782940267.740390336] [belief_mpc_node]: [MPC] Optimized in 20.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940267.741052722] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.011
+[middle_path_follower-2] [INFO] [1782940267.770886806] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940267.780499209] [middle_path_follower]: Publishing Waypoint: dist=0.978m, angle=0.018rad
+[middle_path_follower-2] [INFO] [1782940267.810479401] [middle_path_follower]: DETECTED IDS: [[55]]
+[belief_mpc_node-6] [INFO] [1782940267.813655045] [belief_mpc_node]: [MPC] Optimized in 30.8ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940267.814138128] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.023
+[middle_path_follower-2] [INFO] [1782940267.815918751] [middle_path_follower]: Publishing Waypoint: dist=0.978m, angle=0.014rad
+[belief_mpc_node-6] [INFO] [1782940267.844646753] [belief_mpc_node]: [MPC] Optimized in 27.5ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940267.845053916] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.024
+[middle_path_follower-2] [INFO] [1782940267.860795740] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940267.865444039] [middle_path_follower]: Publishing Waypoint: dist=0.978m, angle=0.011rad
+[belief_mpc_node-6] [INFO] [1782940267.897923632] [belief_mpc_node]: [MPC] Optimized in 30.4ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940267.898566190] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.020
+[middle_path_follower-2] [INFO] [1782940267.912682477] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940267.917583124] [middle_path_follower]: Publishing Waypoint: dist=0.978m, angle=0.011rad
+[belief_mpc_node-6] [INFO] [1782940267.949967099] [belief_mpc_node]: [MPC] Optimized in 30.9ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940267.950431344] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.018
+[middle_path_follower-2] [INFO] [1782940267.963961305] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940267.969925150] [middle_path_follower]: Publishing Waypoint: dist=0.982m, angle=0.008rad
+[belief_mpc_node-6] [INFO] [1782940267.996406881] [belief_mpc_node]: [MPC] Optimized in 25.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940267.996839464] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.015
+[middle_path_follower-2] [INFO] [1782940268.022665587] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940268.032563451] [middle_path_follower]: Publishing Waypoint: dist=0.984m, angle=0.016rad
+[uav_ancillary_node-7] [INFO] [1782940268.034578216] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 0.309 | Alpha: 0.50 | Inside: True
+[belief_mpc_node-6] [INFO] [1782940268.071299890] [belief_mpc_node]: [MPC] Optimized in 36.7ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940268.071745449] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.023
+[middle_path_follower-2] [INFO] [1782940268.079408945] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940268.084659593] [middle_path_follower]: Publishing Waypoint: dist=0.984m, angle=0.009rad
+[belief_mpc_node-6] [INFO] [1782940268.110430196] [belief_mpc_node]: [MPC] Optimized in 24.6ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940268.110833381] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.017
+[middle_path_follower-2] [INFO] [1782940268.120122624] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940268.124807164] [middle_path_follower]: Publishing Waypoint: dist=0.984m, angle=-0.003rad
+[belief_mpc_node-6] [INFO] [1782940268.143919765] [belief_mpc_node]: [MPC] Optimized in 17.5ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940268.144288111] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.006
+[middle_path_follower-2] [INFO] [1782940268.172088348] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940268.178020770] [middle_path_follower]: Publishing Waypoint: dist=0.984m, angle=-0.003rad
+[belief_mpc_node-6] [INFO] [1782940268.193469904] [belief_mpc_node]: [MPC] Optimized in 13.6ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940268.193882016] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.001
+[middle_path_follower-2] [INFO] [1782940268.231012858] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940268.236686039] [middle_path_follower]: Publishing Waypoint: dist=0.990m, angle=0.003rad
+[belief_mpc_node-6] [INFO] [1782940268.252729966] [belief_mpc_node]: [MPC] Optimized in 14.7ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940268.253112270] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.002
+[middle_path_follower-2] [INFO] [1782940268.280682413] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940268.289303708] [middle_path_follower]: Publishing Waypoint: dist=0.990m, angle=0.015rad
+[belief_mpc_node-6] [INFO] [1782940268.317501639] [belief_mpc_node]: [MPC] Optimized in 26.3ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940268.318010413] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.018
+[middle_path_follower-2] [INFO] [1782940268.321884304] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940268.327044212] [middle_path_follower]: Publishing Waypoint: dist=0.990m, angle=0.015rad
+[belief_mpc_node-6] [INFO] [1782940268.363837558] [belief_mpc_node]: [MPC] Optimized in 34.8ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940268.364415318] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.022
+[middle_path_follower-2] [INFO] [1782940268.373125379] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940268.378434932] [middle_path_follower]: Publishing Waypoint: dist=0.994m, angle=0.012rad
+[belief_mpc_node-6] [INFO] [1782940268.411120866] [belief_mpc_node]: [MPC] Optimized in 31.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940268.411519993] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.020
+[middle_path_follower-2] [INFO] [1782940268.420371984] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940268.425845040] [middle_path_follower]: Publishing Waypoint: dist=0.996m, angle=0.016rad
+[belief_mpc_node-6] [INFO] [1782940268.454905973] [belief_mpc_node]: [MPC] Optimized in 26.5ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940268.455457240] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.025
+[middle_path_follower-2] [INFO] [1782940268.470411398] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940268.476931369] [middle_path_follower]: Publishing Waypoint: dist=0.994m, angle=0.009rad
+[belief_mpc_node-6] [INFO] [1782940268.511211728] [belief_mpc_node]: [MPC] Optimized in 32.9ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940268.511637758] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.019
+[middle_path_follower-2] [INFO] [1782940268.521893267] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940268.530992436] [middle_path_follower]: Publishing Waypoint: dist=0.996m, angle=0.013rad
+[belief_mpc_node-6] [INFO] [1782940268.561597755] [belief_mpc_node]: [MPC] Optimized in 29.3ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940268.561974008] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.020
+[middle_path_follower-2] [INFO] [1782940268.573180052] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940268.580111675] [middle_path_follower]: Publishing Waypoint: dist=0.996m, angle=0.001rad
+[belief_mpc_node-6] [INFO] [1782940268.600912445] [belief_mpc_node]: [MPC] Optimized in 19.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940268.601316051] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.009
+[middle_path_follower-2] [INFO] [1782940268.620867056] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940268.625745919] [middle_path_follower]: Publishing Waypoint: dist=1.000m, angle=0.007rad
+[belief_mpc_node-6] [INFO] [1782940268.645876538] [belief_mpc_node]: [MPC] Optimized in 18.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940268.646306726] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.011
+[middle_path_follower-2] [INFO] [1782940268.679916302] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940268.684797480] [middle_path_follower]: Publishing Waypoint: dist=1.002m, angle=0.007rad
+[belief_mpc_node-6] [INFO] [1782940268.702467315] [belief_mpc_node]: [MPC] Optimized in 16.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940268.702922893] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.012
+[middle_path_follower-2] [INFO] [1782940268.721439478] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940268.727390075] [middle_path_follower]: Publishing Waypoint: dist=1.000m, angle=0.015rad
+[uav_ancillary_node-7] [INFO] [1782940268.734323171] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 0.0015 | UAV_Z: 2.50
+[belief_mpc_node-6] [INFO] [1782940268.759768703] [belief_mpc_node]: [MPC] Optimized in 30.5ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940268.760154594] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.021
+[middle_path_follower-2] [INFO] [1782940268.770581732] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940268.779033674] [middle_path_follower]: Publishing Waypoint: dist=1.002m, angle=0.019rad
+[belief_mpc_node-6] [INFO] [1782940268.807333386] [belief_mpc_node]: [MPC] Optimized in 26.5ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940268.807745459] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.029
+[middle_path_follower-2] [INFO] [1782940268.820775711] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940268.825511162] [middle_path_follower]: Publishing Waypoint: dist=1.006m, angle=0.017rad
+[belief_mpc_node-6] [INFO] [1782940268.854675319] [belief_mpc_node]: [MPC] Optimized in 27.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940268.855448674] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.028
+[middle_path_follower-2] [INFO] [1782940268.876493426] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940268.882917427] [middle_path_follower]: Publishing Waypoint: dist=1.006m, angle=0.021rad
+[belief_mpc_node-6] [INFO] [1782940268.913851285] [belief_mpc_node]: [MPC] Optimized in 29.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940268.914300952] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.033
+[middle_path_follower-2] [INFO] [1782940268.923867943] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940268.929548548] [middle_path_follower]: Publishing Waypoint: dist=1.006m, angle=0.021rad
+[belief_mpc_node-6] [INFO] [1782940268.958132140] [belief_mpc_node]: [MPC] Optimized in 27.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940268.958702776] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.035
+[middle_path_follower-2] [INFO] [1782940268.973639158] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940268.978971306] [middle_path_follower]: Publishing Waypoint: dist=1.006m, angle=0.013rad
+[belief_mpc_node-6] [INFO] [1782940269.009829754] [belief_mpc_node]: [MPC] Optimized in 29.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940269.010271635] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.027
+[middle_path_follower-2] [INFO] [1782940269.024494247] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940269.033616389] [middle_path_follower]: Publishing Waypoint: dist=1.008m, angle=0.013rad
+[belief_mpc_node-6] [INFO] [1782940269.063018541] [belief_mpc_node]: [MPC] Optimized in 28.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940269.063520200] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.024
+[middle_path_follower-2] [INFO] [1782940269.075414921] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940269.082277616] [middle_path_follower]: Publishing Waypoint: dist=1.012m, angle=0.011rad
+[belief_mpc_node-6] [INFO] [1782940269.112358647] [belief_mpc_node]: [MPC] Optimized in 28.7ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940269.112775369] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.019
+[middle_path_follower-2] [INFO] [1782940269.122874047] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940269.127258274] [middle_path_follower]: Publishing Waypoint: dist=1.014m, angle=0.023rad
+[belief_mpc_node-6] [INFO] [1782940269.156166401] [belief_mpc_node]: [MPC] Optimized in 25.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940269.156940919] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.032
+[middle_path_follower-2] [INFO] [1782940269.173933393] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940269.178743691] [middle_path_follower]: Publishing Waypoint: dist=1.014m, angle=0.008rad
+[belief_mpc_node-6] [INFO] [1782940269.204046036] [belief_mpc_node]: [MPC] Optimized in 23.7ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940269.204512226] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.020
+[middle_path_follower-2] [INFO] [1782940269.223043736] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940269.227895556] [middle_path_follower]: Publishing Waypoint: dist=1.012m, angle=0.019rad
+[belief_mpc_node-6] [INFO] [1782940269.256391590] [belief_mpc_node]: [MPC] Optimized in 27.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940269.256788783] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.029
+[middle_path_follower-2] [INFO] [1782940269.274325843] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940269.282937428] [middle_path_follower]: Publishing Waypoint: dist=1.011m, angle=0.015rad
+[belief_mpc_node-6] [INFO] [1782940269.310041326] [belief_mpc_node]: [MPC] Optimized in 25.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940269.310526172] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.027
+[middle_path_follower-2] [INFO] [1782940269.322634534] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940269.327602252] [middle_path_follower]: Publishing Waypoint: dist=1.015m, angle=0.021rad
+[belief_mpc_node-6] [INFO] [1782940269.356939746] [belief_mpc_node]: [MPC] Optimized in 27.7ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940269.357431636] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.032
+[middle_path_follower-2] [INFO] [1782940269.374907825] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940269.380104495] [middle_path_follower]: Publishing Waypoint: dist=1.011m, angle=0.009rad
+[belief_mpc_node-6] [INFO] [1782940269.408253735] [belief_mpc_node]: [MPC] Optimized in 26.7ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940269.408675918] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.021
+[middle_path_follower-2] [INFO] [1782940269.422492108] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940269.427351012] [middle_path_follower]: Publishing Waypoint: dist=1.011m, angle=0.009rad
+[belief_mpc_node-6] [INFO] [1782940269.457726914] [belief_mpc_node]: [MPC] Optimized in 28.9ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940269.458152724] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.017
+[middle_path_follower-2] [INFO] [1782940269.474268059] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940269.479778006] [middle_path_follower]: Publishing Waypoint: dist=1.009m, angle=-0.003rad
+[belief_mpc_node-6] [INFO] [1782940269.499321864] [belief_mpc_node]: [MPC] Optimized in 17.4ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940269.499704198] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.005
+[middle_path_follower-2] [INFO] [1782940269.523760996] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940269.532739184] [middle_path_follower]: Publishing Waypoint: dist=1.007m, angle=-0.011rad
+[belief_mpc_node-6] [INFO] [1782940269.551066061] [belief_mpc_node]: [MPC] Optimized in 16.6ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940269.551561528] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.011
+[middle_path_follower-2] [INFO] [1782940269.573261388] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940269.578852596] [middle_path_follower]: Publishing Waypoint: dist=1.009m, angle=-0.009rad
+[belief_mpc_node-6] [INFO] [1782940269.599488698] [belief_mpc_node]: [MPC] Optimized in 19.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940269.599878246] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.015
+[middle_path_follower-2] [INFO] [1782940269.623708037] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940269.629722309] [middle_path_follower]: Publishing Waypoint: dist=1.007m, angle=-0.029rad
+[belief_mpc_node-6] [INFO] [1782940269.660646753] [belief_mpc_node]: [MPC] Optimized in 29.4ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940269.661044147] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.037
+[middle_path_follower-2] [INFO] [1782940269.684034401] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940269.689318393] [middle_path_follower]: Publishing Waypoint: dist=1.005m, angle=-0.017rad
+[belief_mpc_node-6] [INFO] [1782940269.715508229] [belief_mpc_node]: [MPC] Optimized in 24.9ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940269.715983486] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.031
+[middle_path_follower-2] [INFO] [1782940269.723289426] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940269.728706050] [middle_path_follower]: Publishing Waypoint: dist=1.008m, angle=-0.023rad
+[belief_mpc_node-6] [INFO] [1782940269.759796611] [belief_mpc_node]: [MPC] Optimized in 29.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940269.760174316] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.037
+[middle_path_follower-2] [INFO] [1782940269.773402737] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940269.782215248] [middle_path_follower]: Publishing Waypoint: dist=1.006m, angle=-0.023rad
+[belief_mpc_node-6] [INFO] [1782940269.814651123] [belief_mpc_node]: [MPC] Optimized in 31.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940269.815078827] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.039
+[middle_path_follower-2] [INFO] [1782940269.823089156] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940269.828455270] [middle_path_follower]: Publishing Waypoint: dist=1.004m, angle=-0.047rad
+[belief_mpc_node-6] [INFO] [1782940269.864296551] [belief_mpc_node]: [MPC] Optimized in 34.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940269.864719746] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.066
+[middle_path_follower-2] [INFO] [1782940269.873313456] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940269.878540185] [middle_path_follower]: Publishing Waypoint: dist=1.007m, angle=-0.045rad
+[belief_mpc_node-6] [INFO] [1782940269.915235421] [belief_mpc_node]: [MPC] Optimized in 34.9ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940269.915641712] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.074
+[middle_path_follower-2] [INFO] [1782940269.923252914] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940269.928467118] [middle_path_follower]: Publishing Waypoint: dist=1.003m, angle=-0.045rad
+[belief_mpc_node-6] [INFO] [1782940269.960666356] [belief_mpc_node]: [MPC] Optimized in 30.8ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940269.961127847] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.080
+[middle_path_follower-2] [INFO] [1782940269.974077227] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940269.979217556] [middle_path_follower]: Publishing Waypoint: dist=1.006m, angle=-0.052rad
+[belief_mpc_node-6] [INFO] [1782940270.012561239] [belief_mpc_node]: [MPC] Optimized in 31.5ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940270.013028641] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.086
+[middle_path_follower-2] [INFO] [1782940270.023597905] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940270.031751786] [middle_path_follower]: Publishing Waypoint: dist=1.004m, angle=-0.071rad
+[uav_ancillary_node-7] [INFO] [1782940270.033660901] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 0.201 | Alpha: 0.50 | Inside: True
+[belief_mpc_node-6] [INFO] [1782940270.064938837] [belief_mpc_node]: [MPC] Optimized in 31.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940270.065339316] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.108
+[middle_path_follower-2] [INFO] [1782940270.074447048] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940270.079782180] [middle_path_follower]: Publishing Waypoint: dist=1.008m, angle=-0.065rad
+[belief_mpc_node-6] [INFO] [1782940270.108793596] [belief_mpc_node]: [MPC] Optimized in 27.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940270.109249785] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.109
+[middle_path_follower-2] [INFO] [1782940270.122787965] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940270.127852183] [middle_path_follower]: Publishing Waypoint: dist=1.005m, angle=-0.065rad
+[belief_mpc_node-6] [INFO] [1782940270.157988988] [belief_mpc_node]: [MPC] Optimized in 28.6ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940270.158396521] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.109
+[middle_path_follower-2] [INFO] [1782940270.174267692] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940270.179084812] [middle_path_follower]: Publishing Waypoint: dist=1.009m, angle=-0.071rad
+[belief_mpc_node-6] [INFO] [1782940270.208174953] [belief_mpc_node]: [MPC] Optimized in 27.4ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940270.208546957] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.116
+[middle_path_follower-2] [INFO] [1782940270.224859117] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940270.229347188] [middle_path_follower]: Publishing Waypoint: dist=0.997m, angle=-0.078rad
+[belief_mpc_node-6] [INFO] [1782940270.262068130] [belief_mpc_node]: [MPC] Optimized in 31.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940270.262560921] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.126
+[middle_path_follower-2] [INFO] [1782940270.285044543] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940270.294353973] [middle_path_follower]: Publishing Waypoint: dist=0.997m, angle=-0.062rad
+[belief_mpc_node-6] [INFO] [1782940270.325278592] [belief_mpc_node]: [MPC] Optimized in 28.9ms | Result: Success
+[middle_path_follower-2] [INFO] [1782940270.325403678] [middle_path_follower]: DETECTED IDS: [[55]]
+[belief_mpc_node-6] [INFO] [1782940270.325915337] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.112
+[middle_path_follower-2] [INFO] [1782940270.331235490] [middle_path_follower]: Publishing Waypoint: dist=1.012m, angle=-0.055rad
+[belief_mpc_node-6] [INFO] [1782940270.366723027] [belief_mpc_node]: [MPC] Optimized in 33.8ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940270.367155530] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.098
+[middle_path_follower-2] [INFO] [1782940270.374636454] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940270.380419629] [middle_path_follower]: Publishing Waypoint: dist=0.987m, angle=-0.064rad
+[belief_mpc_node-6] [INFO] [1782940270.409609006] [belief_mpc_node]: [MPC] Optimized in 27.4ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940270.410264448] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.105
+[middle_path_follower-2] [INFO] [1782940270.424522989] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940270.429799675] [middle_path_follower]: Publishing Waypoint: dist=1.022m, angle=-0.058rad
+[belief_mpc_node-6] [INFO] [1782940270.463377647] [belief_mpc_node]: [MPC] Optimized in 31.6ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940270.463974504] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.099
+[middle_path_follower-2] [INFO] [1782940270.484893821] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940270.490452213] [middle_path_follower]: Publishing Waypoint: dist=0.989m, angle=-0.041rad
+[middle_path_follower-2] [INFO] [1782940270.524003081] [middle_path_follower]: DETECTED IDS: [[55]]
+[belief_mpc_node-6] [INFO] [1782940270.524808740] [belief_mpc_node]: [MPC] Optimized in 32.9ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940270.525205582] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.080
+[middle_path_follower-2] [INFO] [1782940270.533312931] [middle_path_follower]: Publishing Waypoint: dist=0.941m, angle=-0.045rad
+[belief_mpc_node-6] [INFO] [1782940270.570164068] [belief_mpc_node]: [MPC] Optimized in 35.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940270.570730926] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.078
+[middle_path_follower-2] [INFO] [1782940270.584004324] [middle_path_follower]: DETECTED IDS: [[55]]
+[uav_ancillary_node-7] [INFO] [1782940270.584023211] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 0.0017 | UAV_Z: 2.50
+[middle_path_follower-2] [INFO] [1782940270.589143429] [middle_path_follower]: Publishing Waypoint: dist=0.937m, angle=-0.043rad
+[middle_path_follower-2] [INFO] [1782940270.625647802] [middle_path_follower]: DETECTED IDS: [[55]]
+[belief_mpc_node-6] [INFO] [1782940270.627042963] [belief_mpc_node]: [MPC] Optimized in 36.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940270.627444826] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.079
+[middle_path_follower-2] [INFO] [1782940270.630536042] [middle_path_follower]: Publishing Waypoint: dist=0.929m, angle=-0.024rad
+[belief_mpc_node-6] [INFO] [1782940270.659892508] [belief_mpc_node]: [MPC] Optimized in 27.7ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940270.660277578] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.054
+[middle_path_follower-2] [INFO] [1782940270.683649110] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940270.688452233] [middle_path_follower]: Publishing Waypoint: dist=0.931m, angle=-0.023rad
+[belief_mpc_node-6] [INFO] [1782940270.722516624] [belief_mpc_node]: [MPC] Optimized in 32.6ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940270.722956512] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.045
+[middle_path_follower-2] [INFO] [1782940270.733697755] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940270.738961957] [middle_path_follower]: Publishing Waypoint: dist=0.910m, angle=-0.009rad
+[belief_mpc_node-6] [INFO] [1782940270.772459520] [belief_mpc_node]: [MPC] Optimized in 31.3ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940270.772966239] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.026
+[middle_path_follower-2] [INFO] [1782940270.773600661] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940270.782503108] [middle_path_follower]: Publishing Waypoint: dist=0.916m, angle=-0.022rad
+[belief_mpc_node-6] [INFO] [1782940270.812148483] [belief_mpc_node]: [MPC] Optimized in 27.7ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940270.812619372] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.034
+[middle_path_follower-2] [INFO] [1782940270.823372650] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940270.828167646] [middle_path_follower]: Publishing Waypoint: dist=0.900m, angle=-0.014rad
+[belief_mpc_node-6] [INFO] [1782940270.856851345] [belief_mpc_node]: [MPC] Optimized in 27.3ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940270.857394877] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.027
+[middle_path_follower-2] [INFO] [1782940270.874496976] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940270.879706950] [middle_path_follower]: Publishing Waypoint: dist=0.900m, angle=0.006rad
+[belief_mpc_node-6] [INFO] [1782940270.900126892] [belief_mpc_node]: [MPC] Optimized in 18.9ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940270.900601749] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.002
+[middle_path_follower-2] [INFO] [1782940270.923849557] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940270.928800311] [middle_path_follower]: Publishing Waypoint: dist=0.884m, angle=0.011rad
+[belief_mpc_node-6] [INFO] [1782940270.947380114] [belief_mpc_node]: [MPC] Optimized in 17.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940270.947773730] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.013
+[middle_path_follower-2] [INFO] [1782940270.973131971] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940270.978267058] [middle_path_follower]: Publishing Waypoint: dist=0.875m, angle=0.007rad
+[belief_mpc_node-6] [INFO] [1782940270.997719201] [belief_mpc_node]: [MPC] Optimized in 18.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940270.998084061] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.013
+[middle_path_follower-2] [INFO] [1782940271.022613764] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940271.031176800] [middle_path_follower]: Publishing Waypoint: dist=0.875m, angle=0.015rad
+[middle_path_follower-2] [INFO] [1782940271.072953484] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940271.077829209] [middle_path_follower]: Publishing Waypoint: dist=0.885m, angle=0.011rad
+[belief_mpc_node-6] [INFO] [1782940271.083049132] [belief_mpc_node]: [MPC] Optimized in 27.7ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940271.083414252] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.020
+[belief_mpc_node-6] [INFO] [1782940271.113028511] [belief_mpc_node]: [MPC] Optimized in 28.3ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940271.113398892] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.018
+[belief_mpc_node-6] [INFO] [1782940271.114152768] [belief_mpc_node]: [MPC] Sigma updated. Trace: 0.204771
+[middle_path_follower-2] [INFO] [1782940271.124866155] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940271.129535904] [middle_path_follower]: Publishing Waypoint: dist=0.865m, angle=0.011rad
+[belief_mpc_node-6] [INFO] [1782940271.158832467] [belief_mpc_node]: [MPC] Optimized in 28.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940271.159244229] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.018
+[middle_path_follower-2] [INFO] [1782940271.173866814] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940271.178732549] [middle_path_follower]: Publishing Waypoint: dist=0.865m, angle=0.011rad
+[belief_mpc_node-6] [INFO] [1782940271.207504027] [belief_mpc_node]: [MPC] Optimized in 27.6ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940271.208002219] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.018
+[middle_path_follower-2] [INFO] [1782940271.223673192] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940271.229010698] [middle_path_follower]: Publishing Waypoint: dist=0.851m, angle=0.029rad
+[belief_mpc_node-6] [INFO] [1782940271.260099565] [belief_mpc_node]: [MPC] Optimized in 29.9ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940271.260609120] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.038
+[middle_path_follower-2] [INFO] [1782940271.283206352] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940271.291638700] [middle_path_follower]: Publishing Waypoint: dist=0.851m, angle=0.036rad
+[middle_path_follower-2] [INFO] [1782940271.324902847] [middle_path_follower]: DETECTED IDS: [[55]]
+[belief_mpc_node-6] [INFO] [1782940271.325157910] [belief_mpc_node]: [MPC] Optimized in 31.6ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940271.325736150] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.054
+[middle_path_follower-2] [INFO] [1782940271.329794704] [middle_path_follower]: Publishing Waypoint: dist=0.843m, angle=0.033rad
+[belief_mpc_node-6] [INFO] [1782940271.360221205] [belief_mpc_node]: [MPC] Optimized in 28.7ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940271.360703406] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.056
+[middle_path_follower-2] [INFO] [1782940271.375749767] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940271.380523601] [middle_path_follower]: Publishing Waypoint: dist=0.839m, angle=0.035rad
+[belief_mpc_node-6] [INFO] [1782940271.411220084] [belief_mpc_node]: [MPC] Optimized in 28.7ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940271.411686143] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.060
+[middle_path_follower-2] [INFO] [1782940271.423731186] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940271.428568365] [middle_path_follower]: Publishing Waypoint: dist=0.835m, angle=0.038rad
+[belief_mpc_node-6] [INFO] [1782940271.458904668] [belief_mpc_node]: [MPC] Optimized in 29.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940271.459265129] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.064
+[middle_path_follower-2] [INFO] [1782940271.474671400] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940271.479587364] [middle_path_follower]: Publishing Waypoint: dist=0.835m, angle=0.038rad
+[belief_mpc_node-6] [INFO] [1782940271.512247520] [belief_mpc_node]: [MPC] Optimized in 30.6ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940271.512661016] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.065
+[middle_path_follower-2] [INFO] [1782940271.523493457] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940271.532510649] [middle_path_follower]: Publishing Waypoint: dist=0.827m, angle=0.028rad
+[belief_mpc_node-6] [INFO] [1782940271.564797960] [belief_mpc_node]: [MPC] Optimized in 30.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940271.565180183] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.054
+[middle_path_follower-2] [INFO] [1782940271.573354603] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940271.578569477] [middle_path_follower]: Publishing Waypoint: dist=0.823m, angle=0.030rad
+[belief_mpc_node-6] [INFO] [1782940271.610385999] [belief_mpc_node]: [MPC] Optimized in 30.5ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940271.610783914] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.054
+[middle_path_follower-2] [INFO] [1782940271.623179628] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940271.628421655] [middle_path_follower]: Publishing Waypoint: dist=0.817m, angle=0.028rad
+[belief_mpc_node-6] [INFO] [1782940271.660801338] [belief_mpc_node]: [MPC] Optimized in 31.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940271.661236476] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.051
+[middle_path_follower-2] [INFO] [1782940271.673322069] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940271.678609656] [middle_path_follower]: Publishing Waypoint: dist=0.813m, angle=0.030rad
+[belief_mpc_node-6] [INFO] [1782940271.711613259] [belief_mpc_node]: [MPC] Optimized in 31.4ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940271.711996495] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.053
+[middle_path_follower-2] [INFO] [1782940271.722924805] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940271.728130601] [middle_path_follower]: Publishing Waypoint: dist=0.809m, angle=0.033rad
+[belief_mpc_node-6] [INFO] [1782940271.758475311] [belief_mpc_node]: [MPC] Optimized in 28.8ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940271.758962030] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.056
+[middle_path_follower-2] [INFO] [1782940271.774158328] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940271.783306097] [middle_path_follower]: Publishing Waypoint: dist=0.807m, angle=0.044rad
+[belief_mpc_node-6] [INFO] [1782940271.815502999] [belief_mpc_node]: [MPC] Optimized in 30.6ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940271.815987144] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.069
+[middle_path_follower-2] [INFO] [1782940271.823207402] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940271.827942771] [middle_path_follower]: Publishing Waypoint: dist=0.807m, angle=0.044rad
+[belief_mpc_node-6] [INFO] [1782940271.858665846] [belief_mpc_node]: [MPC] Optimized in 29.5ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940271.859054392] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.074
+[middle_path_follower-2] [INFO] [1782940271.875414955] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940271.880648656] [middle_path_follower]: Publishing Waypoint: dist=0.797m, angle=0.044rad
+[belief_mpc_node-6] [INFO] [1782940271.911497781] [belief_mpc_node]: [MPC] Optimized in 29.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940271.911949431] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.076
+[middle_path_follower-2] [INFO] [1782940271.923407958] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940271.928238323] [middle_path_follower]: Publishing Waypoint: dist=0.797m, angle=0.048rad
+[belief_mpc_node-6] [INFO] [1782940271.956739387] [belief_mpc_node]: [MPC] Optimized in 27.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940271.957296125] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.077
+[middle_path_follower-2] [INFO] [1782940271.973281959] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940271.978522062] [middle_path_follower]: Publishing Waypoint: dist=0.797m, angle=0.048rad
+[belief_mpc_node-6] [INFO] [1782940272.007638478] [belief_mpc_node]: [MPC] Optimized in 27.6ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940272.008020381] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.078
+[middle_path_follower-2] [INFO] [1782940272.023786048] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940272.031660335] [middle_path_follower]: Publishing Waypoint: dist=0.791m, angle=0.041rad
+[uav_ancillary_node-7] [INFO] [1782940272.033631662] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 0.201 | Alpha: 0.50 | Inside: True
+[belief_mpc_node-6] [INFO] [1782940272.063619974] [belief_mpc_node]: [MPC] Optimized in 30.4ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940272.064027307] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.074
+[middle_path_follower-2] [INFO] [1782940272.074860368] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940272.079753536] [middle_path_follower]: Publishing Waypoint: dist=0.791m, angle=0.041rad
+[belief_mpc_node-6] [INFO] [1782940272.111935483] [belief_mpc_node]: [MPC] Optimized in 29.8ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940272.112333618] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.072
+[middle_path_follower-2] [INFO] [1782940272.123306665] [middle_path_follower]: DETECTED IDS: [[55]]
+[ekf_node-3] [INFO] [1782940272.125084371] [ekf_node]: [EKF] Dynamic R_k: q=0.383, tr(R)=0.0466
+[experiment_logger-5] [INFO] [1782940272.125146183] [experiment_logger]: Logging: 16.2/65.0s | Samples: 100
+[middle_path_follower-2] [INFO] [1782940272.128147480] [middle_path_follower]: Publishing Waypoint: dist=0.791m, angle=0.034rad
+[belief_mpc_node-6] [INFO] [1782940272.129279402] [belief_mpc_node]: [MPC] Dynamic R_k: q=0.392, tr(R)=0.0455
+[belief_mpc_node-6] [INFO] [1782940272.158698381] [belief_mpc_node]: [MPC] Optimized in 28.9ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940272.159148739] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.063
+[middle_path_follower-2] [INFO] [1782940272.173191409] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940272.178107723] [middle_path_follower]: Publishing Waypoint: dist=0.785m, angle=0.031rad
+[belief_mpc_node-6] [INFO] [1782940272.210520135] [belief_mpc_node]: [MPC] Optimized in 31.4ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940272.210912529] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.059
+[middle_path_follower-2] [INFO] [1782940272.233875057] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940272.239056664] [middle_path_follower]: Publishing Waypoint: dist=0.781m, angle=0.037rad
+[middle_path_follower-2] [INFO] [1782940272.272647038] [middle_path_follower]: DETECTED IDS: [[55]]
+[belief_mpc_node-6] [INFO] [1782940272.274457237] [belief_mpc_node]: [MPC] Optimized in 33.9ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940272.275209981] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.063
+[middle_path_follower-2] [INFO] [1782940272.281215463] [middle_path_follower]: Publishing Waypoint: dist=0.781m, angle=0.037rad
+[belief_mpc_node-6] [INFO] [1782940272.312669044] [belief_mpc_node]: [MPC] Optimized in 29.8ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940272.313080105] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.068
+[middle_path_follower-2] [INFO] [1782940272.325160395] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940272.330275350] [middle_path_follower]: Publishing Waypoint: dist=0.777m, angle=0.028rad
+[belief_mpc_node-6] [INFO] [1782940272.363344597] [belief_mpc_node]: [MPC] Optimized in 31.5ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940272.363835916] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.056
+[middle_path_follower-2] [INFO] [1782940272.374186776] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940272.379659527] [middle_path_follower]: Publishing Waypoint: dist=0.770m, angle=0.030rad
+[belief_mpc_node-6] [INFO] [1782940272.411540130] [belief_mpc_node]: [MPC] Optimized in 30.6ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940272.411923857] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.054
+[middle_path_follower-2] [INFO] [1782940272.422694966] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940272.427751386] [middle_path_follower]: Publishing Waypoint: dist=0.766m, angle=0.036rad
+[uav_ancillary_node-7] [INFO] [1782940272.433630148] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 0.0017 | UAV_Z: 2.50
+[belief_mpc_node-6] [INFO] [1782940272.461819182] [belief_mpc_node]: [MPC] Optimized in 32.5ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940272.462359918] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.060
+[middle_path_follower-2] [INFO] [1782940272.473177859] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940272.478292324] [middle_path_follower]: Publishing Waypoint: dist=0.766m, angle=0.036rad
+[belief_mpc_node-6] [INFO] [1782940272.512553260] [belief_mpc_node]: [MPC] Optimized in 32.8ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940272.512932508] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.062
+[middle_path_follower-2] [INFO] [1782940272.525741545] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940272.534634100] [middle_path_follower]: Publishing Waypoint: dist=0.756m, angle=0.029rad
+[belief_mpc_node-6] [INFO] [1782940272.570204859] [belief_mpc_node]: [MPC] Optimized in 33.5ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940272.570745565] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.055
+[middle_path_follower-2] [INFO] [1782940272.573683678] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940272.579004109] [middle_path_follower]: Publishing Waypoint: dist=0.756m, angle=0.029rad
+[belief_mpc_node-6] [INFO] [1782940272.612400221] [belief_mpc_node]: [MPC] Optimized in 31.7ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940272.612951087] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.053
+[middle_path_follower-2] [INFO] [1782940272.622895004] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940272.628051773] [middle_path_follower]: Publishing Waypoint: dist=0.746m, angle=0.045rad
+[belief_mpc_node-6] [INFO] [1782940272.659474643] [belief_mpc_node]: [MPC] Optimized in 30.3ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940272.659898569] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.070
+[middle_path_follower-2] [INFO] [1782940272.673722768] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940272.678532742] [middle_path_follower]: Publishing Waypoint: dist=0.746m, angle=0.045rad
+[belief_mpc_node-6] [INFO] [1782940272.709367943] [belief_mpc_node]: [MPC] Optimized in 29.4ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940272.709775778] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.072
+[middle_path_follower-2] [INFO] [1782940272.725694907] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940272.730832718] [middle_path_follower]: Publishing Waypoint: dist=0.742m, angle=0.051rad
+[belief_mpc_node-6] [INFO] [1782940272.761045392] [belief_mpc_node]: [MPC] Optimized in 28.4ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940272.761476312] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.082
+[middle_path_follower-2] [INFO] [1782940272.774959148] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940272.784039052] [middle_path_follower]: Publishing Waypoint: dist=0.740m, angle=0.046rad
+[belief_mpc_node-6] [INFO] [1782940272.812114201] [belief_mpc_node]: [MPC] Optimized in 26.5ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940272.812593806] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.078
+[middle_path_follower-2] [INFO] [1782940272.823336940] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940272.828488267] [middle_path_follower]: Publishing Waypoint: dist=0.740m, angle=0.042rad
+[belief_mpc_node-6] [INFO] [1782940272.858104736] [belief_mpc_node]: [MPC] Optimized in 28.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940272.858509494] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.071
+[middle_path_follower-2] [INFO] [1782940272.873576483] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940272.878652472] [middle_path_follower]: Publishing Waypoint: dist=0.732m, angle=0.040rad
+[belief_mpc_node-6] [INFO] [1782940272.908951086] [belief_mpc_node]: [MPC] Optimized in 28.9ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940272.909356726] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.070
+[middle_path_follower-2] [INFO] [1782940272.923217567] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940272.928619348] [middle_path_follower]: Publishing Waypoint: dist=0.734m, angle=0.035rad
+[belief_mpc_node-6] [INFO] [1782940272.960672671] [belief_mpc_node]: [MPC] Optimized in 30.6ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940272.961108090] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.068
+[middle_path_follower-2] [INFO] [1782940272.973794015] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940272.978722362] [middle_path_follower]: Publishing Waypoint: dist=0.730m, angle=0.038rad
+[belief_mpc_node-6] [INFO] [1782940273.011336400] [belief_mpc_node]: [MPC] Optimized in 30.8ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940273.011746899] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.067
+[middle_path_follower-2] [INFO] [1782940273.022173967] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940273.030580853] [middle_path_follower]: Publishing Waypoint: dist=0.732m, angle=0.033rad
+[belief_mpc_node-6] [INFO] [1782940273.063841060] [belief_mpc_node]: [MPC] Optimized in 32.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940273.064241129] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.064
+[middle_path_follower-2] [INFO] [1782940273.074243781] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940273.079186266] [middle_path_follower]: Publishing Waypoint: dist=0.730m, angle=0.028rad
+[belief_mpc_node-6] [INFO] [1782940273.112297179] [belief_mpc_node]: [MPC] Optimized in 31.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940273.112705343] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.055
+[middle_path_follower-2] [INFO] [1782940273.123120809] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940273.127786688] [middle_path_follower]: Publishing Waypoint: dist=0.726m, angle=0.016rad
+[belief_mpc_node-6] [INFO] [1782940273.157940291] [belief_mpc_node]: [MPC] Optimized in 28.8ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940273.158370970] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.037
+[middle_path_follower-2] [INFO] [1782940273.173162624] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940273.177966686] [middle_path_follower]: Publishing Waypoint: dist=0.722m, angle=0.018rad
+[belief_mpc_node-6] [INFO] [1782940273.205864550] [belief_mpc_node]: [MPC] Optimized in 26.8ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940273.206231654] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.034
+[middle_path_follower-2] [INFO] [1782940273.223139991] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940273.228247311] [middle_path_follower]: Publishing Waypoint: dist=0.720m, angle=0.013rad
+[belief_mpc_node-6] [INFO] [1782940273.253794120] [belief_mpc_node]: [MPC] Optimized in 24.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940273.254317573] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.026
+[middle_path_follower-2] [INFO] [1782940273.273537558] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940273.282054770] [middle_path_follower]: Publishing Waypoint: dist=0.720m, angle=0.013rad
+[belief_mpc_node-6] [INFO] [1782940273.312055912] [belief_mpc_node]: [MPC] Optimized in 28.4ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940273.312443005] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.024
+[middle_path_follower-2] [INFO] [1782940273.324789929] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940273.329868923] [middle_path_follower]: Publishing Waypoint: dist=0.714m, angle=0.010rad
+[belief_mpc_node-6] [INFO] [1782940273.360668890] [belief_mpc_node]: [MPC] Optimized in 29.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940273.361147513] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.019
+[middle_path_follower-2] [INFO] [1782940273.374244306] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940273.379389059] [middle_path_follower]: Publishing Waypoint: dist=0.714m, angle=0.017rad
+[belief_mpc_node-6] [INFO] [1782940273.406734475] [belief_mpc_node]: [MPC] Optimized in 26.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940273.407324488] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.027
+[middle_path_follower-2] [INFO] [1782940273.423150201] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940273.428090812] [middle_path_follower]: Publishing Waypoint: dist=0.710m, angle=0.014rad
+[belief_mpc_node-6] [INFO] [1782940273.455632134] [belief_mpc_node]: [MPC] Optimized in 25.8ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940273.456109064] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.025
+[middle_path_follower-2] [INFO] [1782940273.474822220] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940273.480019797] [middle_path_follower]: Publishing Waypoint: dist=0.710m, angle=0.014rad
+[belief_mpc_node-6] [INFO] [1782940273.511581716] [belief_mpc_node]: [MPC] Optimized in 30.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940273.512118465] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.024
+[middle_path_follower-2] [INFO] [1782940273.533839531] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940273.542945475] [middle_path_follower]: Publishing Waypoint: dist=0.704m, angle=0.015rad
+[belief_mpc_node-6] [INFO] [1782940273.569355416] [belief_mpc_node]: [MPC] Optimized in 25.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940273.569780464] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.025
+[middle_path_follower-2] [INFO] [1782940273.573274903] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940273.578589081] [middle_path_follower]: Publishing Waypoint: dist=0.704m, angle=0.007rad
+[belief_mpc_node-6] [INFO] [1782940273.606697701] [belief_mpc_node]: [MPC] Optimized in 26.5ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940273.607109604] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.017
+[middle_path_follower-2] [INFO] [1782940273.623766655] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940273.628883053] [middle_path_follower]: Publishing Waypoint: dist=0.698m, angle=-0.008rad
+[belief_mpc_node-6] [INFO] [1782940273.651965724] [belief_mpc_node]: [MPC] Optimized in 21.7ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940273.652337467] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.004
+[middle_path_follower-2] [INFO] [1782940273.674558188] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940273.680226494] [middle_path_follower]: Publishing Waypoint: dist=0.698m, angle=-0.008rad
+[belief_mpc_node-6] [INFO] [1782940273.700009028] [belief_mpc_node]: [MPC] Optimized in 17.6ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940273.700408236] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.011
+[middle_path_follower-2] [INFO] [1782940273.725910637] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940273.730748816] [middle_path_follower]: Publishing Waypoint: dist=0.694m, angle=-0.005rad
+[belief_mpc_node-6] [INFO] [1782940273.750822214] [belief_mpc_node]: [MPC] Optimized in 18.4ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940273.751210459] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.010
+[middle_path_follower-2] [INFO] [1782940273.773611346] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940273.782681088] [middle_path_follower]: Publishing Waypoint: dist=0.692m, angle=-0.007rad
+[belief_mpc_node-6] [INFO] [1782940273.800816535] [belief_mpc_node]: [MPC] Optimized in 16.6ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940273.801324156] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.012
+[middle_path_follower-2] [INFO] [1782940273.833073154] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940273.838238979] [middle_path_follower]: Publishing Waypoint: dist=0.686m, angle=0.002rad
+[belief_mpc_node-6] [INFO] [1782940273.854971369] [belief_mpc_node]: [MPC] Optimized in 15.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940273.855511945] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.002
+[middle_path_follower-2] [INFO] [1782940273.873695086] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940273.879076807] [middle_path_follower]: Publishing Waypoint: dist=0.686m, angle=0.001rad
+[belief_mpc_node-6] [INFO] [1782940273.891651560] [belief_mpc_node]: [MPC] Optimized in 10.9ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940273.892159932] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.004
+[middle_path_follower-2] [INFO] [1782940273.923849883] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940273.928945139] [middle_path_follower]: Publishing Waypoint: dist=0.686m, angle=0.001rad
+[belief_mpc_node-6] [INFO] [1782940273.946059272] [belief_mpc_node]: [MPC] Optimized in 15.3ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940273.946720616] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.001
+[middle_path_follower-2] [INFO] [1782940273.973749558] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940273.978921014] [middle_path_follower]: Publishing Waypoint: dist=0.676m, angle=-0.014rad
+[belief_mpc_node-6] [INFO] [1782940274.007812427] [belief_mpc_node]: [MPC] Optimized in 27.5ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940274.008312653] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.017
+[middle_path_follower-2] [INFO] [1782940274.023540714] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940274.031315572] [middle_path_follower]: Publishing Waypoint: dist=0.676m, angle=-0.014rad
+[uav_ancillary_node-7] [INFO] [1782940274.033631428] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 0.335 | Alpha: 0.50 | Inside: True
+[belief_mpc_node-6] [INFO] [1782940274.063787420] [belief_mpc_node]: [MPC] Optimized in 30.3ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940274.064310300] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.021
+[middle_path_follower-2] [INFO] [1782940274.073536229] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940274.078292416] [middle_path_follower]: Publishing Waypoint: dist=0.676m, angle=-0.011rad
+[belief_mpc_node-6] [INFO] [1782940274.107961097] [belief_mpc_node]: [MPC] Optimized in 28.4ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940274.108413970] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.020
+[middle_path_follower-2] [INFO] [1782940274.123616020] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940274.128508946] [middle_path_follower]: Publishing Waypoint: dist=0.670m, angle=-0.018rad
+[belief_mpc_node-6] [INFO] [1782940274.155730212] [belief_mpc_node]: [MPC] Optimized in 26.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940274.156219026] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.027
+[middle_path_follower-2] [INFO] [1782940274.172960171] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940274.177981039] [middle_path_follower]: Publishing Waypoint: dist=0.668m, angle=-0.009rad
+[belief_mpc_node-6] [INFO] [1782940274.203390463] [belief_mpc_node]: [MPC] Optimized in 23.9ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940274.203776955] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.019
+[middle_path_follower-2] [INFO] [1782940274.224008120] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940274.228927739] [middle_path_follower]: Publishing Waypoint: dist=0.664m, angle=-0.009rad
+[belief_mpc_node-6] [INFO] [1782940274.260579710] [belief_mpc_node]: [MPC] Optimized in 30.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940274.261231876] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.016
+[middle_path_follower-2] [INFO] [1782940274.275407342] [middle_path_follower]: DETECTED IDS: [[55]]
+[uav_ancillary_node-7] [INFO] [1782940274.284326185] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 0.0021 | UAV_Z: 2.50
+[middle_path_follower-2] [INFO] [1782940274.284869176] [middle_path_follower]: Publishing Waypoint: dist=0.660m, angle=-0.018rad
+[belief_mpc_node-6] [INFO] [1782940274.317862902] [belief_mpc_node]: [MPC] Optimized in 31.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940274.318419139] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.025
+[middle_path_follower-2] [INFO] [1782940274.334324305] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940274.339392257] [middle_path_follower]: Publishing Waypoint: dist=0.654m, angle=-0.018rad
+[belief_mpc_node-6] [INFO] [1782940274.370340079] [belief_mpc_node]: [MPC] Optimized in 29.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940274.370875204] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.029
+[middle_path_follower-2] [INFO] [1782940274.373061474] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940274.378604813] [middle_path_follower]: Publishing Waypoint: dist=0.650m, angle=-0.019rad
+[belief_mpc_node-6] [INFO] [1782940274.408273023] [belief_mpc_node]: [MPC] Optimized in 28.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940274.408663052] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.032
+[middle_path_follower-2] [INFO] [1782940274.433267379] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940274.438301683] [middle_path_follower]: Publishing Waypoint: dist=0.650m, angle=-0.015rad
+[belief_mpc_node-6] [INFO] [1782940274.465371090] [belief_mpc_node]: [MPC] Optimized in 25.6ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940274.466010621] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.028
+[middle_path_follower-2] [INFO] [1782940274.473557309] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940274.479258909] [middle_path_follower]: Publishing Waypoint: dist=0.644m, angle=-0.014rad
+[belief_mpc_node-6] [INFO] [1782940274.507340872] [belief_mpc_node]: [MPC] Optimized in 26.5ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940274.507780339] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.026
+[middle_path_follower-2] [INFO] [1782940274.525035507] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940274.533679197] [middle_path_follower]: Publishing Waypoint: dist=0.644m, angle=-0.007rad
+[belief_mpc_node-6] [INFO] [1782940274.562581177] [belief_mpc_node]: [MPC] Optimized in 27.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940274.562972548] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.017
+[middle_path_follower-2] [INFO] [1782940274.575119055] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940274.580160765] [middle_path_follower]: Publishing Waypoint: dist=0.634m, angle=-0.023rad
+[belief_mpc_node-6] [INFO] [1782940274.610236919] [belief_mpc_node]: [MPC] Optimized in 28.7ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940274.610837854] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.031
+[middle_path_follower-2] [INFO] [1782940274.623237088] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940274.629871809] [middle_path_follower]: Publishing Waypoint: dist=0.634m, angle=-0.015rad
+[belief_mpc_node-6] [INFO] [1782940274.657826280] [belief_mpc_node]: [MPC] Optimized in 26.4ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940274.658301897] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.028
+[middle_path_follower-2] [INFO] [1782940274.683430939] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940274.688213457] [middle_path_follower]: Publishing Waypoint: dist=0.630m, angle=-0.020rad
+[belief_mpc_node-6] [INFO] [1782940274.717099235] [belief_mpc_node]: [MPC] Optimized in 27.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940274.717790638] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.033
+[middle_path_follower-2] [INFO] [1782940274.723348134] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940274.728236181] [middle_path_follower]: Publishing Waypoint: dist=0.628m, angle=-0.011rad
+[belief_mpc_node-6] [INFO] [1782940274.758139745] [belief_mpc_node]: [MPC] Optimized in 28.4ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940274.758540154] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.023
+[middle_path_follower-2] [INFO] [1782940274.773630114] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940274.782317741] [middle_path_follower]: Publishing Waypoint: dist=0.624m, angle=-0.004rad
+[belief_mpc_node-6] [INFO] [1782940274.800614853] [belief_mpc_node]: [MPC] Optimized in 16.8ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940274.801010503] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.013
+[middle_path_follower-2] [INFO] [1782940274.823435864] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940274.828320795] [middle_path_follower]: Publishing Waypoint: dist=0.618m, angle=-0.012rad
+[belief_mpc_node-6] [INFO] [1782940274.858772940] [belief_mpc_node]: [MPC] Optimized in 28.8ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940274.859300050] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.018
+[middle_path_follower-2] [INFO] [1782940274.874015521] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940274.879071969] [middle_path_follower]: Publishing Waypoint: dist=0.614m, angle=-0.012rad
+[belief_mpc_node-6] [INFO] [1782940274.907199001] [belief_mpc_node]: [MPC] Optimized in 27.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940274.907732833] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.019
+[middle_path_follower-2] [INFO] [1782940274.924100632] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940274.929037996] [middle_path_follower]: Publishing Waypoint: dist=0.609m, angle=-0.021rad
+[belief_mpc_node-6] [INFO] [1782940274.958416735] [belief_mpc_node]: [MPC] Optimized in 27.8ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940274.958948924] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.031
+[middle_path_follower-2] [INFO] [1782940274.974186735] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940274.978795010] [middle_path_follower]: Publishing Waypoint: dist=0.609m, angle=-0.017rad
+[belief_mpc_node-6] [INFO] [1782940275.008863969] [belief_mpc_node]: [MPC] Optimized in 28.6ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940275.009430015] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.030
+[middle_path_follower-2] [INFO] [1782940275.025236695] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940275.033725148] [middle_path_follower]: Publishing Waypoint: dist=0.603m, angle=-0.025rad
+[belief_mpc_node-6] [INFO] [1782940275.064337514] [belief_mpc_node]: [MPC] Optimized in 29.3ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940275.064868029] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.039
+[middle_path_follower-2] [INFO] [1782940275.074582259] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940275.079196976] [middle_path_follower]: Publishing Waypoint: dist=0.603m, angle=-0.021rad
+[belief_mpc_node-6] [INFO] [1782940275.109820995] [belief_mpc_node]: [MPC] Optimized in 29.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940275.110244360] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.038
+[middle_path_follower-2] [INFO] [1782940275.123903306] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940275.128862652] [middle_path_follower]: Publishing Waypoint: dist=0.593m, angle=-0.017rad
+[belief_mpc_node-6] [INFO] [1782940275.155538117] [belief_mpc_node]: [MPC] Optimized in 25.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940275.155974087] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.033
+[middle_path_follower-2] [INFO] [1782940275.183810711] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940275.188708826] [middle_path_follower]: Publishing Waypoint: dist=0.593m, angle=-0.025rad
+[belief_mpc_node-6] [INFO] [1782940275.221391433] [belief_mpc_node]: [MPC] Optimized in 31.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940275.222044551] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.043
+[middle_path_follower-2] [INFO] [1782940275.223350756] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940275.228398005] [middle_path_follower]: Publishing Waypoint: dist=0.593m, angle=-0.018rad
+[belief_mpc_node-6] [INFO] [1782940275.254983323] [belief_mpc_node]: [MPC] Optimized in 25.3ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940275.255367711] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.035
+[middle_path_follower-2] [INFO] [1782940275.274321895] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940275.282805028] [middle_path_follower]: Publishing Waypoint: dist=0.583m, angle=-0.026rad
+[belief_mpc_node-6] [INFO] [1782940275.315107105] [belief_mpc_node]: [MPC] Optimized in 30.3ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940275.315633102] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.044
+[middle_path_follower-2] [INFO] [1782940275.324231101] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940275.329141982] [middle_path_follower]: Publishing Waypoint: dist=0.583m, angle=-0.022rad
+[belief_mpc_node-6] [INFO] [1782940275.360783867] [belief_mpc_node]: [MPC] Optimized in 30.3ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940275.361334833] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.042
+[middle_path_follower-2] [INFO] [1782940275.374573851] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940275.379635529] [middle_path_follower]: Publishing Waypoint: dist=0.573m, angle=-0.019rad
+[belief_mpc_node-6] [INFO] [1782940275.405798144] [belief_mpc_node]: [MPC] Optimized in 24.5ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940275.406226689] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.036
+[middle_path_follower-2] [INFO] [1782940275.423211601] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940275.427972476] [middle_path_follower]: Publishing Waypoint: dist=0.573m, angle=-0.015rad
+[belief_mpc_node-6] [INFO] [1782940275.455910279] [belief_mpc_node]: [MPC] Optimized in 26.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940275.456401448] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.030
+[middle_path_follower-2] [INFO] [1782940275.475510958] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940275.481104455] [middle_path_follower]: Publishing Waypoint: dist=0.573m, angle=-0.012rad
+[belief_mpc_node-6] [INFO] [1782940275.510584038] [belief_mpc_node]: [MPC] Optimized in 27.5ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940275.511101217] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.021
+[middle_path_follower-2] [INFO] [1782940275.526118180] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940275.534658155] [middle_path_follower]: Publishing Waypoint: dist=0.569m, angle=-0.023rad
+[belief_mpc_node-6] [INFO] [1782940275.567107202] [belief_mpc_node]: [MPC] Optimized in 31.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940275.567565034] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.036
+[middle_path_follower-2] [INFO] [1782940275.572865353] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940275.578313593] [middle_path_follower]: Publishing Waypoint: dist=0.563m, angle=-0.020rad
+[belief_mpc_node-6] [INFO] [1782940275.610937775] [belief_mpc_node]: [MPC] Optimized in 31.3ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940275.611306872] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.036
+[middle_path_follower-2] [INFO] [1782940275.624286890] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940275.629580495] [middle_path_follower]: Publishing Waypoint: dist=0.559m, angle=-0.024rad
+[belief_mpc_node-6] [INFO] [1782940275.661495098] [belief_mpc_node]: [MPC] Optimized in 30.8ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940275.661917962] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.042
+[middle_path_follower-2] [INFO] [1782940275.673426849] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940275.678305717] [middle_path_follower]: Publishing Waypoint: dist=0.559m, angle=-0.020rad
+[belief_mpc_node-6] [INFO] [1782940275.707906158] [belief_mpc_node]: [MPC] Optimized in 28.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940275.708302660] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.039
+[middle_path_follower-2] [INFO] [1782940275.724212773] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940275.729302146] [middle_path_follower]: Publishing Waypoint: dist=0.549m, angle=-0.017rad
+[belief_mpc_node-6] [INFO] [1782940275.756627272] [belief_mpc_node]: [MPC] Optimized in 26.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940275.757070756] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.034
+[middle_path_follower-2] [INFO] [1782940275.773856315] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940275.782761580] [middle_path_follower]: Publishing Waypoint: dist=0.547m, angle=-0.021rad
+[belief_mpc_node-6] [INFO] [1782940275.816286688] [belief_mpc_node]: [MPC] Optimized in 31.6ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940275.816772616] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.037
+[middle_path_follower-2] [INFO] [1782940275.823713969] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940275.828682043] [middle_path_follower]: Publishing Waypoint: dist=0.543m, angle=-0.014rad
+[belief_mpc_node-6] [INFO] [1782940275.859043244] [belief_mpc_node]: [MPC] Optimized in 29.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940275.859417943] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.028
+[middle_path_follower-2] [INFO] [1782940275.874257135] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940275.879889328] [middle_path_follower]: Publishing Waypoint: dist=0.539m, angle=-0.026rad
+[belief_mpc_node-6] [INFO] [1782940275.914940404] [belief_mpc_node]: [MPC] Optimized in 33.6ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940275.915322196] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.042
+[middle_path_follower-2] [INFO] [1782940275.923722867] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940275.928772050] [middle_path_follower]: Publishing Waypoint: dist=0.539m, angle=-0.022rad
+[belief_mpc_node-6] [INFO] [1782940275.953129095] [belief_mpc_node]: [MPC] Optimized in 22.7ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940275.953514885] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.040
+[middle_path_follower-2] [INFO] [1782940275.973190171] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940275.978361606] [middle_path_follower]: Publishing Waypoint: dist=0.531m, angle=-0.019rad
+[belief_mpc_node-6] [INFO] [1782940276.005443893] [belief_mpc_node]: [MPC] Optimized in 25.9ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940276.005863810] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.036
+[middle_path_follower-2] [INFO] [1782940276.023731349] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940276.032064154] [middle_path_follower]: Publishing Waypoint: dist=0.531m, angle=-0.019rad
+[uav_ancillary_node-7] [INFO] [1782940276.034236115] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 0.469 | Alpha: 0.50 | Inside: True
+[belief_mpc_node-6] [INFO] [1782940276.058616663] [belief_mpc_node]: [MPC] Optimized in 25.4ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940276.059002132] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.034
+[middle_path_follower-2] [INFO] [1782940276.075464351] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940276.080085500] [middle_path_follower]: Publishing Waypoint: dist=0.529m, angle=-0.015rad
+[belief_mpc_node-6] [INFO] [1782940276.108524407] [belief_mpc_node]: [MPC] Optimized in 26.7ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940276.108960115] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.029
+[middle_path_follower-2] [INFO] [1782940276.124616516] [middle_path_follower]: DETECTED IDS: [[55]]
+[belief_mpc_node-6] [INFO] [1782940276.126641408] [belief_mpc_node]: [MPC] Sigma updated. Trace: 0.207162
+[middle_path_follower-2] [INFO] [1782940276.129379635] [middle_path_follower]: Publishing Waypoint: dist=0.519m, angle=-0.019rad
+[uav_ancillary_node-7] [INFO] [1782940276.133626566] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 0.0024 | UAV_Z: 2.50
+[belief_mpc_node-6] [INFO] [1782940276.160752645] [belief_mpc_node]: [MPC] Optimized in 29.8ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940276.161154056] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.032
+[middle_path_follower-2] [INFO] [1782940276.175138551] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940276.179850329] [middle_path_follower]: Publishing Waypoint: dist=0.519m, angle=-0.016rad
+[belief_mpc_node-6] [INFO] [1782940276.207049472] [belief_mpc_node]: [MPC] Optimized in 25.7ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940276.207428238] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.029
+[middle_path_follower-2] [INFO] [1782940276.223925927] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940276.228920963] [middle_path_follower]: Publishing Waypoint: dist=0.515m, angle=-0.004rad
+[belief_mpc_node-6] [INFO] [1782940276.255416649] [belief_mpc_node]: [MPC] Optimized in 25.4ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940276.255810025] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.015
+[middle_path_follower-2] [INFO] [1782940276.273967415] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940276.282821838] [middle_path_follower]: Publishing Waypoint: dist=0.517m, angle=-0.001rad
+[belief_mpc_node-6] [INFO] [1782940276.297759051] [belief_mpc_node]: [MPC] Optimized in 13.3ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940276.298162406] [belief_mpc_node]: UGV CMD Published: v=0.220, w=-0.007
+[middle_path_follower-2] [INFO] [1782940276.324617623] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940276.329820278] [middle_path_follower]: Publishing Waypoint: dist=0.506m, angle=0.019rad
+[belief_mpc_node-6] [INFO] [1782940276.358437055] [belief_mpc_node]: [MPC] Optimized in 27.2ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940276.358847715] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.020
+[middle_path_follower-2] [INFO] [1782940276.383970455] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940276.389095887] [middle_path_follower]: Publishing Waypoint: dist=0.506m, angle=0.015rad
+[belief_mpc_node-6] [INFO] [1782940276.415351330] [belief_mpc_node]: [MPC] Optimized in 25.1ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940276.415728193] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.025
+[middle_path_follower-2] [INFO] [1782940276.433329187] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940276.438591379] [middle_path_follower]: Publishing Waypoint: dist=0.502m, angle=0.019rad
+[belief_mpc_node-6] [INFO] [1782940276.469070276] [belief_mpc_node]: [MPC] Optimized in 28.9ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940276.469621894] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.030
+[middle_path_follower-2] [INFO] [1782940276.484496734] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940276.489531328] [middle_path_follower]: Publishing Waypoint: dist=0.500m, angle=0.013rad
+[belief_mpc_node-6] [INFO] [1782940276.520039012] [belief_mpc_node]: [MPC] Optimized in 29.0ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940276.520689795] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.025
+[middle_path_follower-2] [INFO] [1782940276.623037294] [middle_path_follower]: DETECTED IDS: [[55]]
+[middle_path_follower-2] [INFO] [1782940276.627984205] [middle_path_follower]: Publishing Waypoint: dist=0.492m, angle=0.037rad
+[belief_mpc_node-6] [INFO] [1782940276.657328026] [belief_mpc_node]: [MPC] Optimized in 27.8ms | Result: Success
+[belief_mpc_node-6] [INFO] [1782940276.657694538] [belief_mpc_node]: UGV CMD Published: v=0.220, w=0.050
+[uav_ancillary_node-7] [INFO] [1782940277.984424953] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 0.0089 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940278.034153480] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 0.050 | Alpha: 0.54 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940279.834358964] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 0.0225 | UAV_Z: 2.50
+[uav_mpc_node-4] [INFO] [1782940279.858560556] [uav_mpc_node]: [MPC] PHASE 2 SUMMARY | Solve: 13.2ms | Goal Dist: 2.55m
+[uav_ancillary_node-7] [INFO] [1782940280.034369739] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 0.292 | Alpha: 0.70 | Inside: True
+[belief_mpc_node-6] [INFO] [1782940281.127756066] [belief_mpc_node]: [MPC] Sigma updated. Trace: 0.279127
+[uav_ancillary_node-7] [INFO] [1782940281.684265591] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 0.0462 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940282.034140448] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 0.419 | Alpha: 0.99 | Inside: True
+[experiment_logger-5] [INFO] [1782940282.125262426] [experiment_logger]: Logging: 26.2/65.0s | Samples: 200
+[uav_ancillary_node-7] [INFO] [1782940283.534152994] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 0.0848 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940284.034349561] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 0.736 | Alpha: 1.47 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940285.384295394] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 0.1428 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940286.034205089] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 1.113 | Alpha: 2.00 | Inside: True
+[belief_mpc_node-6] [INFO] [1782940286.177870764] [belief_mpc_node]: [MPC] Sigma updated. Trace: 0.457093
+[uav_ancillary_node-7] [INFO] [1782940287.234391031] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 0.2250 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940288.034297571] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 1.502 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940289.084270642] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 0.3354 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940290.034257430] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 1.844 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940290.934363843] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 0.4783 | UAV_Z: 2.50
+[belief_mpc_node-6] [INFO] [1782940291.228396181] [belief_mpc_node]: [MPC] Sigma updated. Trace: 0.827329
+[uav_ancillary_node-7] [INFO] [1782940292.034318640] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 2.144 | Alpha: 2.00 | Inside: True
+[experiment_logger-5] [INFO] [1782940292.125377669] [experiment_logger]: Logging: 36.2/65.0s | Samples: 300
+[uav_ancillary_node-7] [INFO] [1782940292.784645787] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 0.6573 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940294.034380345] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 2.380 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940294.634662925] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 0.8759 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940296.034216973] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 2.594 | Alpha: 2.00 | Inside: True
+[belief_mpc_node-6] [INFO] [1782940296.277782919] [belief_mpc_node]: [MPC] Sigma updated. Trace: 1.470171
+[uav_ancillary_node-7] [INFO] [1782940296.484601036] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 1.1373 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940298.035156762] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 2.809 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940298.334733841] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 1.4443 | UAV_Z: 2.50
+[uav_mpc_node-4] [INFO] [1782940298.353402729] [uav_mpc_node]: [MPC] PHASE 2 SUMMARY | Solve: 21.8ms | Goal Dist: 4.33m
+[uav_ancillary_node-7] [INFO] [1782940300.034525942] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 3.025 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940300.184551377] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 1.7992 | UAV_Z: 2.50
+[belief_mpc_node-6] [INFO] [1782940301.327639157] [belief_mpc_node]: [MPC] Sigma updated. Trace: 2.448776
+[uav_ancillary_node-7] [INFO] [1782940302.034758854] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 2.2040 | UAV_Z: 2.50
+[experiment_logger-5] [INFO] [1782940302.125315272] [experiment_logger]: Logging: 46.2/65.0s | Samples: 400
+[uav_ancillary_node-7] [INFO] [1782940303.884391047] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 2.6603 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940304.034485458] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 0.321 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940305.734536913] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 3.1692 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940306.034735190] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 0.568 | Alpha: 2.00 | Inside: True
+[belief_mpc_node-6] [INFO] [1782940306.377479180] [belief_mpc_node]: [MPC] Sigma updated. Trace: 3.805145
+[uav_ancillary_node-7] [INFO] [1782940307.584574716] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 3.7313 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940308.034248286] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 0.851 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940309.435484968] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 4.3469 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940310.034858493] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 1.206 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940311.284539226] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 5.0157 | UAV_Z: 2.50
+[belief_mpc_node-6] [INFO] [1782940311.378215732] [belief_mpc_node]: [MPC] Sigma updated. Trace: 5.538192
+[uav_ancillary_node-7] [INFO] [1782940312.034532207] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 1.612 | Alpha: 2.00 | Inside: True
+[experiment_logger-5] [INFO] [1782940312.125505996] [experiment_logger]: Logging: 56.2/65.0s | Samples: 500
+[uav_ancillary_node-7] [INFO] [1782940313.134758270] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 5.7371 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940314.034375584] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 2.050 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940314.984865128] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 6.5099 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940316.034605282] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 2.491 | Alpha: 2.00 | Inside: True
+[belief_mpc_node-6] [INFO] [1782940316.427603314] [belief_mpc_node]: [MPC] Sigma updated. Trace: 7.676007
+[uav_ancillary_node-7] [INFO] [1782940316.834490880] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 7.3326 | UAV_Z: 2.50
+[uav_mpc_node-4] [INFO] [1782940316.846568666] [uav_mpc_node]: [MPC] PHASE 2 SUMMARY | Solve: 15.3ms | Goal Dist: 7.01m
+[uav_ancillary_node-7] [INFO] [1782940318.034556107] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 2.937 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940318.684686364] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 8.2030 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940320.034384108] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 3.347 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940320.534227157] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 9.1190 | UAV_Z: 2.50
+[experiment_logger-5] [INFO] [1782940320.942141199] [experiment_logger]: Data saved to: /home/omen/CRAZYFLY_SITL/ugv_uav_control/03_System_Integration_ROS2/results/TRIO_B_error_20260702_024200.csv
+[belief_mpc_node-6] [INFO] [1782940321.427563350] [belief_mpc_node]: [MPC] Sigma updated. Trace: 10.145880
+[uav_ancillary_node-7] [INFO] [1782940322.034376422] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 3.731 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940322.384154035] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 10.0776 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940324.034430489] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 4.094 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940324.234447781] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 11.0757 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940326.034464522] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 4.457 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940326.085028430] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 12.1098 | UAV_Z: 2.50
+[belief_mpc_node-6] [INFO] [1782940326.477511163] [belief_mpc_node]: [MPC] Sigma updated. Trace: 12.944135
+[uav_ancillary_node-7] [INFO] [1782940327.934500094] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 13.1762 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940328.034501909] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 0.230 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940329.784127325] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 14.2707 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940330.034979639] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 0.597 | Alpha: 2.00 | Inside: True
+[belief_mpc_node-6] [INFO] [1782940331.477644188] [belief_mpc_node]: [MPC] Sigma updated. Trace: 15.944258
+[uav_ancillary_node-7] [INFO] [1782940331.634438694] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 15.3891 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940332.034396079] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 0.956 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940333.484567173] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 16.5269 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940334.034303568] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 1.309 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940335.334304585] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 17.6793 | UAV_Z: 2.50
+[uav_mpc_node-4] [INFO] [1782940335.340957634] [uav_mpc_node]: [MPC] PHASE 2 SUMMARY | Solve: 7.0ms | Goal Dist: 8.57m
+[uav_ancillary_node-7] [INFO] [1782940336.034253727] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 1.662 | Alpha: 2.00 | Inside: True
+[belief_mpc_node-6] [INFO] [1782940336.528048595] [belief_mpc_node]: [MPC] Sigma updated. Trace: 19.119711
+[uav_ancillary_node-7] [INFO] [1782940337.184211771] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 18.8417 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940338.034210820] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 2.006 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940339.034219719] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 20.0090 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940340.034310243] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 2.343 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940340.884454309] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 21.1765 | UAV_Z: 2.50
+[belief_mpc_node-6] [INFO] [1782940341.578005694] [belief_mpc_node]: [MPC] Sigma updated. Trace: 22.345102
+[uav_ancillary_node-7] [INFO] [1782940342.034413710] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 2.673 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940342.734504701] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 22.3391 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940344.034296590] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 3.000 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940344.584800402] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 23.4920 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940346.034255490] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 3.321 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940346.434146805] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 24.6303 | UAV_Z: 2.50
+[belief_mpc_node-6] [INFO] [1782940346.627807175] [belief_mpc_node]: [MPC] Sigma updated. Trace: 25.520873
+[uav_ancillary_node-7] [INFO] [1782940348.034313804] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 3.639 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940348.284465205] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 25.7495 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940350.034440526] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 3.950 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940350.134334720] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 26.8450 | UAV_Z: 2.50
+[belief_mpc_node-6] [INFO] [1782940351.628085146] [belief_mpc_node]: [MPC] Sigma updated. Trace: 28.521604
+[uav_ancillary_node-7] [INFO] [1782940351.984611889] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 27.9124 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940352.034376181] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 0.090 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940353.834326556] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 28.9478 | UAV_Z: 2.50
+[uav_mpc_node-4] [INFO] [1782940353.845522935] [uav_mpc_node]: [MPC] PHASE 2 SUMMARY | Solve: 5.7ms | Goal Dist: 8.52m
+[uav_ancillary_node-7] [INFO] [1782940354.034244363] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 0.419 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940355.684232878] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 29.9472 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940356.034310272] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 0.738 | Alpha: 2.00 | Inside: True
+[belief_mpc_node-6] [INFO] [1782940356.677382587] [belief_mpc_node]: [MPC] Sigma updated. Trace: 31.320732
+[uav_ancillary_node-7] [INFO] [1782940357.534791830] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 30.9073 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940358.034311499] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 1.068 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940359.384406227] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 31.8248 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940360.034173557] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 1.390 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940361.234368432] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 32.6970 | UAV_Z: 2.50
+[belief_mpc_node-6] [INFO] [1782940361.677764779] [belief_mpc_node]: [MPC] Sigma updated. Trace: 33.791671
+[uav_ancillary_node-7] [INFO] [1782940362.034296015] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 1.581 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940363.084116454] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 33.5214 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940364.034289299] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 1.670 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940364.934199813] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 34.2960 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940366.034153843] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 1.862 | Alpha: 2.00 | Inside: True
+[belief_mpc_node-6] [INFO] [1782940366.727104547] [belief_mpc_node]: [MPC] Sigma updated. Trace: 35.930699
+[uav_ancillary_node-7] [INFO] [1782940366.784196571] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 35.0192 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940368.034171682] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 2.131 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940368.634673333] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 35.6899 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940370.034470189] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 2.444 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940370.484225261] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 36.3075 | UAV_Z: 2.50
+[belief_mpc_node-6] [INFO] [1782940371.727349222] [belief_mpc_node]: [MPC] Sigma updated. Trace: 37.665009
+[uav_ancillary_node-7] [INFO] [1782940372.034254037] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 2.771 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940372.334220683] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 36.8715 | UAV_Z: 2.50
+[uav_mpc_node-4] [INFO] [1782940372.349161485] [uav_mpc_node]: [MPC] PHASE 2 SUMMARY | Solve: 12.7ms | Goal Dist: 6.86m
+[uav_ancillary_node-7] [INFO] [1782940374.034260943] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 3.097 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940374.184554785] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 37.3823 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940376.034122420] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 37.8404 | UAV_Z: 2.50
+[belief_mpc_node-6] [INFO] [1782940376.727775685] [belief_mpc_node]: [MPC] Sigma updated. Trace: 39.011098
+[uav_ancillary_node-7] [INFO] [1782940377.884451207] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 38.2470 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940378.034309558] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 0.309 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940379.734296990] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 38.6037 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940380.035137147] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 0.638 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940381.584468417] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 38.9124 | UAV_Z: 2.50
+[belief_mpc_node-6] [INFO] [1782940381.777675355] [belief_mpc_node]: [MPC] Sigma updated. Trace: 39.994438
+[uav_ancillary_node-7] [INFO] [1782940382.034162545] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 0.978 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940383.434283754] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 39.1754 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940384.034279769] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 1.296 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940385.284183205] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 39.3955 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940386.034145617] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 1.633 | Alpha: 2.00 | Inside: True
+[belief_mpc_node-6] [INFO] [1782940386.777811036] [belief_mpc_node]: [MPC] Sigma updated. Trace: 40.636377
+[uav_ancillary_node-7] [INFO] [1782940387.134639615] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 39.5759 | UAV_Z: 2.50
+[uav_ancillary_node-7] [INFO] [1782940388.034879729] [uav_ancillary_node]: [ANC_HB] State: TRACKING | e_norm: 1.951 | Alpha: 2.00 | Inside: True
+[uav_ancillary_node-7] [INFO] [1782940388.983679548] [uav_ancillary_node]: [TRIGGER] Level 4: Plan Expiry | tr(Sigma): 39.7199 | UAV_Z: 2.50

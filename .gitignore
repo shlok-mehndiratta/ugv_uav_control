@@ -37,3 +37,13 @@ model.config.erb
 requirements.txt.bak
 
 /temp/
+
+# Local archive of superseded pre-reconciliation logs (kept out of git; history has them)
+03_System_Integration_ROS2/results/_archive_stale/
+
+# LaTeX intermediates
+*.aux
+*.out
+*.synctex.gz
+*.fdb_latexmk
+*.fls

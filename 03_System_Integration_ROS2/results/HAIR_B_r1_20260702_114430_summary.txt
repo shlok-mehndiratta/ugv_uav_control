@@ -1,0 +1,22 @@
+experiment: HAIR_B_r1
+total_samples: 538
+total_replans: 30
+ugv_dist_traveled: 12.9085
+uav_dist_traveled: 11.6207
+mean_ugv_solve_ms: 27.4719
+mean_uav_solve_ms: 7.4073
+mean_tracking_error: 0.1156
+max_tracking_error: 0.5931
+control_smoothness: 0.0941
+mean_cov_trace: 0.0064
+max_cov_trace: 0.0119
+mean_uav_z: 6.0000
+min_uav_z: 6.0000
+max_uav_z: 6.0000
+fov_exit_pct: 0.0000
+aruco_visible_pct: 100.0000
+aruco_dropouts: 1
+max_dropout_s: 6.1167
+
+--- Trigger Breakdown ---
+Plan Expiry: 29

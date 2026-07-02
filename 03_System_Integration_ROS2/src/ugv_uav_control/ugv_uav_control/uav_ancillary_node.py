@@ -33,6 +33,13 @@ class UAVAncillaryNode(Node):
         self.declare_parameter('z_opt', 6.0)
         self.declare_parameter('c1_baseline', False)
         self.declare_parameter('controller_type', 'belief_mpc')
+        # Day-1 ablation flags (DEFAULT-OFF: OFF => identical to prior behavior).
+        # freeze_alpha: freeze the 1a tube-exit test radius at alpha_min (nominal fixed tube)
+        #   (perception-free trigger boundary); does NOT touch K, P_0, or u_anc.
+        # error_only: disable perception triggers 1b/2/3 while keeping belief_mpc
+        #   running (so the UAV planner still receives /ugv_predicted_traj).
+        self.declare_parameter('freeze_alpha', False)
+        self.declare_parameter('error_only', False)
         
         self.alpha_min = self.get_parameter('alpha_min').value
         self.alpha_max = self.get_parameter('alpha_max').value
@@ -45,6 +52,11 @@ class UAVAncillaryNode(Node):
         self.z_opt = self.get_parameter('z_opt').value
         self.controller_type = self.get_parameter('controller_type').value
         self.enable_belief = (self.controller_type == 'belief_mpc')
+
+        def _as_bool(v):
+            return (v.lower() == 'true') if isinstance(v, str) else bool(v)
+        self.freeze_alpha = _as_bool(self.get_parameter('freeze_alpha').value)
+        self.error_only = _as_bool(self.get_parameter('error_only').value)
         
         # Support string/bool for c1_baseline
         c1_val = self.get_parameter('c1_baseline').value
@@ -195,7 +207,11 @@ class UAVAncillaryNode(Node):
                   np.clip((self.last_tr_sigma - self.tr_min)/(self.tr_max - self.tr_min), 0, 1)
         
         # Boundary Check
-        inside_tube = (e_k.T @ self.P_0 @ e_k) <= (alpha_k**2)
+        # freeze_alpha OFF (default): use adaptive alpha_k => identical to prior behavior.
+        # freeze_alpha ON: freeze the trigger-test radius at alpha_min = the nominal adaptive value (perception-free, fair).
+        # This only changes the RADIUS in the membership test; K, P_0, u_anc untouched.
+        alpha_test = self.alpha_min if self.freeze_alpha else alpha_k
+        inside_tube = (e_k.T @ self.P_0 @ e_k) <= (alpha_test**2)
         
         # Ancillary Command (u_anc = u_bar - K*e)
         u_anc = u_bar - self.K @ e_k
@@ -220,7 +236,8 @@ class UAVAncillaryNode(Node):
         can_trigger_3 = (now_ts - self.trigger_lockouts["3"]) > 1.0
         
         # Level 1b - ArUco Spike
-        if self.enable_belief and not trigger and can_trigger_1b:
+        # error_only OFF (default): gate == enable_belief => identical to prior behavior.
+        if self.enable_belief and not self.error_only and not trigger and can_trigger_1b:
             if self.last_tr_sigma > self.tr_spike_threshold:
                 past_05 = [v for t, v in self.tr_sigma_history if (now_ts - t) >= 0.45 and (now_ts - t) <= 0.55]
                 if past_05 and self.last_tr_sigma > (1.5 * past_05[0]):
@@ -229,7 +246,7 @@ class UAVAncillaryNode(Node):
 
         # Level 2 - Curvature Anticipation
         max_kappa = 0.0
-        if self.enable_belief and not trigger and can_trigger_2 and self.ugv_traj is not None:
+        if self.enable_belief and not self.error_only and not trigger and can_trigger_2 and self.ugv_traj is not None:
             poses = self.ugv_traj.poses
             for i in range(min(2, len(poses)-1)):
                 p1 = poses[i].pose.position; p2 = poses[i+1].pose.position
@@ -245,7 +262,7 @@ class UAVAncillaryNode(Node):
                 self.trigger_lockouts["2"] = now_ts
                 
         # Level 3 - Drift Maintenance
-        if self.enable_belief and not trigger and can_trigger_3:
+        if self.enable_belief and not self.error_only and not trigger and can_trigger_3:
             time_since_replan = (self.get_clock().now() - self.last_replan_time).nanoseconds / 1e9
             if self.last_tr_sigma > self.drift_threshold and time_since_replan > self.T_min:
                 trigger = True; replan_reason = "Drift Maintenance"; level = "3"
@@ -274,7 +291,8 @@ class UAVAncillaryNode(Node):
             self.reason_pub.publish(reason_msg)
         elif (now_ts % 2.0) < 0.05: # Heartbeat every 2s
             e_norm = np.linalg.norm(e_k)
-            self.get_logger().info(f"[ANC_HB] State: {self.state} | e_norm: {e_norm:.3f} | Alpha: {alpha_k:.2f} | Inside: {inside_tube}")
+            self.get_logger().info(f"[ANC_HB] State: {self.state} | e_norm: {e_norm:.3f} | Alpha: {alpha_k:.2f} | Inside: {inside_tube}"
+                                   f" | uav_z: {self.uav_pos[2]:.2f} xbar_z: {x_bar[2]:.2f} cmd_vz: {u_anc[2]:.2f}")
 
 def main(args=None):
     rclpy.init(args=args)

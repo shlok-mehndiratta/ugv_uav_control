@@ -71,7 +71,12 @@ class EKFNode(Node):
         self.declare_parameter('block_aruco', False)
         self.declare_parameter('block_aruco_start', 25.0)
         self.declare_parameter('block_aruco_end', 30.0)
-        
+        # GSD (ground-sampling-distance) measurement noise: R grows ~z^2 with altitude
+        # (physically correct). DEFAULT OFF -> current view-quality-inverse behavior.
+        self.declare_parameter('use_gsd_noise', False)
+        gv = self.get_parameter('use_gsd_noise').value
+        self.use_gsd_noise = (gv.lower() == 'true') if isinstance(gv, str) else bool(gv)
+
         # === SUBSCRIBERS ===
         self.create_subscription(TwistStamped, '/cmd_vel', self.cmd_callback, 10)
         self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
@@ -190,7 +195,8 @@ class EKFNode(Node):
         
         # --- DYNAMIC R_k ---
         R_k, q_k = ugv_model.get_dynamic_R(
-            self.uav_pos, [x_aruco, y_aruco], self.R_full
+            self.uav_pos, [x_aruco, y_aruco], self.R_full,
+            use_gsd=self.use_gsd_noise
         )
         
         self.update_step(z, H, R_k)

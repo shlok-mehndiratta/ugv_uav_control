@@ -1,0 +1,51 @@
+experiment: CIRCUIT_probe
+total_samples: 487
+total_replans: 41
+ugv_dist_traveled: 14.9949
+uav_dist_traveled: 10.3819
+mean_ugv_solve_ms: 29.5778
+mean_uav_solve_ms: 9.0906
+mean_tracking_error: 0.1623
+max_tracking_error: 0.6015
+control_smoothness: 0.0589
+mean_cov_trace: 0.0064
+max_cov_trace: 0.0128
+mean_uav_z: 6.0000
+min_uav_z: 6.0000
+max_uav_z: 6.0000
+fov_exit_pct: 0.0000
+aruco_visible_pct: 100.0000
+aruco_dropouts: 1
+max_dropout_s: 6.2905
+
+--- Trigger Breakdown ---
+Curvature (0.40): 1
+Curvature (0.41): 2
+Curvature (0.42): 2
+Curvature (0.43): 1
+Curvature (0.44): 1
+Curvature (0.45): 1
+Curvature (0.46): 2
+Curvature (0.47): 1
+Curvature (0.48): 1
+Curvature (0.51): 2
+Curvature (0.62): 1
+Curvature (0.74): 1
+Curvature (0.93): 1
+Curvature (1.19): 1
+Curvature (1.20): 1
+Curvature (1.40): 1
+Curvature (1.48): 1
+Curvature (10.98): 1
+Curvature (15.01): 1
+Curvature (15.25): 1
+Curvature (2.78): 1
+Curvature (2.96): 1
+Curvature (3.77): 1
+Curvature (3.84): 1
+Curvature (37.73): 1
+Curvature (5.29): 2
+Curvature (5.76): 1
+Curvature (5.83): 1
+Curvature (7.76): 1
+Plan Expiry: 6

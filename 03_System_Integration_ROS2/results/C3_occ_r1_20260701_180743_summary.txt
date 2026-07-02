@@ -1,0 +1,40 @@
+experiment: C3_occ_r1
+total_samples: 340
+total_replans: 30
+ugv_dist_traveled: 10.1277
+uav_dist_traveled: 7.2788
+mean_ugv_solve_ms: 27.9362
+mean_uav_solve_ms: 9.3786
+mean_tracking_error: 0.0857
+max_tracking_error: 0.5970
+control_smoothness: 0.0219
+mean_cov_trace: 0.0236
+max_cov_trace: 0.3952
+mean_uav_z: 6.0000
+min_uav_z: 6.0000
+max_uav_z: 6.0000
+fov_exit_pct: 0.0000
+aruco_visible_pct: 99.7059
+aruco_dropouts: 1
+max_dropout_s: 6.0487
+
+--- Trigger Breakdown ---
+Curvature (0.40): 1
+Curvature (0.41): 2
+Curvature (0.42): 2
+Curvature (0.43): 2
+Curvature (0.47): 1
+Curvature (0.48): 1
+Curvature (0.50): 2
+Curvature (0.52): 1
+Curvature (0.53): 1
+Curvature (0.65): 2
+Curvature (0.74): 1
+Curvature (0.77): 1
+Curvature (0.86): 1
+Curvature (0.87): 1
+Curvature (1.10): 1
+Curvature (1.72): 1
+Curvature (5.10): 1
+Plan Expiry: 5
+Tube Exit: 1

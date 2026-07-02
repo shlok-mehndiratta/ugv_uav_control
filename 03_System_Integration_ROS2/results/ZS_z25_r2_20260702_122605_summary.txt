@@ -1,0 +1,50 @@
+experiment: ZS_z25_r2
+total_samples: 538
+total_replans: 43
+ugv_dist_traveled: 13.3577
+uav_dist_traveled: 11.6847
+mean_ugv_solve_ms: 26.2217
+mean_uav_solve_ms: 9.9346
+mean_tracking_error: 0.1034
+max_tracking_error: 0.5999
+control_smoothness: 0.0457
+mean_cov_trace: 0.0081
+max_cov_trace: 0.0159
+mean_uav_z: 2.5000
+min_uav_z: 2.5000
+max_uav_z: 2.5000
+fov_exit_pct: 0.0000
+aruco_visible_pct: 100.0000
+aruco_dropouts: 1
+max_dropout_s: 6.0904
+
+--- Trigger Breakdown ---
+Curvature (0.40): 1
+Curvature (0.42): 1
+Curvature (0.50): 1
+Curvature (0.59): 1
+Curvature (0.66): 1
+Curvature (0.77): 1
+Curvature (0.78): 1
+Curvature (0.85): 1
+Curvature (0.87): 1
+Curvature (0.90): 1
+Curvature (1.05): 1
+Curvature (1.14): 1
+Curvature (1.28): 1
+Curvature (1.89): 1
+Curvature (2.11): 1
+Curvature (2.14): 1
+Curvature (2.23): 1
+Curvature (2.29): 1
+Curvature (2.32): 1
+Curvature (2.41): 1
+Curvature (2.43): 1
+Curvature (2.74): 1
+Curvature (3.08): 1
+Curvature (3.31): 1
+Curvature (3.58): 1
+Curvature (3.89): 1
+Curvature (4.34): 1
+Curvature (7.00): 1
+Plan Expiry: 13

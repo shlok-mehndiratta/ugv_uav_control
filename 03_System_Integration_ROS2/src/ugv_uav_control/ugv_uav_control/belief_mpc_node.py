@@ -35,9 +35,16 @@ class BeliefMPCNode(Node):
         # === MPC PARAMETERS ===
         self.horizon = 5
         self.dt = 0.2
-        self.max_v = 0.22
+        # UGV top speed is a parameter (default 0.22, unchanged). Raising it creates the
+        # FoV-constrained regime (larger tracking lag at turns) for the active-altitude study.
+        self.declare_parameter('ugv_max_v', 0.22)
+        self.max_v = float(self.get_parameter('ugv_max_v').value)
         self.max_w = 2.0
-        
+        # GSD measurement-noise model in the belief rollout (default OFF, matches EKF flag).
+        self.declare_parameter('use_gsd_noise', False)
+        gv = self.get_parameter('use_gsd_noise').value
+        self.use_gsd_noise = (gv.lower() == 'true') if isinstance(gv, str) else bool(gv)
+
         # Actuator dynamics
         self.alpha_v = 2.0
         self.alpha_w = 5.0
@@ -120,7 +127,8 @@ class BeliefMPCNode(Node):
             if gamma > 0.01:
                 # Use shared logic for R_k and Sigma_obs
                 R_k, q_k = ugv_model.get_dynamic_R(
-                    self.uav_pos, world_mu[:2], self.R_obs_base
+                    self.uav_pos, world_mu[:2], self.R_obs_base,
+                    use_gsd=self.use_gsd_noise
                 )
                 Sigma_obs = ugv_model.kalman_update(Sigma_pred, self.H_obs, R_k)
                 Sigma = (1 - gamma) * Sigma_pred + gamma * Sigma_obs

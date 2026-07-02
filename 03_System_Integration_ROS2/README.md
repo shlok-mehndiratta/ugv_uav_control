@@ -31,21 +31,39 @@ The core logic is implemented in the following nodes within `src/ugv_uav_control
 *   **`middle_path_follower.launch.py`**: The primary entry point. It launches the Gazebo simulation, spawns the UGV and UAV, and sets up all core control, EKF, and vision nodes.
 
 ## Comparative Evaluation Metrics
-These figures summarize the performance comparison between the continuous baseline (C1), the standard reactive event-triggered Tube-MPC (C2), and the proposed Belief-MPC (C3) under nominal conditions:
+The table below compares the continuous baseline (C1), the event-triggered Tube-MPC without the
+perception/belief trigger terms (C2), and the proposed belief-coupled, perception-triggered system (C3).
+**All numbers are regenerated from fresh logs** by `scripts/run_batch.py` + `scripts/plot_final_figures.py`
+into `results/`; the table is auto-filled by the plotting script (`results/Table_1_Summary.csv`) and should
+never be hand-edited. Run `make reproduce` (or the two scripts) to regenerate.
 
-| Metric | C1 (Continuous MPC) | C2 (Reactive Tube-MPC) | C3 (Proposed Belief-MPC) |
-| :--- | :--- | :--- | :--- |
-| **Number of Replans** | 1,102 | 105 | **99 (-91.0%)** |
-| **Mean Tracking Offset (m)** | 0.6395 m | 0.4811 m | 0.6888 m |
-| **Max Tracking Offset (m)** | 1.0458 m | 0.5774 m | 1.1232 m |
-| **Control Jerk** | 0.0195 | 0.0151 | 0.0286 |
-| **Mean Covariance Trace $tr(\Sigma)$** | 0.0067 | 0.0065 | 0.0065 |
-| **ArUco Visibility (%)** | 100.0% | 100.0% | 100.0% |
+<!-- From fresh logs: R=4 repeats x {nominal, occlusion} = 8 runs/method, 40s each.
+     err & mean-cov on t>=8s (skip takeoff transient); peak cov over injected [20,28]s window.
+     A passive-UGV "C2" is omitted: the UAV planner needs belief_mpc's /ugv_predicted_traj,
+     so a passive UGV leaves it idle -> not a valid comparison (see AUDIT_REPORT.md). -->
+Windows (shared with the paper): † = steady-state `t ≥ 8 s` (excludes takeoff/EKF-convergence transient);
+‡ = full-run peak, dominated by that initial transient — the occlusion-window peak isolates the injected occlusion.
+
+| Metric | C1 (Continuous) | C3 (Event-Triggered) |
+| :--- | :--- | :--- |
+| Planner solves per 40 s run (#) | 331 ± 3 | **29 ± 1  (−91 %)** |
+| Mean tracking error (m) † | 0.065 ± 0.001 | 0.064 ± 0.001 |
+| Mean covariance trace tr(Σ) † | 0.0148 ± 0.0084 | 0.0148 ± 0.0084 |
+| Peak tr(Σ) (full run) ‡ | 0.245 ± 0.161 | 0.197 ± 0.166 |
+| Peak tr(Σ) (occlusion window) | 0.168 ± 0.001 | 0.170 ± 0.001 |
+| Mean UAV solve time (ms) | 6.2 ± 0.2 | 9.0 ± 0.2 |
 
 ## Scientific Inferences
-*   **Significant Compute Savings**: Both event-triggered formulations (C2 and C3) reduce the optimization load by over 90% compared to Continuous MPC (C1), saving onboard compute while maintaining stable tracking.
-*   **Uncertainty-Aware Adaptive Envelope**: Under nominal conditions where uncertainty is low, the proposed Belief-MPC (C3) expands the allowed tracking bounds (up to 1.12m), saving control actions, while contracting the bounds to safeguard the system when uncertainty rises.
-*   **Decoupled Local Tracking**: The local waypoint generation in the UGV base frame ensures that UGV path tracking remains stable even in the event of EKF state drift.
+*   **Compute savings (robustly supported):** the event-triggered formulations reduce the number of online
+    planner solves by roughly an order of magnitude versus continuous replanning, at statistically comparable
+    tracking error. This is the headline, reproducible result.
+*   **Belief coupling (mechanism, effect scenario-dependent):** the UGV cost penalizes predicted covariance
+    trace and FoV exit, and the UAV tube radius scales with the EKF covariance. Under a benign track with no
+    FoV risk these mechanisms are largely dormant; their effect is exercised only under the adversarial
+    scenarios (injected occlusion, high curvature) — see the simulation study.
+*   **Honesty note:** the online tube is an ellipsoidal surrogate with an adaptive *trigger* radius; the
+    certified mRPI set is computed offline only and is not wired into the online loop. Do not read the adaptive
+    radius as an online recursive-feasibility guarantee.
 
 ## Prerequisites and Dependencies
 Ensure your environment meets the following requirements before building:

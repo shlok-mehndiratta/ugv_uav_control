@@ -1,0 +1,35 @@
+experiment: ACTALT_dbg
+total_samples: 188
+total_replans: 28
+ugv_dist_traveled: 10.3864
+uav_dist_traveled: 9.0604
+mean_ugv_solve_ms: 30.4705
+mean_uav_solve_ms: 13.7207
+mean_tracking_error: 0.1919
+max_tracking_error: 0.5883
+control_smoothness: 0.1528
+mean_cov_trace: 0.0101
+max_cov_trace: 0.3974
+mean_uav_z: 2.5000
+min_uav_z: 2.5000
+max_uav_z: 2.5000
+fov_exit_pct: 0.0000
+aruco_visible_pct: 100.0000
+aruco_dropouts: 1
+max_dropout_s: 6.1785
+
+--- Trigger Breakdown ---
+Curvature (0.42): 1
+Curvature (0.46): 1
+Curvature (0.63): 1
+Curvature (0.88): 1
+Curvature (0.99): 1
+Curvature (1.02): 1
+Curvature (1.11): 1
+Curvature (1.57): 1
+Curvature (1.85): 1
+Curvature (1.89): 1
+Curvature (2.55): 1
+Curvature (3.12): 1
+Plan Expiry: 8
+Tube Exit: 10

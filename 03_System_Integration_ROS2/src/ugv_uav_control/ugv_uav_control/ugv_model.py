@@ -68,20 +68,37 @@ def kalman_update(Sigma, H, R):
     Sigma_updated = (Sigma_updated + Sigma_updated.T) / 2.0
     return Sigma_updated
 
-def get_dynamic_R(uav_pos, ugv_pos_world, R_base, sharpness=5.0):
+def get_dynamic_R(uav_pos, ugv_pos_world, R_base, sharpness=5.0,
+                  use_gsd=False, gsd_z0=3.0):
     """
-    Compute dynamic measurement noise based on UAV-UGV view quality.
-    uav_pos: [x, y, z]
-    ugv_pos_world: [x, y]
+    Compute dynamic measurement noise based on UAV-UGV imaging geometry.
+    uav_pos: [x, y, z]; ugv_pos_world: [x, y].
+
+    use_gsd=False (DEFAULT, unchanged): R scales inversely with the view-quality
+        metric q (a Gaussian bowl centred at z_opt). Kept for backward compatibility.
+    use_gsd=True: physically-correct ground-sampling-distance model. Pixel-level
+        localization is fixed, GSD (m/px) grows linearly with altitude, so the metric
+        position-measurement covariance grows QUADRATICALLY with altitude:
+            R(z) = R_base * (z / gsd_z0)^2 * (1 + (d / r_fov)^2)
+        The FoV-edge factor (1+(d/r_fov)^2) mildly inflates noise near the footprint
+        edge. This is monotone increasing in z (unlike the q-bowl), matching the theory
+        (Assumption A2). Returns the geometric q as well for logging/gating.
     """
     q_k = compute_view_quality(
         uav_pos[0], uav_pos[1], uav_pos[2],
         ugv_pos_world[0], ugv_pos_world[1],
         sharpness=sharpness
     )
-    # Scale R inversely with quality (add epsilon to avoid division by zero)
-    r_scale = 1.0 / (q_k + 1e-3)
-    
+    if use_gsd:
+        z = max(float(uav_pos[2]), 0.1)
+        dx = uav_pos[0] - ugv_pos_world[0]; dy = uav_pos[1] - ugv_pos_world[1]
+        d = math.sqrt(dx * dx + dy * dy)
+        r_fov = max(z * math.tan(1.047 / 2.0), 1e-3)
+        r_scale = (z / gsd_z0) ** 2 * (1.0 + (d / r_fov) ** 2)
+    else:
+        # Scale R inversely with quality (add epsilon to avoid division by zero)
+        r_scale = 1.0 / (q_k + 1e-3)
+
     if np.isscalar(R_base):
         # Default to 2x2 for [x, y] observation if scalar is provided
         return np.eye(2) * (R_base * r_scale), q_k
