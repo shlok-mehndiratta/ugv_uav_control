@@ -1,0 +1,22 @@
+experiment: cod_C1_r1
+total_samples: 389
+total_replans: 379
+ugv_dist_traveled: 8.7669
+uav_dist_traveled: 8.3574
+mean_ugv_solve_ms: 27.7837
+mean_uav_solve_ms: 4.0268
+mean_tracking_error: 0.0816
+max_tracking_error: 0.5972
+control_smoothness: 0.0223
+mean_cov_trace: 0.0073
+max_cov_trace: 0.3967
+mean_uav_z: 6.0000
+min_uav_z: 6.0000
+max_uav_z: 6.0000
+fov_exit_pct: 0.0000
+aruco_visible_pct: 100.0000
+aruco_dropouts: 1
+max_dropout_s: 6.1028
+
+--- Trigger Breakdown ---
+C1 Baseline Continuous: 758
