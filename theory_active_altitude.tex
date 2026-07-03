@@ -18,8 +18,9 @@ We formalize why a tracker that \emph{actively varies its altitude} maintains a 
 estimation covariance than \emph{any} fixed-altitude tracker on maneuvering targets, and
 why \emph{anticipatory} altitude changes are required under a bounded climb rate. Claims
 are proven on a linear estimation surrogate (Assumption~\ref{as:lin}); the nonlinear
-closed loop is validated numerically ($\S$\ref{sec:num}) and, subject to the reproducibility
-caveats, in simulation.
+closed loop is validated numerically ($\S$\ref{sec:num}) and its key behaviors --- the
+anticipatory climb-into-turns and the GSD resolution trend --- are corroborated in a
+genuinely-controlled, headless-reproducible ROS\,2/Gazebo SITL implementation.
 
 \subsection*{Models and assumptions}
 
@@ -247,20 +248,27 @@ fit): the steady-state Kalman covariance is a concave function of $R$, so $R\pro
 to a weaker-than-quadratic $\operatorname{tr}\Sigma(z)$. What matters for Prop.~\ref{prop:A} is
 the monotonicity, which holds.
 
-\emph{(ii) The closed-loop active-altitude maneuver cannot be exercised in the current SITL.}
-The stripped quadrotor model is driven by a planar velocity controller
-(\texttt{gz-sim-velocity-control-system}) that actuates the horizontal axes but not the
-vertical one: we verified that the commanded vertical velocity \emph{reaches} the controller
-(confirmed on the simulator-side command topic) yet produces no altitude change. The
-active-altitude control law is thus implemented and verified up to actuation, but the vehicle
-holds its spawn altitude. Closing this loop requires a full multicopter model with rotor
-dynamics (\texttt{MulticopterVelocityControl}); we leave it as SITL future work.
+\emph{(ii) The closed-loop active-altitude maneuver runs in SITL.} An earlier configuration
+prevented vertical motion, but the cause was a topic-routing defect, not a physical limit: the
+quadrotor's velocity-control plugin subscribed to a \emph{global} \texttt{/cmd\_vel} topic that
+the ground vehicle's differential-drive controller also drove, so the UAV silently mirrored the
+ground vehicle's planar commands and the altitude command never reached the plugin. After
+assigning the UAV a dedicated command topic, vertical velocity actuates correctly and the
+active-altitude policy executes closed-loop: the UAV altitude spans $[3,8]$\,m and climbs into
+turns (mean altitude $\approx\!5.8$\,m over high-curvature segments versus $\approx\!4.6$\,m on
+straights), the anticipatory behavior Prop.~\ref{prop:C} prescribes.
 
-Consequently, Propositions~\ref{prop:A}--\ref{prop:C} are established analytically and
-validated in the numerical simulator (\S\ref{sec:num}), which is exact and reproducible; the
-SITL stack independently corroborates the resolution ingredient (Fig.~\ref{fig:gsdsitl}) and
-demonstrates the perception-triggered compute reduction, with the vertical maneuver deferred
-to the multicopter upgrade.
+Consequently, Propositions~\ref{prop:A}--\ref{prop:C} are established analytically, validated in
+the numerical simulator (\S\ref{sec:num}), and their key behaviors corroborated in a
+genuinely-controlled SITL stack --- the resolution ingredient (Fig.~\ref{fig:gsdsitl}), the
+anticipatory climb, and the perception-triggered compute reduction. The SITL stack is
+reproducible when run headless (identical-configuration ground-truth trajectories agree to
+$\sim\!1$\,cm); with the Gazebo GUI, rendering contention with the ROS\,2 executor forks
+trajectories by $\sim\!2.7$\,m, so headless execution is a prerequisite for reproducible
+closed-loop study. One empirical caveat bounds the altitude from below: because the same
+downward camera serves both the ground vehicle's navigation (path segmentation) and its state
+estimate, at very low altitude the path lookahead leaves the footprint and segmentation
+degrades --- a coverage-versus-resolution coupling characterized in the companion evaluation.
 
 \begin{figure}[h]\centering
 \includegraphics[width=0.6\textwidth]{Fig_GSD_SITL.png}
