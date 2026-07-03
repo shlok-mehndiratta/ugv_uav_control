@@ -362,7 +362,7 @@ The UGV controller augments the planning state with the covariance,
 $\xi_k=(\mu_k,\Sigma_k)$, and \emph{propagates both through the horizon}. At each
 predicted step it forms the no-observation prediction
 $\Sigma_{\mathrm{pred}}=F\Sigma F^T+Q$ and a post-measurement covariance
-$\Sigma_{\mathrm{obs}}$ (Joseph update with $R_k$ from \eqref{eq:Rk}), and blends
+$\Sigma_{\mathrm{obs}}$ (Joseph update), and blends
 them by a smooth visibility gate
 $\gamma=1/(1+e^{\beta(d-r_{\mathrm{fov}})})$:
 \begin{equation}
@@ -381,9 +381,12 @@ J_g = \sum_{k=0}^{N_g-1}\!\Big(
 \end{equation}
 where the FoV term is a one-sided quadratic hinge
 $c_{\mathrm{fov}}=\big(\max(0,\,d_k-r_{\mathrm{fov}})\big)^2$ (a soft constraint,
-not an asymptotic barrier). The covariance rollout \eqref{eq:blend} makes
-\eqref{eq:Jg} a nonconvex NLP, solved with SLSQP over $N_g=5$. The two terms
-$\lambda\tr(\Sigma_k)$ and $w_{\mathrm{fov}}c_{\mathrm{fov}}$ are what make the
+not an asymptotic barrier). Crucially, the belief rollout \eqref{eq:blend} uses the
+\emph{same} measurement-noise model as the on-board EKF --- the GSD model \eqref{eq:Rgsd} in
+all reported runs (both share one implementation, selected by a single flag) --- so the planner
+propagates the estimator's actual uncertainty, not a surrogate. The covariance rollout
+\eqref{eq:blend} makes \eqref{eq:Jg} a nonconvex NLP, solved with SLSQP over $N_g=5$. The two
+terms $\lambda\tr(\Sigma_k)$ and $w_{\mathrm{fov}}c_{\mathrm{fov}}$ are what make the
 controller belief-coupled and are absent from the passive baseline.
 
 \subsection{Aerial nominal planner and altitude policy}
@@ -417,7 +420,7 @@ $d_{\mathrm{look}}(\kappa)$ --- and hence the coverage floor $\eta\!\gtrsim\!1$
 view on straights. ``Climb into turns to widen the footprint'' is thus a
 derived consequence of the coverage constraint, not a hand-coded rule.
 
-\subsection{Offline robust invariant set (tube) derivation}
+\subsection{Offline robust-invariant-set baseline}
 \label{sec:mrpi}
 The ancillary law is $\mathbf{u}_k=\bar{\mathbf{u}}_k-K\mathbf{e}_k$ with tracking
 error $\mathbf{e}_k=\mathbf{p}_k-\bar{\mathbf{p}}_k$; substituting into
@@ -427,27 +430,18 @@ error $\mathbf{e}_k=\mathbf{p}_k-\bar{\mathbf{p}}_k$; substituting into
 \qquad \mathbf{w}_k\in\mathbb{W}.
 \label{eq:error_dynamics}
 \end{equation}
-Unlike standard tube MPC, we account for measurement noise $\mathbf{v}_k$ entering
-through the feedback gain; the effective disturbance is
-$\mathbf{w}_{\mathrm{eff}}=\mathbf{w}_a-B_dK\mathbf{v}_k$, and for the offline
-computation $\mathbf{v}_k$ is bounded to a box (a hard, undocumented-confidence
-truncation of the otherwise Gaussian noise; see Section~\ref{sec:theory}). For
-$A_K$ Schur and $\mathbb{W}$ compact, the minimal RPI set is
-$\Omega_\infty=\bigoplus_{i=0}^{\infty}A_K^i\mathbb{W}$, which we outer-approximate
-by truncating after $N=100$ terms and scaling the support values by
-$1/(1-\rho^{N+1})$, $\rho$ the spectral radius of $A_K$, to conservatively bound
-the neglected tail \cite{mRPI}:
+For $A_K$ Schur and $\mathbb{W}$ compact, the minimal RPI set is outer-approximated \emph{offline}
+by a truncated Minkowski series and the constraints tightened by the Pontryagin difference
+\cite{mRPI},
 \begin{equation}
-\Omega_N=\bigoplus_{i=0}^{100}A_K^i\mathbb{W},
-\qquad
-\Omega \supseteq \Omega_\infty .
+\Omega=\textstyle\bigoplus_{i=0}^{N}A_K^i\mathbb{W}\supseteq\Omega_\infty,\quad
+\bar{\mathbb{X}}=\mathbb{X}\ominus\Omega,\ \ \bar{\mathbb{U}}=\mathbb{U}\ominus K\Omega .
 \label{eq:mrpi}
 \end{equation}
-The state/input constraints are then tightened by the Pontryagin difference,
-$\bar{\mathbb{X}}=\mathbb{X}\ominus\Omega$,
-$\bar{\mathbb{U}}=\mathbb{U}\ominus K\Omega$. \eqref{eq:mrpi} and the tightening
-are computed offline and constitute a \emph{certified robust bound for the
-idealized design}.
+We use this only as a \emph{design-time baseline}: $\Omega$ is a certified robust bound for the
+idealized system and seeds the ellipsoidal shape matrix $P_0$ below, but it is \emph{not}
+propagated online. The next subsection states plainly what the deployed controller uses instead
+and what guarantee is traded away.
 
 \subsection{Online adaptive ellipsoidal tube}
 Propagating the polytope $\Omega$ online --- vertex/support-function updates and a
@@ -607,7 +601,15 @@ $100\%$ ArUco visibility for both). Per-solve time is \emph{higher} for C2
 every $50$\,ms from a near-identical previous solution, whereas each C2 solve starts from a
 larger state mismatch --- but the $\approx\!\RESsolveRed\times$ reduction in solve count
 dominates, giving the net CPU saving. This is the co-design point: event-triggering makes the
-heavier perception-aware planner affordable on a constrained companion computer.
+heavier perception-aware planner affordable on a constrained companion computer. We are precise
+about what this does and does not show: the saving is attributable to event-triggering
+\emph{per se} (any state-dependent trigger vs.\ continuous replanning), a well-established
+effect; isolating the contribution of the \emph{perception-specific} conditions (covariance
+spike, curvature) against a plain error- or time-triggered baseline is a separate ablation. Our
+findings above --- estimation quality that is insensitive to the trigger where the FoV does not
+bind --- suggest that ablation would show near-parity in the reproducible regime, consistent
+with the coupling of Sec.~\ref{sec:coverage}; we therefore defer it to future work rather than
+claim a perception-trigger advantage we cannot presently isolate.
 
 \textbf{What event-triggering costs.} It is not free: applying the previous nominal trajectory
 between triggers introduces small control discontinuities at trigger instants. We measure
