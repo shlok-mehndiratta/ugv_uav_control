@@ -1,8 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ICC-12 (2026) submission -- reconciled to the accompanying ugv_uav_control
-% codebase. Claims are tagged so that PROVEN(offline)/IMPLEMENTED/SIMULATED/
-% FUTURE are never blurred. See Sec. VI (Theoretical Properties &
-% Implementation Status) and the claim-status table.
+% codebase. Scope (proven offline / implemented / simulation / future) is stated
+% in prose; see Sec. VI (Theoretical Properties) and the Sec. VII scope paragraph.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \documentclass[letterpaper, 10 pt, conference]{ieeeconf}  % Comment this line out if you need a4paper
@@ -22,11 +21,6 @@
 
 \overrideIEEEmargins                                      % Needed to meet printer requirements.
 
-% ---- claim-status tags: keep proven/implemented/sim/future explicit ----
-\newcommand{\tagOFFLINE}{{\footnotesize\textsc{[proven-offline]}}}
-\newcommand{\tagIMPL}{{\footnotesize\textsc{[implemented]}}}
-\newcommand{\tagSIM}{{\footnotesize\textsc{[simulation]}}}
-\newcommand{\tagFUTURE}{{\footnotesize\textsc{[future work]}}}
 \DeclareMathOperator{\tr}{tr}
 \newcommand{\Rset}{\mathbb{R}}
 
@@ -85,8 +79,7 @@ camera couples navigation and estimation, and the low-altitude/high-speed corner
 non-reproducibly unstable --- both stated as findings. We also report a methodological point:
 headless execution is a prerequisite for reproducible closed-loop active-perception study
 (identical-configuration trajectories fork by $\approx\!\RESforkGUI$\,m with the Gazebo GUI
-versus $\approx\!\RESforkHL$\,m headless). Throughout we mark which properties are proven
-offline, implemented, shown in simulation, or future work.
+versus $\approx\!\RESforkHL$\,m headless).
 \end{abstract}
 
 
@@ -122,19 +115,19 @@ perception-constrained altitude policy: with one downward camera serving both th
 vehicle's navigation (path segmentation) and its state estimate (ArUco/EKF)
 \cite{platt2010belief,vandenberg2012motion}, low altitude sharpens estimation ($R\propto z^2$)
 but starves navigation coverage; the optimum flies as low as segmentation allows, climbing
-anticipatorily into turns. \tagOFFLINE
+anticipatorily into turns.
 
 \item \textbf{A genuinely-controlled, reproducible SITL realization} in ROS\,2/Gazebo
 (vision/ArUco pipeline, view-quality-coupled EKF, belief-space UGV MPC, and the UAV
 planner/ancillary pair \cite{mayne2005robust,eqtami2010event}), including a methodological
 finding: headless execution is a prerequisite for reproducible closed-loop active-perception
 study ($\approx\!\RESforkGUI$\,m vs.\ $\approx\!\RESforkHL$\,m identical-configuration
-trajectory fork). \tagIMPL
+trajectory fork).
 
 \item \textbf{A validated co-design result}: the perception-driven event trigger is the
 computational enabler of the heavier belief-space planner, cutting online planner solves
 $\approx\!\RESsolveRed\times$ and planner CPU $\approx\!\REScpuRed\times$ at matched estimation
-quality, for a small loss of inter-trigger trajectory smoothness. \tagSIM
+quality, for a small loss of inter-trigger trajectory smoothness.
 \end{itemize}
 We are explicit about scope: the \emph{isolated} observability benefit is not separable on this
 platform because the shared camera couples navigation and estimation, and the binding
@@ -273,7 +266,7 @@ dynamics are
 \mathbf{x}_{g,k+1} = \mathbf{f}_g(\mathbf{x}_{g,k}, \mathbf{u}_{g,k}) + \mathbf{w}_g,
 \end{equation}
 where the actuator lag is governed by time constants $\tau_v,\tau_\omega$ and
-$\mathbf{w}_g$ is process noise. \tagIMPL
+$\mathbf{w}_g$ is process noise.
 
 \subsection{UAV model}
 Although the platform is a quadrotor, the planner and the ancillary tracker treat
@@ -289,10 +282,10 @@ $\mathbf{p}=[p_x,p_y,p_z]^T$ and velocity command $\mathbf{u}=[v_x,v_y,v_z]^T$,
 with bounded disturbance $\mathbf{w}_k\in\mathbb{W}$. All three axes are fully
 actuated: $v_z$ is a genuine decision variable and the altitude policy of
 Sec.~\ref{sec:coverage} is realized closed-loop in SITL (the UAV altitude spans
-$[3,8]$\,m; Sec.~\ref{sec:results}). A
+$[2.5,7]$\,m; Sec.~\ref{sec:results}). A
 second-order double-integrator (acceleration input) is the more faithful
 rigid-body abstraction; we use \eqref{eq:uav_disc} because it is exactly what the
-implementation optimizes. \tagIMPL
+implementation optimizes.
 
 \subsection{View-quality-dependent perception}
 The camera's vantage point affects estimation accuracy. We use a differentiable
@@ -310,7 +303,7 @@ q_k =
 \end{equation}
 with $\sigma_{xy}=r_{\mathrm{fov}}/2$. The altitude factor makes $q_k$
 \emph{non-monotone} in $z$ (it does not tend to $1$ as $z\to\infty$), removing the
-incentive to climb without bound. \tagIMPL
+incentive to climb without bound.
 
 The measurement covariance grows as view quality drops. The implementation scales
 the baseline ArUco covariance $R_{\mathrm{full}}$ inversely with $q_k$,
@@ -321,7 +314,7 @@ R_k(q_k) = \frac{R_{\mathrm{full}}}{q_k + \epsilon},
 \end{equation}
 so $R_k\to R_{\mathrm{full}}$ for an excellent view and $R_k\to\infty$ (the
 update ignores the marker) as $q_k\to0$. This couples UAV geometry directly to
-EKF performance. \tagIMPL
+EKF performance.
 
 For the quantitative study we use the physically-grounded \emph{ground-sampling-distance}
 (GSD) noise model: pixel-level localization is fixed while the GSD (m/px) grows linearly with
@@ -335,7 +328,7 @@ with a mild FoV-edge inflation $(1+(d/r_{\mathrm{fov}})^2)$. Unlike the Gaussian
 nominal altitude --- \eqref{eq:Rgsd} is monotone increasing in $z$, matching the theory's
 resolution assumption and the $R\propto z^2$ side of the coverage--resolution tension
 (Sec.~\ref{sec:coverage}). Equation~\eqref{eq:Rgsd} is the measurement-noise model used in all
-reported results. \tagIMPL
+reported results.
 
 \subsection{Segmentation coverage model}
 \label{sec:coverage}
@@ -356,7 +349,7 @@ resolution), while \eqref{eq:eta} demands \emph{sufficient} altitude for navigat
 estimation-optimal altitude is thus the lowest that keeps $\eta\gtrsim1$, and this floor rises
 with curvature --- the analytic basis for climbing into turns. The aerial planner
 (Sec.~\ref{sec:aerial}) enforces $\eta\gtrsim1$ as a soft lower bound; Sec.~\ref{sec:results}
-reports the empirical cost tradeoff over $\eta$. \tagIMPL
+reports the empirical cost tradeoff over $\eta$.
 
 \section{Coupled Event-Triggered Tube MPC}
 \label{sec:method}
@@ -391,7 +384,7 @@ $c_{\mathrm{fov}}=\big(\max(0,\,d_k-r_{\mathrm{fov}})\big)^2$ (a soft constraint
 not an asymptotic barrier). The covariance rollout \eqref{eq:blend} makes
 \eqref{eq:Jg} a nonconvex NLP, solved with SLSQP over $N_g=5$. The two terms
 $\lambda\tr(\Sigma_k)$ and $w_{\mathrm{fov}}c_{\mathrm{fov}}$ are what make the
-controller belief-coupled and are absent from the passive baseline. \tagIMPL
+controller belief-coupled and are absent from the passive baseline.
 
 \subsection{Aerial nominal planner and altitude policy}
 \label{sec:aerial}
@@ -422,7 +415,7 @@ $\beta_\kappa\hat\kappa_k$ raises altitude into turns where the required lookahe
 $d_{\mathrm{look}}(\kappa)$ --- and hence the coverage floor $\eta\!\gtrsim\!1$
 \eqref{eq:eta} --- grows; $z_{\mathrm{m}}$ is a fixed margin that keeps the forward lookahead in
 view on straights. ``Climb into turns to widen the footprint'' is thus a
-derived consequence of the coverage constraint, not a hand-coded rule. \tagIMPL
+derived consequence of the coverage constraint, not a hand-coded rule.
 
 \subsection{Offline robust invariant set (tube) derivation}
 \label{sec:mrpi}
@@ -454,7 +447,7 @@ The state/input constraints are then tightened by the Pontryagin difference,
 $\bar{\mathbb{X}}=\mathbb{X}\ominus\Omega$,
 $\bar{\mathbb{U}}=\mathbb{U}\ominus K\Omega$. \eqref{eq:mrpi} and the tightening
 are computed offline and constitute a \emph{certified robust bound for the
-idealized design}. \tagOFFLINE
+idealized design}.
 
 \subsection{Online adaptive ellipsoidal tube}
 Propagating the polytope $\Omega$ online --- vertex/support-function updates and a
@@ -479,7 +472,7 @@ when the estimate is sharp and loosens when perception degrades. We stress that
 online; it is \emph{not} accompanied by an online re-derivation of
 \eqref{eq:mrpi} nor by re-tightening $\bar{\mathbb{X}},\bar{\mathbb{U}}$. A
 homothetic tube with a matching recursive-feasibility argument is future work
-(Section~\ref{sec:theory}). \tagIMPL
+(Section~\ref{sec:theory}).
 Accordingly, $\alpha_k$ is a heuristic monitor/trigger radius, not a certified
 invariant radius. The certified objects are the \emph{offline} mRPI set $\Omega$
 \eqref{eq:mrpi} and the $A_K$-Schur ISS bound of Sec.~\ref{sec:theory} (which rests
@@ -518,7 +511,7 @@ $\Omega_\sigma$, is the natural formulation for the offline mRPI $\Omega$ and
 would furnish the tunable computation--accuracy parameter $\sigma$; the
 implementation instead uses the ellipsoidal test above, so we present the
 $\sigma$-polytopic trigger as future work rather than as an implemented result.
-\tagFUTURE
+
 
 \subsection{Nominal optimization actually solved}
 At each trigger the planner solves \eqref{eq:Ja} over the single integrator
@@ -526,7 +519,7 @@ At each trigger the planner solves \eqref{eq:Ja} over the single integrator
 $v_z\in[-1,1]$\,m/s, warm-started from the previous solution (SLSQP,
 $\text{maxiter}=15$). Altitude limits $z\in[z_{\min},z_{\max}]$ are shaped by the
 cost; a hard terminal set $\mathbb{X}_f$ and the DARE terminal cost of the
-idealized formulation below are \emph{not} enforced online. \tagIMPL
+idealized formulation below are \emph{not} enforced online.
 
 \section{Theoretical Properties and Implementation Status}
 \label{sec:theory}
@@ -542,7 +535,7 @@ true state satisfies $\mathbf{x}_k\in\bar{\mathbb{X}}\oplus\Omega\subseteq\mathb
 \cite{mayne2005robust,mRPI}. This holds for the \emph{idealized} design; the code
 uses the ellipsoidal surrogate \eqref{eq:ellipsoid} and does not enforce
 tightening or a terminal set, so online recursive feasibility is \emph{assumed,
-not verified}. \tagOFFLINE
+not verified}.
 
 \textbf{Bounded inter-trigger error (ISS).} With $A_K$ Schur and
 $\mathbf{w}\in\mathbb{W}$ bounded, \eqref{eq:error_dynamics} is input-to-state
@@ -550,55 +543,18 @@ stable. For the implemented contraction $A_K=0.6\,I_3$ this is immediate:
 $\lVert\mathbf{e}_{k+1}\rVert\le 0.6\lVert\mathbf{e}_k\rVert+\sup\lVert\mathbf{w}\rVert$,
 hence $\limsup_k\lVert\mathbf{e}_k\rVert\le\sup\lVert\mathbf{w}\rVert/0.4$. Thus,
 between triggers, the error stays bounded and the ellipsoid membership is a
-meaningful monitor. \tagOFFLINE
+meaningful monitor.
 
 \textbf{Belief-MPC stability.} Adding $\lambda\tr\Sigma_k$ and $c_{\mathrm{fov}}$
 to the stage cost \eqref{eq:Jg} makes it nonconvex and state-dependent; the
 standard terminal-cost machinery does not directly apply and we do not claim a
-formal stability proof for the UGV controller. \tagFUTURE
+formal stability proof for the UGV controller.
 
 \textbf{Stochastic/bounded mismatch.} The mRPI machinery needs a bounded
 $\mathbb{W}$, whereas the EKF noise is Gaussian. The offline computation truncates
 $\mathbf{v}_k$ to a box without a stated confidence level, and the online
 $\Sigma$ is never mapped to a hard bound. A probabilistic/stochastic-tube
-treatment is future work. \tagFUTURE
-
-Table~\ref{tab:status} summarizes the claim status.
-
-\begin{table}[h]
-\caption{Claim status: proven offline vs.\ implemented vs.\ future}
-\label{tab:status}
-\begin{center}
-\footnotesize
-\begin{tabular}{|l|l|}
-\hline
-\textbf{Claim} & \textbf{Status}\\
-\hline
-Belief NMPC propagates $\Sigma$, penalizes $\tr\Sigma$+FoV & implemented\\
-\hline
-View-quality-coupled $R_k$ \eqref{eq:Rk} & implemented\\
-\hline
-Non-monotone view quality in altitude \eqref{eq:q} & implemented\\
-\hline
-Adaptive ellipsoidal tube radius \eqref{eq:alpha} & implemented\\
-\hline
-Four-condition perception event trigger & implemented\\
-\hline
-Offline mRPI outer bound \eqref{eq:mrpi}, tightening & proven (offline)\\
-\hline
-Bounded inter-trigger error / ISS & proven (offline)\\
-\hline
-$\sigma$-polytopic fractional trigger, $\Omega_\sigma$ & future work\\
-\hline
-Online mRPI / homothetic tube / re-tightening & future work\\
-\hline
-Terminal-set + DARE recursive feasibility online & future work\\
-\hline
-UGV belief-MPC formal stability proof & future work\\
-\hline
-\end{tabular}
-\end{center}
-\end{table}
+treatment is future work.
 
 \textbf{Limitations and honest scope.} The study is in simulation only; the UAV is
 a point-mass single integrator; the tube adaptivity is in the trigger/monitor
@@ -706,10 +662,15 @@ estimation uncertainty $\tr\Sigma$ \emph{decreases} as altitude decreases ($0.00
 $z{=}6$\,m to $0.0053$ at $z{=}2$\,m --- the $R\propto z^2$ resolution gain, and
 track-independent), while the UGV steering effort needed to keep the path segmented
 \emph{increases} as altitude decreases, and increases with path curvature. Hence the
-perception-constrained policy: fly as low as segmentation allows, climbing anticipatorily into
-turns where the navigation floor rises. In SITL the active-altitude policy realizes exactly
-this --- the UAV altitude spans $[3,8]$\,m, climbing into turns (mean $\approx\!5.8$\,m over
-high-curvature segments vs.\ $\approx\!4.6$\,m on straights). \tagSIM
+perception-constrained policy: fly as low as segmentation allows, raising altitude on
+anticipated curvature where the navigation floor rises. In SITL the active-altitude policy
+actuates altitude closed-loop, the UAV spanning $z\in[2.5,7]$\,m as the curvature-driven
+setpoint varies (versus a fixed altitude in the baseline). We note that a clean anticipatory
+\emph{lead} of the achieved altitude over the realized curvature is not isolable in SITL: the
+policy's prediction horizon is short and the closed-loop tracking adds lag, so the achieved
+altitude is roughly coincident with the turn; the anticipation property itself
+(Prop.~3) is established analytically and in the exact numerical model, not claimed as an SITL
+result.
 
 \begin{figure}[thpb]
 \centering
@@ -732,7 +693,7 @@ $z{=}2$\,m and UGV speed $1.0$\,m/s --- exactly where the coverage constraint bi
 identical configurations yield ArUco visibility from $35\%$ to $100\%$, so no crisp feasibility
 boundary can be reported there. Establishing the isolated observability benefit would require
 decoupling the ground vehicle's navigation from the tracking camera (onboard odometry or a
-second sensor); we leave it as future work. \tagFUTURE
+second sensor); we leave it as future work.
 
 \section{CONCLUSIONS}
 

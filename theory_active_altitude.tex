@@ -254,9 +254,12 @@ quadrotor's velocity-control plugin subscribed to a \emph{global} \texttt{/cmd\_
 the ground vehicle's differential-drive controller also drove, so the UAV silently mirrored the
 ground vehicle's planar commands and the altitude command never reached the plugin. After
 assigning the UAV a dedicated command topic, vertical velocity actuates correctly and the
-active-altitude policy executes closed-loop: the UAV altitude spans $[3,8]$\,m and climbs into
-turns (mean altitude $\approx\!5.8$\,m over high-curvature segments versus $\approx\!4.6$\,m on
-straights), the anticipatory behavior Prop.~\ref{prop:C} prescribes.
+active-altitude policy executes closed-loop: the UAV altitude spans $[2.5,7]$\,m as the
+curvature-driven setpoint varies. We are careful not to over-read this: a clean anticipatory
+\emph{lead} of the achieved altitude over the realized curvature is not isolable in the SITL
+closed loop (short prediction horizon plus tracking lag leave the achieved altitude roughly
+coincident with the turn); the anticipation property (Prop.~\ref{prop:C}) is established
+analytically and in the exact numerical model of \S\ref{sec:num}, not claimed from SITL.
 
 Consequently, Propositions~\ref{prop:A}--\ref{prop:C} are established analytically, validated in
 the numerical simulator (\S\ref{sec:num}), and their key behaviors corroborated in a
