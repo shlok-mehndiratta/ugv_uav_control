@@ -217,9 +217,12 @@ def generate_launch_description():
     gz_sim_path = SetEnvironmentVariable(name='GZ_SIM_RESOURCE_PATH', value=new_gz_path)
 
     # Graphics environment variables removed to prevent Optimus segfaults
+    # GZ_HEADLESS=1 -> server-only (-s): removes GUI/GL contention with the sensor
+    # RenderThread, which intermittently starved the camera (ArUco 0% some runs).
+    _hl = '-s ' if os.environ.get('GZ_HEADLESS') == '1' else ''
     gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(pkg_gz, 'launch', 'gz_sim.launch.py')),
-        launch_arguments={'gz_args': f'-r -v 4 "{os.path.join(pkg_ugv, "worlds", "path_following.world")}"'}.items(),
+        launch_arguments={'gz_args': f'{_hl}-r -v 4 "{os.path.join(pkg_ugv, "worlds", "path_following.world")}"'}.items(),
     )
 
     return LaunchDescription([
