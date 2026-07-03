@@ -1,70 +1,75 @@
-# Robust Linear Control: A Belief-Coupled Tube-MPC Framework
+# Perception-Constrained Altitude Control for Aerial–Ground Cooperative Tracking
 
-### LCS 334 - Linear Control Systems
-**Final Project Submission**
+A software-in-the-loop (SITL) study of UAV–UGV cooperative tracking in which a **single
+downward UAV camera is the ground vehicle's only exteroceptive sensor** — serving *both* its
+navigation reference (path segmentation) *and* its state estimate (ArUco/EKF). This dual role
+induces a **coverage–resolution altitude tension**: low altitude sharpens estimation
+(ground-sampling noise `R ∝ z²`) but starves navigation coverage (the path lookahead leaves the
+camera footprint); high altitude does the reverse. We formalize this tension, derive the
+altitude policy that resolves it (fly as low as segmentation allows, climb into turns), and
+evaluate it in a genuinely-controlled, reproducible ROS 2 / Gazebo stack.
 
----
+## Repository layout
 
-## Project Architecture and Roadmap
-This repository presents a unified research framework for autonomous multi-agent tracking, bridging the gap between robust control theory, high-fidelity trajectory engineering, and mission-scale ROS 2 integration. The project is organized into three distinct phases, each building upon the scientific results of the previous.
+```
+ugv_uav_control/
+├── paper/          Manuscript (self-contained; compiles standalone / on Overleaf)
+│   ├── ICC12.tex / .pdf                 — the paper
+│   ├── theory_active_altitude.tex/.pdf  — companion theory note (Props A/B/C)
+│   ├── ieeeconf.cls                     — IEEE conference class
+│   └── Fig_*.png                        — figures used by the manuscripts
+└── ros2_ws/        ROS 2 workspace (colcon)
+    ├── src/ugv_uav_control/   nodes, launch, models (UAV/UGV/ground plane), tracks
+    ├── scripts/               analysis + figure generation (spawn finder, sweep runner, …)
+    ├── results/               experiment data (per-run CSVs + summaries)
+    ├── requirements.txt
+    └── Makefile
+```
+`build/`, `install/`, `log/`, and raw console logs are generated artifacts and are git-ignored.
 
-### [01: Mathematical Foundations](./01_Mathematical_Foundations/)
-*   **Scientific Goal**: Guaranteeing stability under bounded disturbances using Robust Positional Invariant (RPI) Sets.
-*   **Key Deliverables**: Derivation of the tracking gain K and nominal constraint tightening.
-*   *Implementation details and execution steps available in the sub-directory README.*
+## Build & run
 
-### [02: Trajectory Engineering](./02_Trajectory_Engineering/)
-*   **Scientific Goal**: Validating high-dynamic flight trajectories for micro-UAV hardware.
-*   **Key Deliverables**: Crazyflie SITL validation logs and optimized 3D path coordinates derived from stability constraints, docker file to ensure reproducibility.
-*   *Implementation details and execution steps available in the sub-directory README.*
+Requires ROS 2 Jazzy and Gazebo (Harmonic / `gz-sim` 8). From the workspace:
 
-### [03: System Integration and Validation](./03_System_Integration_ROS2/)
-*   **Scientific Goal**: Closing the loop between perception (OpenCV), state estimation (EKF), and belief-space control.
-*   **Key Deliverables**: A high-fidelity ROS 2 and Gazebo mission demonstrating Adaptive Tube-MPC and Belief-Coupled tracking.
-*   *ROS 2 workspace setup and execution steps available in the sub-directory README.*
+```bash
+cd ros2_ws
+colcon build --symlink-install
+source install/setup.bash
 
----
+# Run a mission (headless is required for reproducible closed-loop runs — see below):
+GZ_HEADLESS=1 ros2 launch ugv_uav_control middle_path_follower.launch.py \
+    experiment_name:=demo duration:=45
+```
 
-## Result Verification Matrix
-Quantitative results are **regenerated from fresh simulation logs** (see
-`03_System_Integration_ROS2/results/` and the plotting scripts) and must not be hand-edited here.
-The headline, reproducible finding is computational: the perception-driven event trigger reduces the
-number of online planner solves by roughly an order of magnitude relative to continuous replanning, at
-statistically comparable tracking accuracy. Belief-coupling and adaptive-tube effects are exercised only
-under the adversarial scenarios (injected occlusion, high curvature) in the simulation study; the
-certified mRPI set is an **offline** design artifact and is not wired into the online loop. See
-`AUDIT_REPORT.md` for the full claim-status ledger (proven-offline / implemented / simulation / future).
+**Reproducibility (important).** Run **headless** (`GZ_HEADLESS=1`). With the Gazebo GUI, the
+rendering thread contends with the ROS 2 executor and forks identical-configuration trajectories
+by ≈2.7 m (and randomly starves the camera); headless runs agree to ≈0.03 m. All reported
+results are headless.
 
----
+## Key results (all regenerated from the committed run data in `ros2_ws/results/`)
 
-## Scientific Inferences
+- **Co-design.** A perception-driven event trigger invokes the expensive belief-space planner
+  only when needed, cutting online planner solves ≈28× (1255→45 / run) and total planner CPU
+  ≈14× at matched estimation quality (`tr Σ = 0.0063`, 100 % ArUco visibility), for a small loss
+  of inter-trigger trajectory smoothness.
+- **Coverage–resolution envelope.** Estimation cost falls with altitude (GSD, `R ∝ z²`) while
+  the segmentation/navigation cost rises and worsens with path curvature — the two jaws of the
+  altitude tension.
 
-### 1. The Observability-Control Link
-The UGV controller couples path-following with estimation quality by penalizing the predicted covariance
-trace and FoV exit (belief-space NMPC). This is a genuine bidirectional mechanism; its measurable benefit,
-however, appears only when the scenario actually stresses observability (occlusion, high curvature) — under
-a benign track all methods coincide.
+Per-track on-lane spawns are computed by `scripts/find_spawn.py`; the envelope sweep is driven
+by `scripts/envelope_run_cell.sh`.
 
-### 2. Computational Efficiency
-The event-triggered law re-solves the UAV planner only when the adaptive ellipsoidal tube is exited or a
-perception condition fires, reducing the number of online solves by roughly an order of magnitude versus
-continuous replanning. Per-solve timings are logged (`*_solve_time`) rather than asserted.
+## Scope (stated honestly)
 
-### 3. Robustness via Adaptation
-The UAV tube radius scales with the EKF covariance and the trigger anticipates high curvature. Whether this
-prevents visual dropouts is an empirical, scenario-dependent question evaluated under injected occlusion —
-not a guarantee.
+The demonstrated payoff is computational. The *isolated* observability benefit of
+perception-awareness is **not** separable on this platform — the shared camera couples
+navigation and estimation, so estimation covariance is dominated by altitude-dependent
+measurement noise — and the low-altitude/high-speed corner is non-reproducibly unstable. The
+offline mRPI/tube derivation is a design-time baseline that seeds the ellipsoidal shape matrix;
+the online controller uses an adaptive ellipsoidal surrogate and carries no online
+recursive-feasibility certificate. These are stated as findings in the paper, not hidden.
 
-### 4. Theoretical Scope (offline vs. online)
-A minimal Robust Positively Invariant (mRPI) set is computed **offline** via a support-function/Minkowski
-construction with a certified truncation bound, and constitutes a valid robust bound for the idealized design.
-The **online** controller uses an ellipsoidal invariant-set surrogate with an adaptive radius; it does **not**
-re-derive the mRPI online, does not enforce constraint tightening or a terminal set, and therefore carries
-**no online recursive-feasibility certificate**. Recursive feasibility and Lyapunov stability hold for the
-idealized formulation and are assumed, not verified, for the running code. See `AUDIT_REPORT.md`.
+## Authors
 
----
-**Team Members:**
-*   Shlok Mehndiratta (23309)
-*   Divyam Sood (23112)
-*   Prashant Gupta (23237)
+Shlok Mehndiratta, Divyam Sood, Prashant Gupta, and Arijit Sen — Indian Institute of Science
+Education and Research (IISER) Bhopal.
