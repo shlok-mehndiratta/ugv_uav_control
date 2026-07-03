@@ -283,11 +283,10 @@ $\mathbf{p}=[p_x,p_y,p_z]^T$ and velocity command $\mathbf{u}=[v_x,v_y,v_z]^T$,
 \qquad A_d=I_3,\ B_d=\Delta t\, I_3,
 \label{eq:uav_disc}
 \end{equation}
-with bounded disturbance $\mathbf{w}_k\in\mathbb{W}$. Vertical velocity is a
-genuine decision variable, so altitude is planned rather than fixed in the
-optimization; in the reported runs, however, the simulator's velocity plugin
-does not actuate the vertical channel, so the vehicle holds its spawn altitude
-($z\equiv6$\,m; cf.\ Sec.~\ref{sec:theory}). A
+with bounded disturbance $\mathbf{w}_k\in\mathbb{W}$. All three axes are fully
+actuated: $v_z$ is a genuine decision variable and the altitude policy of
+Sec.~\ref{sec:coverage} is realized closed-loop in SITL (the UAV altitude spans
+$[3,8]$\,m; Sec.~\ref{sec:results}). A
 second-order double-integrator (acceleration input) is the more faithful
 rigid-body abstraction; we use \eqref{eq:uav_disc} because it is exactly what the
 implementation optimizes. \tagIMPL
@@ -320,6 +319,27 @@ R_k(q_k) = \frac{R_{\mathrm{full}}}{q_k + \epsilon},
 so $R_k\to R_{\mathrm{full}}$ for an excellent view and $R_k\to\infty$ (the
 update ignores the marker) as $q_k\to0$. This couples UAV geometry directly to
 EKF performance. \tagIMPL
+
+\subsection{Segmentation coverage model}
+\label{sec:coverage}
+The same downward camera also supplies the UGV's \emph{navigation} reference: an OpenCV
+segmenter extracts the lane and seeds a waypoint a lookahead distance ahead of the vehicle.
+That waypoint must lie inside the camera footprint or segmentation fails and the UGV loses its
+reference. With footprint radius $r_{\mathrm{fov}}(z)=z\tan(\phi/2)$ and required lookahead
+$d_{\mathrm{look}}(\kappa)$ --- which grows with local path curvature $\kappa$, since a curving
+lane exits the footprint sooner and needs more forward view --- define the non-dimensional
+\emph{coverage factor}
+\begin{equation}
+\eta \;=\; \frac{r_{\mathrm{fov}}(z)}{d_{\mathrm{look}}(\kappa)}
+      \;=\; \frac{z\tan(\phi/2)}{d_{\mathrm{look}}(\kappa)} ,
+\label{eq:eta}
+\end{equation}
+with segmentation feasible for $\eta\gtrsim1$. This is the crux coupling: the estimator wants \emph{low} altitude ($R\propto z^2$, better
+resolution), while \eqref{eq:eta} demands \emph{sufficient} altitude for navigation. The
+estimation-optimal altitude is thus the lowest that keeps $\eta\gtrsim1$, and this floor rises
+with curvature --- the analytic basis for climbing into turns. The aerial planner
+(Sec.~\ref{sec:aerial}) enforces $\eta\gtrsim1$ as a soft lower bound; Sec.~\ref{sec:results}
+reports the empirical cost tradeoff over $\eta$. \tagIMPL
 
 \section{Coupled Event-Triggered Tube MPC}
 \label{sec:method}
@@ -356,7 +376,8 @@ not an asymptotic barrier). The covariance rollout \eqref{eq:blend} makes
 $\lambda\tr(\Sigma_k)$ and $w_{\mathrm{fov}}c_{\mathrm{fov}}$ are what make the
 controller belief-coupled and are absent from the passive baseline. \tagIMPL
 
-\subsection{Aerial nominal planner}
+\subsection{Aerial nominal planner and altitude policy}
+\label{sec:aerial}
 The UAV computes a nominal trajectory $\bar{\mathbf{p}}$ over $N_a=10$ by
 optimizing goal tracking, an altitude regularizer toward $z_{\mathrm{opt}}$, and a
 visibility term that tolerates lateral offset only when altitude is sufficient:
@@ -372,9 +393,18 @@ J_a = \sum_{k}w_{\ell,k}\Big[\,
 \end{equation}
 where $\mathbf{g}$ is the UGV's predicted end-of-horizon position (read from the
 belief-MPC rollout, one direction of the coupling) and $w_{\ell,k}$ up-weights
-later steps. The weights are fixed (not re-scaled online); ``climb into turns to
-widen the footprint'' is an emergent optimum of \eqref{eq:Ja}, not a hand-coded
-rule. \tagIMPL
+later steps. The perception-constrained altitude policy of Sec.~\ref{sec:coverage} sets the
+altitude setpoint explicitly to the coverage floor plus an anticipatory margin,
+\begin{equation}
+z_k \;=\; \hat d_k/\tan(\phi/2) \;+\; \beta_\kappa\,\hat\kappa_k \;+\; z_{\mathrm{m}},
+\label{eq:altpol}
+\end{equation}
+where $\hat d_k$ is the estimated horizontal UAV--UGV offset (the first term places the
+footprint edge at the target, i.e.\ $\eta\!\approx\!1$), $\hat\kappa_k$ is the anticipated path
+curvature, and $\beta_\kappa\hat\kappa_k$ raises altitude into turns where
+$d_{\mathrm{look}}(\kappa)$ --- and hence the coverage floor \eqref{eq:eta} --- grows;
+$z_{\mathrm{m}}$ is a fixed margin. ``Climb into turns to widen the footprint'' is thus a
+derived consequence of the coverage constraint, not a hand-coded rule. \tagIMPL
 
 \subsection{Offline robust invariant set (tube) derivation}
 \label{sec:mrpi}
