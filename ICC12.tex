@@ -320,6 +320,20 @@ so $R_k\to R_{\mathrm{full}}$ for an excellent view and $R_k\to\infty$ (the
 update ignores the marker) as $q_k\to0$. This couples UAV geometry directly to
 EKF performance. \tagIMPL
 
+For the quantitative study we use the physically-grounded \emph{ground-sampling-distance}
+(GSD) noise model: pixel-level localization is fixed while the GSD (m/px) grows linearly with
+altitude, so the metric position-measurement covariance grows \emph{quadratically},
+\begin{equation}
+R(z) = R_{\mathrm{full}}\,(z/z_0)^2\,\big(1+(d/r_{\mathrm{fov}})^2\big),
+\label{eq:Rgsd}
+\end{equation}
+with a mild FoV-edge inflation $(1+(d/r_{\mathrm{fov}})^2)$. Unlike the Gaussian-bowl form
+\eqref{eq:Rk} --- which is non-monotone in $z$ and instead models resolution dropout away from a
+nominal altitude --- \eqref{eq:Rgsd} is monotone increasing in $z$, matching the theory's
+resolution assumption and the $R\propto z^2$ side of the coverage--resolution tension
+(Sec.~\ref{sec:coverage}). Equation~\eqref{eq:Rgsd} is the measurement-noise model used in all
+reported results. \tagIMPL
+
 \subsection{Segmentation coverage model}
 \label{sec:coverage}
 The same downward camera also supplies the UGV's \emph{navigation} reference: an OpenCV
@@ -440,7 +454,9 @@ are computed offline and constitute a \emph{certified robust bound for the
 idealized design}. \tagOFFLINE
 
 \subsection{Online adaptive ellipsoidal tube}
-Rather than propagate the polytope $\Omega$ online, the ancillary controller uses
+Propagating the polytope $\Omega$ online --- vertex/support-function updates and a
+Pontryagin difference at every $20$\,Hz ancillary step --- is impractical on the UAV's
+embedded companion processor. Rather than pay that overhead, the ancillary controller uses
 an \emph{ellipsoidal} invariant-set surrogate
 \begin{equation}
 \mathcal{E}(\alpha_k)=\{\mathbf{e}: \mathbf{e}^T P_0\,\mathbf{e}\le\alpha_k^2\},
@@ -480,8 +496,11 @@ $\mathbf{e}_k^T P_0\mathbf{e}_k>\alpha_k^2$, i.e.\ the state left the adaptive
 ellipsoid \eqref{eq:ellipsoid}.
 \item \textbf{(2) Covariance spike:} $\tr\Sigma_{xy}(t)>\tau_{\mathrm{cov}}$ and a
 sudden ($>\!1.5\times$) rise over $\sim0.5$\,s (e.g.\ ArUco occlusion).
-\item \textbf{(3) Curvature anticipation:} discrete curvature of the UGV predicted
-path exceeds $\tau_\kappa$, so the UAV can climb before a turn.
+\item \textbf{(3) Curvature anticipation:} the discrete curvature of the UGV predicted path,
+$\hat\kappa=\max_i |\Delta\theta_i|/\Delta s_i$ --- the wrapped heading change $\Delta\theta_i$
+between consecutive predicted waypoints over their spacing $\Delta s_i$, maximized over the next
+few steps --- exceeds $\tau_\kappa=0.4$\,rad/m, so the UAV climbs before the turn (raising the
+coverage floor of Sec.~\ref{sec:coverage}).
 \item \textbf{(4) Temporal drift:} elevated $\tr\Sigma_{xy}$ with time since last
 replan exceeding $T_{\min}$.
 \end{itemize}
