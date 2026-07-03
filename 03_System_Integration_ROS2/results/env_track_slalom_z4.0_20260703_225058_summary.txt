@@ -1,0 +1,33 @@
+experiment: env_track_slalom_z4.0
+total_samples: 389
+total_replans: 28
+ugv_dist_traveled: 21.0710
+uav_dist_traveled: 20.5345
+mean_ugv_solve_ms: 28.2290
+mean_uav_solve_ms: 10.5610
+mean_tracking_error: 0.0906
+max_tracking_error: 0.5917
+control_smoothness: 0.0302
+mean_cov_trace: 0.0075
+max_cov_trace: 0.0160
+mean_uav_z: 4.0365
+min_uav_z: 3.9943
+max_uav_z: 4.9813
+fov_exit_pct: 0.2571
+aruco_visible_pct: 100.0000
+aruco_dropouts: 1
+max_dropout_s: 6.0021
+
+--- Trigger Breakdown ---
+Curvature (0.41): 2
+Curvature (0.43): 1
+Curvature (0.45): 1
+Curvature (0.46): 1
+Curvature (0.51): 1
+Curvature (0.66): 1
+Curvature (0.70): 1
+Curvature (0.76): 1
+Curvature (0.87): 1
+Curvature (3.61): 1
+Curvature (7.80): 1
+Plan Expiry: 15

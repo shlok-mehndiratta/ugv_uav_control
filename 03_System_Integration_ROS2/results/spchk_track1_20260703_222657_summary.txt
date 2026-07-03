@@ -1,0 +1,28 @@
+experiment: spchk_track1
+total_samples: 383
+total_replans: 25
+ugv_dist_traveled: 22.8644
+uav_dist_traveled: 18.8343
+mean_ugv_solve_ms: 28.6853
+mean_uav_solve_ms: 8.3131
+mean_tracking_error: 0.0646
+max_tracking_error: 0.3159
+control_smoothness: 0.0224
+mean_cov_trace: 0.0095
+max_cov_trace: 0.0242
+mean_uav_z: 6.0034
+min_uav_z: 5.9995
+max_uav_z: 6.0210
+fov_exit_pct: 0.2611
+aruco_visible_pct: 100.0000
+aruco_dropouts: 1
+max_dropout_s: 6.6332
+
+--- Trigger Breakdown ---
+Curvature (0.41): 2
+Curvature (0.42): 1
+Curvature (0.43): 1
+Curvature (0.44): 1
+Curvature (0.47): 1
+Curvature (0.49): 1
+Plan Expiry: 16

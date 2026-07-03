@@ -42,13 +42,16 @@ def launch_setup(context, *args, **kwargs):
     # 3. Standard Robot Spawning
     robot_sdf = os.path.join(pkg_ugv, 'models', 'turtlebot3_burger_aruco', 'model.sdf')
     spawn_robot = Node(package='ros_gz_sim', executable='create',
-        arguments=['-name', 'turtlebot3_burger', '-file', robot_sdf, '-z', '0.01', '-x', '0.5'],
+        arguments=['-name', 'turtlebot3_burger', '-file', robot_sdf, '-z', '0.01',
+                   '-x', LaunchConfiguration('ugv_x'), '-y', LaunchConfiguration('ugv_y'),
+                   '-Y', LaunchConfiguration('ugv_yaw')],
         output='screen')
 
-    # 4. Spawn Drone at 5m height
+    # 4. Spawn Drone directly above the UGV spawn (so target starts centred in the FoV)
     drone_sdf = os.path.join(pkg_ugv, 'models', 'x500_downward_camera', 'model.sdf')
     spawn_drone = Node(package='ros_gz_sim', executable='create',
-        arguments=['-name', 'uav', '-file', drone_sdf, '-z', LaunchConfiguration('z_opt'), '-x', '0.0', '-y', '0.0'],
+        arguments=['-name', 'uav', '-file', drone_sdf, '-z', LaunchConfiguration('z_opt'),
+                   '-x', LaunchConfiguration('ugv_x'), '-y', LaunchConfiguration('ugv_y')],
         output='screen')
 
     # 5. Bridges
@@ -177,6 +180,10 @@ def generate_launch_description():
     arg_freeze_alpha = DeclareLaunchArgument('freeze_alpha', default_value='false', description='Day-1: freeze 1a tube-test radius at alpha_max (perception-free trigger boundary)')
     arg_error_only = DeclareLaunchArgument('error_only', default_value='false', description='Day-1: disable perception triggers 1b/2/3 (keep belief_mpc running)')
     arg_debug_vz = DeclareLaunchArgument('debug_const_vz', default_value='0.0', description='Diagnostic: constant added to ancillary published linear.z (0.0 => no effect)')
+    # Per-track UGV spawn (on-lane). Drone spawns directly above. Defaults = track2 lane.
+    arg_ugv_x = DeclareLaunchArgument('ugv_x', default_value='0.5', description='UGV spawn world x (on-lane for the chosen track)')
+    arg_ugv_y = DeclareLaunchArgument('ugv_y', default_value='0.0', description='UGV spawn world y')
+    arg_ugv_yaw = DeclareLaunchArgument('ugv_yaw', default_value='0.0', description='UGV spawn yaw (rad, along lane)')
     arg_use_ancillary = DeclareLaunchArgument('use_ancillary', default_value='true', description='Launch Ancillary node')
 
     # New 3D Trajectory Parameters
@@ -235,6 +242,9 @@ def generate_launch_description():
         arg_freeze_alpha,
         arg_error_only,
         arg_debug_vz,
+        arg_ugv_x,
+        arg_ugv_y,
+        arg_ugv_yaw,
         arg_gsd,
         arg_actalt,
         arg_altmargin,
