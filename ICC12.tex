@@ -31,7 +31,7 @@
 \newcommand{\Rset}{\mathbb{R}}
 
 % ---- results macros. STEADY-STATE window t>=8s (skips takeoff/EKF-convergence transient).
-% Fixed-system co-design numbers (C1 continuous vs C3 event-triggered, track2, headless, R=3).
+% Fixed-system co-design numbers (C1 continuous vs C2 event-triggered, track2, headless, R=3).
 % All values regenerated after the /cmd_vel-collision fix, so the UAV is genuinely controlled.
 \newcommand{\RESsolvesCone}{\ensuremath{1255\pm9}}\newcommand{\RESsolvesCthree}{\ensuremath{45\pm1}}
 \newcommand{\RESmsCone}{\ensuremath{4.2\pm0.1}}\newcommand{\RESmsCthree}{\ensuremath{8.2\pm0.2}}
@@ -42,8 +42,8 @@
 \newcommand{\RESforkGUI}{2.7}\newcommand{\RESforkHL}{0.01}
 
 \title{\LARGE \bf
-An Event-Triggered Tube-MPC Framework for Aerial--Ground Tracking: \\
-Design and Computational Evaluation
+Perception-Constrained Altitude Control for Aerial--Ground \\
+Cooperative Tracking with a Shared Downward Camera
 }
 
 \author{Shlok Mehndiratta$^{1}$, Divyam Sood$^{1}$, and Prashant Gupta$^{1}$%
@@ -173,8 +173,8 @@ observable while the \emph{tracker} adapts its robustness to perception quality 
 is the design novelty of the architecture. What we \emph{evidence} in this paper is
 narrower and concrete: the integrated SITL realization of that architecture and the
 perception-driven trigger's computational result (Sec.~\ref{sec:results}).
-Isolating the coupling's observability benefit is future work requiring a
-controllable-lag, trajectory-reproducible regime (Sec.~\ref{sec:theory}).
+Isolating the coupling's observability benefit is future work requiring the ground
+vehicle's navigation to be decoupled from the tracking camera (Sec.~\ref{sec:theory}).
 
 \textbf{Event-triggered MPC.} Event-triggered schemes \cite{eqtami2010event}
 re-solve only when a state-dependent condition fires. We instantiate a
@@ -399,11 +399,12 @@ altitude setpoint explicitly to the coverage floor plus an anticipatory margin,
 z_k \;=\; \hat d_k/\tan(\phi/2) \;+\; \beta_\kappa\,\hat\kappa_k \;+\; z_{\mathrm{m}},
 \label{eq:altpol}
 \end{equation}
-where $\hat d_k$ is the estimated horizontal UAV--UGV offset (the first term places the
-footprint edge at the target, i.e.\ $\eta\!\approx\!1$), $\hat\kappa_k$ is the anticipated path
-curvature, and $\beta_\kappa\hat\kappa_k$ raises altitude into turns where
-$d_{\mathrm{look}}(\kappa)$ --- and hence the coverage floor \eqref{eq:eta} --- grows;
-$z_{\mathrm{m}}$ is a fixed margin. ``Climb into turns to widen the footprint'' is thus a
+where $\hat d_k$ is the estimated horizontal UAV--UGV offset (the first term keeps the target
+within the footprint), $\hat\kappa_k$ is the anticipated path curvature, and
+$\beta_\kappa\hat\kappa_k$ raises altitude into turns where the required lookahead
+$d_{\mathrm{look}}(\kappa)$ --- and hence the coverage floor $\eta\!\gtrsim\!1$
+\eqref{eq:eta} --- grows; $z_{\mathrm{m}}$ is a fixed margin that keeps the forward lookahead in
+view on straights. ``Climb into turns to widen the footprint'' is thus a
 derived consequence of the coverage constraint, not a hand-coded rule. \tagIMPL
 
 \subsection{Offline robust invariant set (tube) derivation}
@@ -581,21 +582,19 @@ UGV belief-MPC formal stability proof & future work\\
 a point-mass single integrator; the tube adaptivity is in the trigger/monitor
 radius, not a re-derived invariant set; the mRPI is offline and not wired into the
 online loop; and no online recursive-feasibility certificate is enforced. Most
-importantly, \emph{the isolated observability benefit of the perception trigger is
-not demonstrable on this platform at the present scope}, for two documented
-reasons. (a) The UAV tracks the UGV's horizontal position tightly enough (mean lag
-$0.24$\,m against ground truth) that the target stays near the optical center
-regardless of FoV size, so the observability margin is not stressed without
-changing control gains or vehicle speeds. (b) The regime that does shrink the
-margin --- flying lower to reduce the footprint --- is \emph{not
-trajectory-reproducible}: with no seedable RNG and a wall-clock-paced, non-lockstep
-ROS\,2/Gazebo loop, scheduling jitter in the closed perception--control--physics
-loop forks the UGV path by $2.7$\,m on average ($4.9$\,m max) between
-identical-configuration runs (target visibility $100\%$ vs.\ $30\%$), so a fair
-perception-vs-baseline comparison cannot be run. Establishing the observability
-benefit is future work requiring (i) a controllable-lag regime (UAV speed/gain)
-that stresses the FoV margin, and (ii) a deterministic, lockstep simulator
-(\texttt{use\_sim\_time} with a fixed step) for seed-reproducible trajectories.
+importantly, \emph{the isolated observability benefit of perception-awareness is
+not separable on this platform}, for two reasons detailed in Sec.~\ref{sec:results}:
+(a) because the shared downward camera keeps the target near the optical center (mean
+UAV--UGV offset $0.06$--$0.12$\,m), the estimation covariance is dominated by the
+altitude-dependent measurement noise and carries no separable tracking-difficulty
+signal; and (b) the low-altitude/high-speed corner that would stress the coverage
+margin is non-reproducibly unstable. We stress that this residual non-reproducibility
+is confined to that binding corner: in the operating regime the closed loop \emph{is}
+reproducible once run headless (identical-configuration trajectories agree to
+$\approx\!\RESforkHL$\,m; with the Gazebo GUI, rendering contention with the ROS\,2
+executor forks them by $\approx\!\RESforkGUI$\,m). Establishing the isolated
+observability benefit is future work requiring the ground vehicle's navigation to be
+decoupled from the tracking camera (onboard odometry or a second exteroceptive sensor).
 
 \section{Simulation Study}
 \label{sec:results}
@@ -620,22 +619,22 @@ because it is an often-unstated prerequisite for reproducible closed-loop SITL e
 \textbf{Co-design: event-triggering makes the belief-space planner affordable.} The belief-space
 planner propagates the EKF covariance through its horizon and is comparatively expensive per
 solve. Continuous replanning (C1) spends a large, sustained CPU budget; the perception-driven
-event trigger (C3) invokes the \emph{same} planner only when a covariance/curvature/drift
-condition fires. On the nominal track (headless, $R{=}3$), C3 reduces planner invocations
+event trigger (C2) invokes the \emph{same} planner only when a covariance/curvature/drift
+condition fires. On the nominal track (headless, $R{=}3$), C2 reduces planner invocations
 $\approx\!\RESsolveRed\times$ ($\RESsolvesCone\!\to\!\RESsolvesCthree$) and total planner CPU
 $\approx\!\REScpuRed\times$ ($\REScpuCone\!\to\!\REScpuCthree$\,ms per $45$\,s run;
 Fig.~\ref{fig:codesign}), at matched estimation quality (steady-state $\tr\Sigma=\REScov$ and
-$100\%$ ArUco visibility for both). Per-solve time is \emph{higher} for C3
+$100\%$ ArUco visibility for both). Per-solve time is \emph{higher} for C2
 ($\RESmsCthree$ vs.\ $\RESmsCone$\,ms), consistent with a warm-start disparity --- C1 re-solves
-every $50$\,ms from a near-identical previous solution, whereas each C3 solve starts from a
+every $50$\,ms from a near-identical previous solution, whereas each C2 solve starts from a
 larger state mismatch --- but the $\approx\!\RESsolveRed\times$ reduction in solve count
 dominates, giving the net CPU saving. This is the co-design point: event-triggering makes the
 heavier perception-aware planner affordable on a constrained companion computer.
 
 \textbf{What event-triggering costs.} It is not free: applying the previous nominal trajectory
 between triggers introduces small control discontinuities at trigger instants. We measure
-$\approx\!20\times$ higher high-frequency trajectory content for C3 than C1 (RMS of the second
-position difference). The mean UAV--UGV offset is nonetheless smaller for C3
+$\approx\!20\times$ higher high-frequency trajectory content for C2 than C1 (RMS of the second
+position difference). The mean UAV--UGV offset is nonetheless smaller for C2
 ($\RESoffCthree$ vs.\ $\RESoffCone$\,m); we do \emph{not} attribute this to event-triggering
 (the arms differ in planner cadence) and report it only for completeness. The honest summary is
 a standard event-triggered tradeoff: a large compute saving for a small loss of inter-trigger
@@ -644,7 +643,7 @@ trajectory smoothness, at matched estimation quality.
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.99\columnwidth]{Fig_CoDesign.png}
-\caption{Co-design (headless, $R{=}3$, nominal track): the perception-driven event trigger (C3)
+\caption{Co-design (headless, $R{=}3$, nominal track): the perception-driven event trigger (C2)
 invokes the belief-space planner $\approx\!\RESsolveRed\times$ less often than continuous
 replanning (C1), cutting total planner CPU $\approx\!\REScpuRed\times$ ($93\%$) at matched
 estimation quality ($\tr\Sigma=\REScov$, $100\%$ visibility for both).}
@@ -653,14 +652,14 @@ estimation quality ($\tr\Sigma=\REScov$, $100\%$ visibility for both).}
 
 \begin{table}[h]
 \caption{Co-design metrics, fixed system (headless, nominal track, mean\,$\pm$\,std over $R{=}3$).
-C1 = continuous replanning; C3 = perception-driven event-triggered. Steady-state window
+C1 = continuous replanning; C2 = perception-driven event-triggered. Steady-state window
 $t\!\ge\!8$\,s. Estimation quality is matched; the compute budget is not.}
 \label{tab:results}
 \begin{center}
 \footnotesize
 \begin{tabular}{|l|c|c|}
 \hline
-\textbf{Metric} & \textbf{C1 (Continuous)} & \textbf{C3 (Event-Trig.)}\\
+\textbf{Metric} & \textbf{C1 (Continuous)} & \textbf{C2 (Event-Trig.)}\\
 \hline
 Planner solves (\# / run) & \RESsolvesCone & \RESsolvesCthree\\
 \hline
