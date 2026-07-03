@@ -47,3 +47,9 @@ requirements.txt.bak
 *.synctex.gz
 *.fdb_latexmk
 *.fls
+
+# Raw ROS console logs and ad-hoc study runs (data lives in the CSV/summary files)
+03_System_Integration_ROS2/results/log_*.txt
+03_System_Integration_ROS2/results/study_run_*
+03_System_Integration_ROS2/logs/
+03_System_Integration_ROS2/temp/

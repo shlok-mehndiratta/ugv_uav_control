@@ -64,7 +64,22 @@ class BeliefMPCNode(Node):
         self.w_uncertainty = 1.0 # λ: Uncertainty penalty weight
         
         self.prev_ctrl = np.array([0.0, 0.0])
-        
+
+        # === MARKER-LOSS RECOVERY WATCHDOG ===
+        # The lane follower is open-loop on ArUco visibility: /waypoints (and hence
+        # /cmd_vel here) are only published while the marker is seen. On sustained
+        # loss the diff-drive holds the last (turning) command and the UGV spirals
+        # out of the camera footprint, never recovering. This watchdog stops the UGV
+        # (kills angular velocity) when no fresh waypoint has arrived within
+        # waypoint_timeout, so it holds near the lane and the trailing UAV can
+        # re-acquire. Default ON; inert on runs with continuous visibility because the
+        # inter-waypoint gap (one camera frame) is far below the timeout.
+        self.declare_parameter('waypoint_timeout', 0.4)
+        self.waypoint_timeout = float(self.get_parameter('waypoint_timeout').value)
+        self.last_waypoint_time = self.get_clock().now()
+        self.recovery_active = False
+        self.create_timer(0.1, self.watchdog_callback)
+
         self.get_logger().info('Belief-Space MPC Node Started (λ = {:.2f})'.format(self.w_uncertainty))
 
         # UAV parameters (static for now)
@@ -229,6 +244,12 @@ class BeliefMPCNode(Node):
     
     def waypoint_callback(self, msg):
         """Optimize control given target waypoint in ROBOT FRAME."""
+        # Fresh waypoint => marker is visible; refresh the recovery watchdog.
+        self.last_waypoint_time = self.get_clock().now()
+        if self.recovery_active:
+            self.get_logger().info('[MPC] Waypoint re-acquired -> exiting recovery STOP')
+            self.recovery_active = False
+
         tx = msg.pose.position.x
         ty = msg.pose.position.y
         
@@ -304,6 +325,28 @@ class BeliefMPCNode(Node):
         self.get_logger().info(f'UGV CMD Published: v={v_cmd:.3f}, w={w_cmd:.3f}')
         self.publisher.publish(twist_msg)
 
+
+    def watchdog_callback(self):
+        """Stop the UGV if no fresh waypoint has arrived (marker likely lost), so it
+        holds near the lane instead of coasting on the last turning command and
+        spiralling out of the camera footprint."""
+        dt = (self.get_clock().now() - self.last_waypoint_time).nanoseconds / 1e9
+        if dt <= self.waypoint_timeout:
+            return
+        if not self.recovery_active:
+            self.get_logger().warn(
+                f'[MPC] Waypoint stale {dt:.2f}s > {self.waypoint_timeout}s '
+                f'-> recovery STOP (ArUco marker likely lost)')
+            self.recovery_active = True
+        # Halt (kill angular velocity) and reset the warm-start so the next solve
+        # resumes from rest rather than the stale turning command.
+        self.prev_ctrl = np.array([0.0, 0.0])
+        cmd_msg = TwistStamped()
+        cmd_msg.header.stamp = self.get_clock().now().to_msg()
+        cmd_msg.header.frame_id = 'base_link'
+        cmd_msg.twist.linear.x = 0.0
+        cmd_msg.twist.angular.z = 0.0
+        self.publisher.publish(cmd_msg)
 
     def compute_observability(self, mu):
         """
