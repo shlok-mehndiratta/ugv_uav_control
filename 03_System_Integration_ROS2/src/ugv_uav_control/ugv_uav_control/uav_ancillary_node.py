@@ -40,7 +40,11 @@ class UAVAncillaryNode(Node):
         #   running (so the UAV planner still receives /ugv_predicted_traj).
         self.declare_parameter('freeze_alpha', False)
         self.declare_parameter('error_only', False)
-        
+        # Diagnostic (DEFAULT 0.0 => no effect): add a constant to the published
+        # linear.z to test end-to-end vertical actuation of the deployed path.
+        # Does NOT touch the control law u_anc = u_bar - K*e, K, or P_0.
+        self.declare_parameter('debug_const_vz', 0.0)
+
         self.alpha_min = self.get_parameter('alpha_min').value
         self.alpha_max = self.get_parameter('alpha_max').value
         self.tr_min = self.get_parameter('tr_min').value
@@ -57,6 +61,7 @@ class UAVAncillaryNode(Node):
             return (v.lower() == 'true') if isinstance(v, str) else bool(v)
         self.freeze_alpha = _as_bool(self.get_parameter('freeze_alpha').value)
         self.error_only = _as_bool(self.get_parameter('error_only').value)
+        self.debug_const_vz = float(self.get_parameter('debug_const_vz').value)
         
         # Support string/bool for c1_baseline
         c1_val = self.get_parameter('c1_baseline').value
@@ -218,7 +223,8 @@ class UAVAncillaryNode(Node):
         u_anc = np.clip(u_anc, -1.0, 1.0)
         
         msg = Twist()
-        msg.linear.x = float(u_anc[0]); msg.linear.y = float(u_anc[1]); msg.linear.z = float(u_anc[2])
+        msg.linear.x = float(u_anc[0]); msg.linear.y = float(u_anc[1])
+        msg.linear.z = float(u_anc[2]) + self.debug_const_vz  # debug_const_vz defaults 0.0 (no effect)
         self.cmd_pub.publish(msg)
         
         # 3. Event Trigger Logic

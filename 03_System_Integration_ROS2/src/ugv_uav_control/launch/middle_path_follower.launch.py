@@ -131,6 +131,7 @@ def launch_setup(context, *args, **kwargs):
                                    parameters=[{
                                        'use_gsd_noise': LaunchConfiguration('use_gsd_noise'),
                                        'ugv_max_v': LaunchConfiguration('ugv_max_v'),
+                                       'waypoint_timeout': LaunchConfiguration('waypoint_timeout'),
                                    }],
                                    remappings=[('/uav_gps_pose', '/model/uav/pose')]))
 
@@ -154,6 +155,7 @@ def launch_setup(context, *args, **kwargs):
                     'controller_type': LaunchConfiguration('controller'),
                     'freeze_alpha': LaunchConfiguration('freeze_alpha'),
                     'error_only': LaunchConfiguration('error_only'),
+                    'debug_const_vz': LaunchConfiguration('debug_const_vz'),
                 }],
                 remappings=[('/uav_gps_pose', '/model/uav/pose')],
                 output='screen'
@@ -174,6 +176,7 @@ def generate_launch_description():
     arg_use_timer = DeclareLaunchArgument('use_timer', default_value='false', description='Enable 1Hz timer in MPC (legacy)')
     arg_freeze_alpha = DeclareLaunchArgument('freeze_alpha', default_value='false', description='Day-1: freeze 1a tube-test radius at alpha_max (perception-free trigger boundary)')
     arg_error_only = DeclareLaunchArgument('error_only', default_value='false', description='Day-1: disable perception triggers 1b/2/3 (keep belief_mpc running)')
+    arg_debug_vz = DeclareLaunchArgument('debug_const_vz', default_value='0.0', description='Diagnostic: constant added to ancillary published linear.z (0.0 => no effect)')
     arg_use_ancillary = DeclareLaunchArgument('use_ancillary', default_value='true', description='Launch Ancillary node')
 
     # New 3D Trajectory Parameters
@@ -189,6 +192,7 @@ def generate_launch_description():
     arg_altmargin = DeclareLaunchArgument('altitude_margin', default_value='0.4')
     arg_altkappa = DeclareLaunchArgument('altitude_kappa_gain', default_value='0.0', description='>0 = anticipatory climb')
     arg_ugvv = DeclareLaunchArgument('ugv_max_v', default_value='0.22', description='UGV top speed (raise for FoV-constrained regime)')
+    arg_wptimeout = DeclareLaunchArgument('waypoint_timeout', default_value='0.4', description='Stop UGV if no waypoint (ArUco lost) within this many seconds (marker-loss recovery)')
 
     # Phase 2: Tube MPC / Event Trigger Params
     arg_alpha_min = DeclareLaunchArgument('alpha_min', default_value='0.5')
@@ -227,11 +231,13 @@ def generate_launch_description():
         arg_use_timer,
         arg_freeze_alpha,
         arg_error_only,
+        arg_debug_vz,
         arg_gsd,
         arg_actalt,
         arg_altmargin,
         arg_altkappa,
         arg_ugvv,
+        arg_wptimeout,
         arg_use_ancillary,
         arg_z_opt,
         arg_z_min,

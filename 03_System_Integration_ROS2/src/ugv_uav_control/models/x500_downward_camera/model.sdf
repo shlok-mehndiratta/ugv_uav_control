@@ -63,7 +63,11 @@
     </plugin>
 
     <plugin filename="gz-sim-velocity-control-system" name="gz::sim::systems::VelocityControl">
-      <topic>cmd_vel</topic>
+      <!-- Unique per-model topic. A bare "cmd_vel" collided with the turtlebot's
+           global /cmd_vel (DiffDrive), so the UAV silently mirrored the UGV's drive
+           commands instead of obeying the ancillary. Match the bridged topic so the
+           tube-MPC/ancillary actually actuates the UAV (all axes, incl. vertical). -->
+      <topic>/model/uav/cmd_vel</topic>
     </plugin>
   </model>
 </sdf>
