@@ -26,14 +26,16 @@ This repository presents a unified research framework for autonomous multi-agent
 ---
 
 ## Result Verification Matrix
-The following table summarizes the integrated performance of the full framework against the baseline.
+The following table summarizes the integrated performance comparison between the continuous baseline (C1), standard reactive event-triggered Tube-MPC (C2), and the proposed Belief-MPC (C3) under nominal conditions:
 
-| Metric | Baseline | Full System | Improvement |
+| Metric | C1 (Continuous MPC) | C2 (Reactive Tube-MPC) | C3 (Proposed Belief-MPC) |
 | :--- | :--- | :--- | :--- |
-| Mean Tracking Error | 1.037 m | **0.463 m** | **-55.3%** |
-| ArUco Visibility | 46.3% | **87.0%** | **+87.9%** |
-| MPC Solve Time | ~50.0 ms | **~16.0 ms** | **3.1x Faster** |
-| Tube Stability | Standard | **RPI-Bounded** | **Robust** |
+| **Number of Replans** | 1,102 | 105 | **99 (-91.0%)** |
+| **Mean Tracking Offset** | 0.6395 m | 0.4811 m | 0.6888 m |
+| **Max Tracking Offset** | 1.0458 m | 0.5774 m | 1.1232 m |
+| **Control Jerk** | 0.0195 | 0.0151 | 0.0286 |
+| **Mean Covariance Trace $tr(\Sigma)$** | 0.0067 | 0.0065 | 0.0065 |
+| **ArUco Visibility** | 100.0% | 100.0% | 100.0% |
 
 ---
 
