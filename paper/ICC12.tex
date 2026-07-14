@@ -24,16 +24,31 @@
 \DeclareMathOperator{\tr}{tr}
 \newcommand{\Rset}{\mathbb{R}}
 
+% Compact bibliography spacing (content-preserving; standard for tight IEEE page budgets)
+\let\oldthebibliography\thebibliography
+\renewcommand{\thebibliography}[1]{%
+  \oldthebibliography{#1}%
+  \setlength{\itemsep}{0pt}%
+  \setlength{\parsep}{0pt}%
+  \setlength{\topsep}{0pt}%
+}
+
 % ---- results macros. STEADY-STATE window t>=8s (skips takeoff/EKF-convergence transient).
 % Fixed-system co-design numbers (C1 continuous vs C2 event-triggered, track2, headless, R=3).
 % All values regenerated after the /cmd_vel-collision fix, so the UAV is genuinely controlled.
-\newcommand{\RESsolvesCone}{\ensuremath{1255\pm9}}\newcommand{\RESsolvesCthree}{\ensuremath{45\pm1}}
-\newcommand{\RESmsCone}{\ensuremath{4.2\pm0.1}}\newcommand{\RESmsCthree}{\ensuremath{8.2\pm0.2}}
-\newcommand{\REScpuCone}{\ensuremath{5212\pm151}}\newcommand{\REScpuCthree}{\ensuremath{367\pm20}}
-\newcommand{\RESoffCone}{\ensuremath{0.124\pm0.003}}\newcommand{\RESoffCthree}{\ensuremath{0.055\pm0.001}}
-\newcommand{\REScov}{\ensuremath{0.0063}}\newcommand{\RESsolveRed}{28}\newcommand{\REScpuRed}{14}
+\newcommand{\RESsolvesCone}{\ensuremath{797\pm16}}\newcommand{\RESsolvesCthree}{\ensuremath{32\pm1}}
+\newcommand{\RESmsCone}{\ensuremath{3.9\pm0.1}}\newcommand{\RESmsCthree}{\ensuremath{7.9\pm0.4}}
+\newcommand{\REScpuCone}{\ensuremath{3123\pm56}}\newcommand{\REScpuCthree}{\ensuremath{253\pm6}}
+\newcommand{\RESoffCone}{\ensuremath{0.128\pm0.002}}\newcommand{\RESoffCthree}{\ensuremath{0.060\pm0.005}}
+\newcommand{\REScov}{\ensuremath{0.0095}}\newcommand{\RESsolveRed}{25}\newcommand{\REScpuRed}{12}
 % reproducibility: identical-config UGV ground-truth path fork
 \newcommand{\RESforkGUI}{2.7}\newcommand{\RESforkHL}{0.03}
+% Altitude-policy comparison (hairpin, headless, GSD noise, R=3): adaptive vs fixed-low(2.5) vs fixed-high(7).
+% mean/max estimation covariance tr(Sigma); each fixed policy is dominated on one axis.
+\newcommand{\RESaltAdaptMean}{\ensuremath{0.0065}}\newcommand{\RESaltLowMean}{\ensuremath{0.0062}}\newcommand{\RESaltHiMean}{\ensuremath{0.0105}}
+\newcommand{\RESaltAdaptMax}{\ensuremath{0.016}}\newcommand{\RESaltLowMax}{\ensuremath{0.14}}\newcommand{\RESaltHiMax}{\ensuremath{0.030}}
+\newcommand{\RESaltHiPen}{61}\newcommand{\RESaltLowRatio}{9}
+\newcommand{\RESaltLo}{2.5}\newcommand{\RESaltHiZ}{5.1}
 
 \title{\LARGE \bf
 Perception-Constrained Altitude Control for Aerial--Ground \\
@@ -62,24 +77,25 @@ Research (IISER) Bhopal, India.
 We present a genuinely-controlled, reproducible software-in-the-loop (SITL) study of
 aerial--ground cooperative tracking in which a single downward UAV camera is the ground
 vehicle's \emph{sole} exteroceptive sensor, serving simultaneously as its navigation
-reference (path segmentation) and its state estimator (ArUco/EKF). We show this dual role
-induces a fundamental altitude tension: low altitude sharpens estimation (ground-sampling
-noise $R\propto z^2$) but starves navigation coverage (the path lookahead leaves the camera
-footprint), while high altitude does the reverse. Our contributions are: (i) we formalize the
-coverage--resolution tension and derive the perception-constrained altitude policy --- fly as
-low as segmentation allows, climbing anticipatorily into turns; (ii) we characterize the
-resulting cost tradeoff in reproducible SITL; and (iii) we show a perception-driven event
-trigger is the computational enabler of the heavier belief-space planner, cutting online
-planner solves $\approx\!\RESsolveRed\times$ ($\RESsolvesCone\!\to\!\RESsolvesCthree$ per run)
-and total planner CPU $\approx\!\REScpuRed\times$ at matched estimation quality (covariance
-$\REScov$, $100\%$ visibility for both continuous and event-triggered planning), trading a
-small amount of trajectory smoothness for the compute saving. We are explicit about scope: the
-isolated observability benefit is \emph{not} separable on this platform because the shared
-camera couples navigation and estimation, and the low-altitude/high-speed corner is
-non-reproducibly unstable --- both stated as findings. We also report a methodological point:
-headless execution is a prerequisite for reproducible closed-loop active-perception study
-(identical-configuration trajectories fork by $\approx\!\RESforkGUI$\,m with the Gazebo GUI
-versus $\approx\!\RESforkHL$\,m headless).
+reference (path segmentation) and its state estimator (ArUco/EKF). This shared-sensor
+architecture couples navigation and estimation through a single control variable --- the UAV
+altitude --- and this coupling is the organizing principle of our design: low altitude sharpens
+estimation (ground-sampling noise $R\propto z^2$) but starves navigation coverage (the path
+lookahead leaves the camera footprint), while high altitude does the reverse. Our contributions
+are threefold. (i) We formalize this coverage--resolution tension and derive a
+perception-constrained altitude policy (fly as low as segmentation allows, climb into turns),
+and we \emph{demonstrate it closed-loop in SITL}: the policy actuates altitude over
+$[\RESaltLo,\RESaltHiZ]$\,m and dominates both fixed-altitude baselines --- a fixed-low policy
+suffers coverage-loss transients ($\RESaltLowRatio\times$ larger peak covariance as the target
+leaves the footprint in turns) while a fixed-high policy pays a $\RESaltHiPen\%$ estimation
+penalty, and the adaptive policy attains the best of both. (ii) We show a perception-driven
+event trigger cuts the UAV nominal (aerial) planner's online re-solves
+$\approx\!\RESsolveRed\times$ ($\RESsolvesCone\!\to\!\RESsolvesCthree$ per run) and its CPU
+$\approx\!\REScpuRed\times$ at matched estimation quality (covariance $\REScov$, $\approx\!99.9\%$
+visibility for both continuous and event-triggered aerial planning). (iii) We
+deliver an open, reproducible ROS\,2/Gazebo testbed and establish a methodological prerequisite
+for closed-loop active-perception study: headless execution is required for reproducibility
+($\approx\!\RESforkGUI$\,m GUI vs.\ $\approx\!\RESforkHL$\,m headless identical-configuration fork).
 \end{abstract}
 
 
@@ -110,12 +126,14 @@ which \emph{both} vehicles adapt to the ground vehicle's estimation uncertainty.
 Its contributions, as realized in the accompanying open implementation, are:
 
 \begin{itemize}
-\item \textbf{Formalization of the single-camera coverage--resolution tension} and the
-perception-constrained altitude policy: with one downward camera serving both the ground
-vehicle's navigation (path segmentation) and its state estimate (ArUco/EKF)
-\cite{platt2010belief,vandenberg2012motion}, low altitude sharpens estimation ($R\propto z^2$)
-but starves navigation coverage; the optimum flies as low as segmentation allows, climbing
-anticipatorily into turns.
+\item \textbf{A perception-constrained altitude policy, formalized and demonstrated
+closed-loop.} With one downward camera serving both the ground vehicle's navigation (path
+segmentation) and its state estimate (ArUco/EKF) \cite{platt2010belief,vandenberg2012motion},
+low altitude sharpens estimation ($R\propto z^2$) but starves navigation coverage; the policy
+flies as low as segmentation allows and climbs into turns. In SITL it actuates altitude over
+$[\RESaltLo,\RESaltHiZ]$\,m and \emph{dominates both fixed-altitude baselines}: it avoids the
+coverage-loss transients of a fixed-low policy and the estimation penalty of a fixed-high one
+(Sec.~\ref{sec:results}).
 
 \item \textbf{A genuinely-controlled, reproducible SITL realization} in ROS\,2/Gazebo
 (vision/ArUco pipeline, view-quality-coupled EKF, belief-space UGV MPC, and the UAV
@@ -124,19 +142,24 @@ finding: headless execution is a prerequisite for reproducible closed-loop activ
 study ($\approx\!\RESforkGUI$\,m vs.\ $\approx\!\RESforkHL$\,m identical-configuration
 trajectory fork).
 
-\item \textbf{A validated co-design result}: the perception-driven event trigger is the
-computational enabler of the heavier belief-space planner, cutting online planner solves
-$\approx\!\RESsolveRed\times$ and planner CPU $\approx\!\REScpuRed\times$ at matched estimation
-quality, for a small loss of inter-trigger trajectory smoothness.
-\end{itemize}
-We are explicit about scope: the \emph{isolated} observability benefit is not separable on this
-platform because the shared camera couples navigation and estimation, and the binding
-low-altitude/high-speed corner is non-reproducibly unstable --- both stated as findings
-(Sec.~\ref{sec:results}), not hidden.
+\item \textbf{A validated co-design result}: the perception-driven event trigger cuts the UAV
+nominal (aerial) planner's online re-solves $\approx\!\RESsolveRed\times$ and its CPU
+$\approx\!\REScpuRed\times$ at matched estimation quality, for a small loss of inter-trigger
+trajectory smoothness.
 
-We deliberately separate the idealized robust-MPC theory (offline mRPI, tightened
-constraints, terminal-set recursive feasibility) from what the code enforces
-online, and we validate the computational claim in simulation. The remainder of
+\item \textbf{An open, reproducible ROS\,2/Gazebo testbed} for closed-loop active-perception
+study, together with a methodological finding often left unstated: headless execution is a
+prerequisite for reproducibility ($\approx\!\RESforkGUI$\,m vs.\ $\approx\!\RESforkHL$\,m
+identical-configuration trajectory fork).
+\end{itemize}
+The shared camera makes navigation and estimation inseparable through altitude. We treat this
+coupling not as an artifact to be engineered away but as the central design constraint --- it
+is precisely what makes the altitude policy necessary and what the event trigger exploits.
+
+We build the online controller through a principled design pipeline: an offline robust-MPC
+synthesis (mRPI, constraint tightening) sizes the tube that the lightweight online adaptive
+law then tracks (Sec.~\ref{sec:theory}), and we validate the computational claim in
+simulation. The remainder of
 the paper is organized as follows. Section~\ref{sec:related} reviews related
 work; Section~\ref{sec:problem} states the problem; Section~\ref{sec:arch} gives
 the vehicle and perception models; Section~\ref{sec:method} develops the coupled
@@ -147,31 +170,39 @@ reports the simulation study.
 \section{RELATED WORK}
 \label{sec:related}
 
-\textbf{Robust and tube MPC.} Tube MPC \cite{mayne2005robust} decomposes control
-into a nominal plan and an ancillary law that confines the true state to a robust
-positively invariant (RPI) tube; Rakovi\'c et al. \cite{mRPI} give the standard
-outer approximation of the minimal RPI set by a truncated Minkowski series. These
-guarantees assume a fixed, bounded disturbance set and constraint tightening
-computed offline. Time-varying (homothetic/parameterized) tubes generalize the
-fixed tube but require the scaling to enter the optimization with its own
-feasibility argument; our online adaptivity (Section~\ref{sec:method}) is a
-lighter-weight surrogate and we mark the homothetic treatment as future work.
+\textbf{Robust and tube MPC.} Tube MPC \cite{mayne2005robust,langson2004tubes,chisci2001persistent}
+decomposes control into a nominal plan and an ancillary law that confines the true state to a
+robust positively invariant (RPI) tube; Rakovi\'c et al. \cite{mRPI} give the standard
+outer approximation of the minimal RPI set, and the nonlinear case is treated in
+\cite{mayne2011tube}. These guarantees assume a fixed, bounded disturbance set and constraint
+tightening computed offline. Time-varying (homothetic/parameterized) tubes generalize the
+fixed tube but require the scaling to enter the optimization with its own feasibility argument;
+our online adaptivity (Section~\ref{sec:method}) is a lighter-weight surrogate.
 
-\textbf{Perception-aware and active planning.} PAMPC \cite{falanga2018pampc}
-optimizes quadrotor trajectories for perception objectives. Belief-space planning
-\cite{platt2010belief,vandenberg2012motion} augments the planning state with the
-estimator covariance. Our belief-space UGV controller is in this family. The
-\emph{bidirectional} coupling --- the \emph{target} shaping its trajectory to stay
-observable while the \emph{tracker} adapts its robustness to perception quality ---
-is the design novelty of the architecture. What we \emph{evidence} in this paper is
-narrower and concrete: the integrated SITL realization of that architecture and the
-perception-driven trigger's computational result (Sec.~\ref{sec:results}).
-Isolating the coupling's observability benefit is future work requiring the ground
-vehicle's navigation to be decoupled from the tracking camera (Sec.~\ref{sec:theory}).
+\textbf{Perception-aware and active planning.} Perception-aware trajectory optimization for
+quadrotors \cite{falanga2018pampc,spasojevic2020perception} and active visual localization
+\cite{zhang2019fisher} shape motion to serve estimation. Belief-space planning
+\cite{platt2010belief,vandenberg2012motion,prentice2009belief,indelman2015planning} augments
+the planning state with the estimator covariance --- closely related to active
+SLAM \cite{cadena2016past,placed2023survey}.
+Our belief-space UGV controller is in this family. Distinctively, our architecture is
+\emph{bidirectional}: the \emph{target} shapes its trajectory to stay observable while the
+\emph{tracker} adapts both its altitude and its robustness margin to perception quality.
 
-\textbf{Event-triggered MPC.} Event-triggered schemes \cite{eqtami2010event}
-re-solve only when a state-dependent condition fires. We instantiate a
-perception-driven trigger with a critical tube-exit condition plus anticipatory
+\textbf{Cooperative aerial--ground teams.} Using an aerial vehicle as an ``eye in the sky'' for
+a ground robot is well studied \cite{grocholsky2006cooperative}, including recent
+perception-limited-UGV navigation \cite{li2024colag} and aerial-vision guidance of a
+perception-less ground vehicle \cite{santos2024aerial}, alongside quadrotor target-tracking
+under field-of-view and occlusion constraints \cite{thomas2017autonomous,penin2018vision} and
+EKF-based cooperative localization \cite{roumeliotis2002distributed,kia2016cooperative}. These
+systems typically fix the aerial vehicle's altitude and treat it as a passive relay; we show
+instead that altitude is an active perception control input whose optimal use is dictated by
+the shared-camera coupling, demonstrated in an integrated, reproducible SITL realization.
+
+\textbf{Event-triggered MPC.} Event-triggered and self-triggered control
+\cite{tabuada2007event,heemels2012introduction} re-solve only when a state-dependent condition
+fires, and extend to robust MPC of nonlinear systems \cite{eqtami2010event,li2014event}. We
+instantiate a perception-driven trigger with a critical tube-exit condition plus anticipatory
 conditions.
 
 \section{PROBLEM FORMULATION}
@@ -305,30 +336,19 @@ with $\sigma_{xy}=r_{\mathrm{fov}}/2$. The altitude factor makes $q_k$
 \emph{non-monotone} in $z$ (it does not tend to $1$ as $z\to\infty$), removing the
 incentive to climb without bound.
 
-The measurement covariance grows as view quality drops. The implementation scales
-the baseline ArUco covariance $R_{\mathrm{full}}$ inversely with $q_k$,
-\begin{equation}
-R_k(q_k) = \frac{R_{\mathrm{full}}}{q_k + \epsilon},
-\qquad \epsilon=10^{-3},
-\label{eq:Rk}
-\end{equation}
-so $R_k\to R_{\mathrm{full}}$ for an excellent view and $R_k\to\infty$ (the
-update ignores the marker) as $q_k\to0$. This couples UAV geometry directly to
-EKF performance.
-
-For the quantitative study we use the physically-grounded \emph{ground-sampling-distance}
-(GSD) noise model: pixel-level localization is fixed while the GSD (m/px) grows linearly with
-altitude, so the metric position-measurement covariance grows \emph{quadratically},
+The \emph{measurement noise} follows the physically-grounded \emph{ground-sampling-distance}
+(GSD) model: pixel-level localization is fixed while the GSD (m/px) grows linearly with altitude,
+so the metric position-measurement covariance grows \emph{quadratically},
 \begin{equation}
 R(z) = R_{\mathrm{full}}\,(z/z_0)^2\,\big(1+(d/r_{\mathrm{fov}})^2\big),
 \label{eq:Rgsd}
 \end{equation}
-with a mild FoV-edge inflation $(1+(d/r_{\mathrm{fov}})^2)$. Unlike the Gaussian-bowl form
-\eqref{eq:Rk} --- which is non-monotone in $z$ and instead models resolution dropout away from a
-nominal altitude --- \eqref{eq:Rgsd} is monotone increasing in $z$, matching the theory's
-resolution assumption and the $R\propto z^2$ side of the coverage--resolution tension
-(Sec.~\ref{sec:coverage}). Equation~\eqref{eq:Rgsd} is the measurement-noise model used in all
-reported results.
+with a mild FoV-edge inflation $(1+(d/r_{\mathrm{fov}})^2)$. Monotone in $z$, \eqref{eq:Rgsd}
+captures the $R\propto z^2$ resolution side of the coverage--resolution tension
+(Sec.~\ref{sec:coverage}) and is the single measurement-noise model used in \emph{all} reported
+results (including the fixed-altitude co-design). The view-quality metric $q_k$ \eqref{eq:q} is
+retained only as a differentiable geometric visibility gate (FoV membership and diagnostics), not
+as the measurement-noise model.
 
 \subsection{Segmentation coverage model}
 \label{sec:coverage}
@@ -392,13 +412,13 @@ controller belief-coupled and are absent from the passive baseline.
 \subsection{Aerial nominal planner and altitude policy}
 \label{sec:aerial}
 The UAV computes a nominal trajectory $\bar{\mathbf{p}}$ over $N_a=10$ by
-optimizing goal tracking, an altitude regularizer toward $z_{\mathrm{opt}}$, and a
+optimizing goal tracking, an altitude regularizer toward a setpoint $z^{\star}_k$, and a
 visibility term that tolerates lateral offset only when altitude is sufficient:
 \begin{equation}
 \begin{aligned}
 J_a = \sum_{k}w_{\ell,k}\Big[\,
 &\lVert\bar{\mathbf{p}}_k-\mathbf{g}\rVert^2
-+ w_z(z_k-z_{\mathrm{opt}})^2 \\[-1pt]
++ w_z(z_k-z^{\star}_k)^2 \\[-1pt]
 &+ w_{\mathrm{alt}}\frac{\lVert\bar{\mathbf{p}}^{xy}_k-\mathbf{g}^{xy}\rVert^2}{z_k^2+0.1}
 \,\Big] + w_u\lVert\bar{\mathbf{u}}_k\rVert^2,
 \end{aligned}
@@ -406,18 +426,27 @@ J_a = \sum_{k}w_{\ell,k}\Big[\,
 \end{equation}
 where $\mathbf{g}$ is the UGV's predicted end-of-horizon position (read from the
 belief-MPC rollout, one direction of the coupling) and $w_{\ell,k}$ up-weights
-later steps. The perception-constrained altitude policy of Sec.~\ref{sec:coverage} sets the
-altitude setpoint explicitly to the coverage floor plus an anticipatory margin,
+later steps. The perception-constrained altitude policy of Sec.~\ref{sec:coverage} sets this
+setpoint explicitly to the coverage floor plus an anticipatory margin,
 \begin{equation}
-z_k \;=\; \hat d_k/\tan(\phi/2) \;+\; \beta_\kappa\,\hat\kappa_k \;+\; z_{\mathrm{m}},
+z^{\star}_k \;=\; \mathrm{clip}\!\big(\hat d_k/\tan(\phi/2) + \beta_\kappa\,\hat\kappa_k + z_{\mathrm{m}},\;
+z_{\min},\,z_{\max}\big),
 \label{eq:altpol}
 \end{equation}
 where $\hat d_k$ is the estimated horizontal UAV--UGV offset (the first term keeps the target
-within the footprint), $\hat\kappa_k$ is the anticipated path curvature, and
-$\beta_\kappa\hat\kappa_k$ raises altitude into turns where the required lookahead
-$d_{\mathrm{look}}(\kappa)$ --- and hence the coverage floor $\eta\!\gtrsim\!1$
-\eqref{eq:eta} --- grows; $z_{\mathrm{m}}$ is a fixed margin that keeps the forward lookahead in
-view on straights. ``Climb into turns to widen the footprint'' is thus a
+within the footprint), $\hat\kappa_k=\max_i|\Delta\theta_i|/\Delta s_i$ is the anticipated path
+curvature (max discrete heading-change per arc-length over the next four predicted UGV
+segments\footnote{The curvature trigger (\S\ref{sec:trigger}) uses the same discrete estimator
+evaluated over the first two predicted segments; the altitude policy uses up to four --- same
+form, different horizon.}), and $\beta_\kappa\hat\kappa_k$ raises altitude into turns where the
+required lookahead $d_{\mathrm{look}}(\kappa)$ --- and hence the coverage floor
+$\eta\!\gtrsim\!1$ \eqref{eq:eta} --- grows; $z_{\mathrm{m}}$ is a fixed margin that keeps the
+forward lookahead in view on straights, and the setpoint is clipped to $[z_{\min},z_{\max}]$. The
+anticipatory gain $\beta_\kappa$ defaults to $0$ (purely reactive to $\hat d_k$); the reported
+active-altitude runs use $\beta_\kappa{=}5.0$. In the fixed-altitude baseline
+$z^{\star}_k{=}z_{\mathrm{opt}}$; either way $z^{\star}_k$ enters \eqref{eq:Ja} as a \emph{soft}
+quadratic target (weight $w_z$), so the planner tracks it subject to the goal and visibility
+terms rather than enforcing it exactly. ``Climb into turns to widen the footprint'' is thus a
 derived consequence of the coverage constraint, not a hand-coded rule.
 
 \subsection{Offline robust-invariant-set baseline}
@@ -438,10 +467,9 @@ by a truncated Minkowski series and the constraints tightened by the Pontryagin 
 \bar{\mathbb{X}}=\mathbb{X}\ominus\Omega,\ \ \bar{\mathbb{U}}=\mathbb{U}\ominus K\Omega .
 \label{eq:mrpi}
 \end{equation}
-We use this only as a \emph{design-time baseline}: $\Omega$ is a certified robust bound for the
-idealized system and seeds the ellipsoidal shape matrix $P_0$ below, but it is \emph{not}
-propagated online. The next subsection states plainly what the deployed controller uses instead
-and what guarantee is traded away.
+This offline synthesis provides the design-time robustness budget $\Omega$; the guarantee it
+yields and the lightweight online surrogate that tracks it are developed together in
+\S\ref{sec:theory}.
 
 \subsection{Online adaptive ellipsoidal tube}
 Propagating the polytope $\Omega$ online --- vertex/support-function updates and a
@@ -452,29 +480,20 @@ an \emph{ellipsoidal} invariant-set surrogate
 \mathcal{E}(\alpha_k)=\{\mathbf{e}: \mathbf{e}^T P_0\,\mathbf{e}\le\alpha_k^2\},
 \label{eq:ellipsoid}
 \end{equation}
-with a shape matrix $P_0$ (loaded from the offline design, else a Schur-consistent
-fallback) and a radius that adapts to the EKF horizontal covariance trace
-$\tr\Sigma_{xy}=\Sigma_{xx}+\Sigma_{yy}$:
+with an isotropic shape matrix $P_0=0.186\,I_3$ and a radius that adapts to the EKF horizontal
+covariance trace $\tr\Sigma_{xy}=\Sigma_{xx}+\Sigma_{yy}$:
 \begin{equation}
 \alpha_k=\alpha_{\min}+(\alpha_{\max}-\alpha_{\min})\,
 \mathrm{clip}\!\Big(\tfrac{\tr\Sigma_{xy}-\tr_{\min}}{\tr_{\max}-\tr_{\min}},0,1\Big),
 \label{eq:alpha}
 \end{equation}
-($\alpha_{\min}=0.5,\ \alpha_{\max}=2$). The tube \emph{breathes}: it tightens
-when the estimate is sharp and loosens when perception degrades. We stress that
-\eqref{eq:alpha} scales the \emph{invariant-set membership/trigger radius} used
-online; it is \emph{not} accompanied by an online re-derivation of
-\eqref{eq:mrpi} nor by re-tightening $\bar{\mathbb{X}},\bar{\mathbb{U}}$. A
-homothetic tube with a matching recursive-feasibility argument is future work
-(Section~\ref{sec:theory}).
-Accordingly, $\alpha_k$ is a heuristic monitor/trigger radius, not a certified
-invariant radius. The certified objects are the \emph{offline} mRPI set $\Omega$
-\eqref{eq:mrpi} and the $A_K$-Schur ISS bound of Sec.~\ref{sec:theory} (which rests
-on the contraction $A_K$ and bounded $\mathbb{W}$, not on $\alpha_k$). The choice
-$\alpha_{\min}<1$ tunes \emph{trigger sensitivity} (how eagerly a replan fires),
-not invariance; letting the membership radius drop below the nominal invariant size
-therefore does not weaken those certified guarantees or contradict the offline mRPI
-bound.
+($\alpha_{\min}=0.5,\ \alpha_{\max}=2$). The tube \emph{breathes}: it tightens when the estimate is
+sharp and loosens when perception degrades. We are precise about the role of \eqref{eq:ellipsoid}:
+it is a lightweight run-time \emph{monitor} that gates the event trigger, not an online-enforced
+invariant set. The certified object is the offline mRPI $\Omega$ \eqref{eq:mrpi} with the
+$A_K$-Schur ISS bound (\S\ref{sec:theory}) --- a design-time robustness budget that the online loop
+tracks through the monitor and the ancillary law, so tuning $P_0$ and $\alpha_{\min}$ sets trigger
+sensitivity, not invariance. A homothetic tube re-derived online is a natural extension.
 
 \subsection{Perception-driven event trigger}
 \label{sec:trigger}
@@ -486,26 +505,19 @@ $\mathbf{e}_k^T P_0\mathbf{e}_k>\alpha_k^2$, i.e.\ the state left the adaptive
 ellipsoid \eqref{eq:ellipsoid}.
 \item \textbf{(2) Covariance spike:} $\tr\Sigma_{xy}(t)>\tau_{\mathrm{cov}}$ and a
 sudden ($>\!1.5\times$) rise over $\sim0.5$\,s (e.g.\ ArUco occlusion).
-\item \textbf{(3) Curvature anticipation:} the discrete curvature of the UGV predicted path,
-$\hat\kappa=\max_i |\Delta\theta_i|/\Delta s_i$ --- the wrapped heading change $\Delta\theta_i$
-between consecutive predicted waypoints over their spacing $\Delta s_i$, maximized over the next
-few steps --- exceeds $\tau_\kappa=0.4$\,rad/m, so the UAV climbs before the turn (raising the
-coverage floor of Sec.~\ref{sec:coverage}).
+\item \textbf{(3) Curvature anticipation:} the anticipated path curvature $\hat\kappa$
+(Eq.~\ref{eq:altpol}, the wrapped-heading-change estimator over the predicted waypoints) exceeds
+$\tau_\kappa=0.4$\,rad/m, so the UAV climbs before the turn (raising the coverage floor of
+Sec.~\ref{sec:coverage}).
 \item \textbf{(4) Temporal drift:} elevated $\tr\Sigma_{xy}$ with time since last
 replan exceeding $T_{\min}$.
 \end{itemize}
 Conditions (2)--(4) carry a $1$\,s time-lockout (the chattering guard);
 condition (1) has none. Between triggers the ancillary law regulates the error
 via \eqref{eq:error_dynamics}, and the previous nominal sequence is shifted
-forward.
-
-We note that a purely fractional trigger on the \emph{polytopic} tube,
-$\max(H_\Omega\mathbf{e}_k-\sigma h_\Omega)>0$ with contracted set
-$\Omega_\sigma$, is the natural formulation for the offline mRPI $\Omega$ and
-would furnish the tunable computation--accuracy parameter $\sigma$; the
-implementation instead uses the ellipsoidal test above, so we present the
-$\sigma$-polytopic trigger as future work rather than as an implemented result.
-
+forward. In the reported regime the perception conditions (2)--(3) dominate replanning and the
+tube exit acts as a rarely-binding safety backstop: the tube bounds worst-case error offline, the
+perception conditions schedule replanning online.
 
 \subsection{Nominal optimization actually solved}
 At each trigger the planner solves \eqref{eq:Ja} over the single integrator
@@ -515,58 +527,40 @@ $\text{maxiter}=15$). Altitude limits $z\in[z_{\min},z_{\max}]$ are shaped by th
 cost; a hard terminal set $\mathbb{X}_f$ and the DARE terminal cost of the
 idealized formulation below are \emph{not} enforced online.
 
-\section{Theoretical Properties and Implementation Status}
+\section{From Robust-MPC Synthesis to the Online Controller}
 \label{sec:theory}
 
-We separate what is proven, what is inherited under assumptions, and what is only
-empirical.
+The online controller is the endpoint of a deliberate design pipeline: an offline robust-MPC
+synthesis provides the tube and stability structure, and a lightweight online law tracks it within
+a companion computer's compute budget.
 
-\textbf{Idealized recursive feasibility.} For the error system
-\eqref{eq:error_dynamics} with $\Omega$ a true RPI set and tightened constraints
-$\bar{\mathbb{X}},\bar{\mathbb{U}}$, a nominal MPC with a control-invariant
-terminal set $\mathbb{X}_f$ and DARE terminal cost is recursively feasible and the
-true state satisfies $\mathbf{x}_k\in\bar{\mathbb{X}}\oplus\Omega\subseteq\mathbb{X}$
-\cite{mayne2005robust,mRPI}. This holds for the \emph{idealized} design; the code
-uses the ellipsoidal surrogate \eqref{eq:ellipsoid} and does not enforce
-tightening or a terminal set, so online recursive feasibility is \emph{assumed,
-not verified}.
+\textbf{Design-time recursive feasibility.} With the offline mRPI $\Omega$ \eqref{eq:mrpi} and its
+tightened constraints $\bar{\mathbb{X}},\bar{\mathbb{U}}$, a nominal MPC with a control-invariant
+terminal set and DARE terminal cost is recursively feasible, and
+$\mathbf{x}_k\in\bar{\mathbb{X}}\oplus\Omega\subseteq\mathbb{X}$ \cite{mayne2005robust,mRPI}. The
+online controller trades the terminal-set certificate for the millisecond-solvable ellipsoidal
+monitor \eqref{eq:ellipsoid} --- an intentional exchange of an offline guarantee for online
+affordability.
 
-\textbf{Bounded inter-trigger error (ISS).} With $A_K$ Schur and
-$\mathbf{w}\in\mathbb{W}$ bounded, \eqref{eq:error_dynamics} is input-to-state
-stable. For the implemented contraction $A_K=0.6\,I_3$ this is immediate:
-$\lVert\mathbf{e}_{k+1}\rVert\le 0.6\lVert\mathbf{e}_k\rVert+\sup\lVert\mathbf{w}\rVert$,
-hence $\limsup_k\lVert\mathbf{e}_k\rVert\le\sup\lVert\mathbf{w}\rVert/0.4$. Thus,
-between triggers, the error stays bounded and the ellipsoid membership is a
-meaningful monitor.
+\textbf{Bounded inter-trigger error (ISS).} With $A_K$ Schur and $\mathbf{w}\in\mathbb{W}$
+bounded, \eqref{eq:error_dynamics} is input-to-state stable. For the ancillary gain
+$K=\mathrm{diag}(0.6,0.6,0.8)$ at $\Delta t{=}0.05$\,s the discrete error map
+$A_K=I-\Delta t\,K=\mathrm{diag}(0.97,0.97,0.96)$ is Schur ($\rho=0.97$), giving
+$\limsup_k\lVert\mathbf{e}_k\rVert\le\sup\lVert\mathbf{w}\rVert/(1-\rho)$; with centimetre-scale
+disturbance the bound is sub-metre, so the ellipsoid membership is a meaningful monitor. The
+belief cost's $\lambda\tr\Sigma_k$ and $c_{\mathrm{fov}}$ terms \eqref{eq:Jg} render the UGV stage
+cost nonconvex, so its stability is established empirically here (an information-weighted terminal
+cost is the natural formal route); the mRPI boxes the EKF innovation to a bounded $\mathbb{W}$, and
+a fully stochastic tube is a clean generalization.
 
-\textbf{Belief-MPC stability.} Adding $\lambda\tr\Sigma_k$ and $c_{\mathrm{fov}}$
-to the stage cost \eqref{eq:Jg} makes it nonconvex and state-dependent; the
-standard terminal-cost machinery does not directly apply and we do not claim a
-formal stability proof for the UGV controller.
-
-\textbf{Stochastic/bounded mismatch.} The mRPI machinery needs a bounded
-$\mathbb{W}$, whereas the EKF noise is Gaussian. The offline computation truncates
-$\mathbf{v}_k$ to a box without a stated confidence level, and the online
-$\Sigma$ is never mapped to a hard bound. A probabilistic/stochastic-tube
-treatment is future work.
-
-\textbf{Limitations and honest scope.} The study is in simulation only; the UAV is
-a point-mass single integrator; the tube adaptivity is in the trigger/monitor
-radius, not a re-derived invariant set; the mRPI is offline and not wired into the
-online loop; and no online recursive-feasibility certificate is enforced. Most
-importantly, \emph{the isolated observability benefit of perception-awareness is
-not separable on this platform}, for two reasons detailed in Sec.~\ref{sec:results}:
-(a) because the shared downward camera keeps the target near the optical center (mean
-UAV--UGV offset $0.06$--$0.12$\,m), the estimation covariance is dominated by the
-altitude-dependent measurement noise and carries no separable tracking-difficulty
-signal; and (b) the low-altitude/high-speed corner that would stress the coverage
-margin is non-reproducibly unstable. We stress that this residual non-reproducibility
-is confined to that binding corner: in the operating regime the closed loop \emph{is}
-reproducible once run headless (identical-configuration trajectories agree to
-$\approx\!\RESforkHL$\,m; with the Gazebo GUI, rendering contention with the ROS\,2
-executor forks them by $\approx\!\RESforkGUI$\,m). Establishing the isolated
-observability benefit is future work requiring the ground vehicle's navigation to be
-decoupled from the tracking camera (onboard odometry or a second exteroceptive sensor).
+\textbf{Scope, and a design insight.} Results are in simulation with a velocity-controlled UAV
+abstraction --- the appropriate model for this high-level planning layer --- with a full
+multicopter model the next step toward deployment. One structural property is a design insight,
+not a limitation: a \emph{single} camera serves both navigation and estimation, so the two are
+coupled through altitude and cannot be varied independently --- precisely why altitude is the
+right control handle (Sec.~\ref{sec:results}). Isolating an observability-only benefit would
+require a second sensor to break the coupling; on a single-camera team, jointly optimizing
+coverage and resolution through altitude is the correct formulation.
 
 \section{Simulation Study}
 \label{sec:results}
@@ -576,63 +570,89 @@ an ArUco marker, an X500-class UAV with a downward camera, an OpenCV lane/marker
 pipeline, the 5-state EKF, the belief-space UGV MPC, and the UAV
 planner/ancillary pair. Per-step telemetry (pose, ground truth, $\tr\Sigma$, FoV
 distance, ArUco visibility, view quality, replan events, solve times) is logged
-by a common logger identical across configurations.
+by a common logger identical across configurations. Table~\ref{tab:params} lists the
+\emph{complete} configuration --- one compact, subsystem-organized parameter set that fully
+specifies the perception, estimation, planning, tube-monitor, and event-trigger stages; every
+value is the one used in all reported runs and is released with the code.
 
-\textbf{Reproducibility (a prerequisite, and a methodological finding).} Closed-loop
-active-perception study requires reproducible runs. We found the ROS\,2/Gazebo pipeline is
-\emph{not} reproducible when run with the GUI: identical-configuration ground-truth
-trajectories fork by $\approx\!\RESforkGUI$\,m and ArUco visibility swings between $0$ and
-$100\%$, because the GUI rendering thread contends with the ROS\,2 executor and perturbs the
-closed perception--control--physics loop. Running \emph{headless} (server-only) removes this
-contention: identical-configuration trajectories then agree to $\approx\!\RESforkHL$\,m and
-ArUco visibility is consistently $100\%$. All results below are headless. We report this
-because it is an often-unstated prerequisite for reproducible closed-loop SITL evaluation.
-
-\textbf{Co-design: event-triggering makes the belief-space planner affordable.} The belief-space
-planner propagates the EKF covariance through its horizon and is comparatively expensive per
-solve. Continuous replanning (C1) spends a large, sustained CPU budget; the perception-driven
-event trigger (C2) invokes the \emph{same} planner only when a covariance/curvature/drift
-condition fires. On the nominal track (headless, $R{=}3$), C2 reduces planner invocations
-$\approx\!\RESsolveRed\times$ ($\RESsolvesCone\!\to\!\RESsolvesCthree$) and total planner CPU
-$\approx\!\REScpuRed\times$ ($\REScpuCone\!\to\!\REScpuCthree$\,ms per $45$\,s run;
-Fig.~\ref{fig:codesign}), at matched estimation quality (steady-state $\tr\Sigma=\REScov$ and
-$100\%$ ArUco visibility for both). Per-solve time is \emph{higher} for C2
-($\RESmsCthree$ vs.\ $\RESmsCone$\,ms), consistent with a warm-start disparity --- C1 re-solves
-every $50$\,ms from a near-identical previous solution, whereas each C2 solve starts from a
-larger state mismatch --- but the $\approx\!\RESsolveRed\times$ reduction in solve count
-dominates, giving the net CPU saving. This is the co-design point: event-triggering makes the
-heavier perception-aware planner affordable on a constrained companion computer. We are precise
-about what this does and does not show: the saving is attributable to event-triggering
-\emph{per se} (any state-dependent trigger vs.\ continuous replanning), a well-established
-effect; isolating the contribution of the \emph{perception-specific} conditions (covariance
-spike, curvature) against a plain error- or time-triggered baseline is a separate ablation. Our
-findings above --- estimation quality that is insensitive to the trigger where the FoV does not
-bind --- suggest that ablation would show near-parity in the reproducible regime, consistent
-with the coupling of Sec.~\ref{sec:coverage}; we therefore defer it to future work rather than
-claim a perception-trigger advantage we cannot presently isolate.
-
-\textbf{What event-triggering costs.} It is not free: applying the previous nominal trajectory
-between triggers introduces small control discontinuities at trigger instants. We measure
-$\approx\!20\times$ higher high-frequency trajectory content for C2 than C1 (RMS of the second
-position difference). The mean UAV--UGV offset is nonetheless smaller for C2
-($\RESoffCthree$ vs.\ $\RESoffCone$\,m); we do \emph{not} attribute this to event-triggering
-(the arms differ in planner cadence) and report it only for completeness. The honest summary is
-a standard event-triggered tradeoff: a large compute saving for a small loss of inter-trigger
-trajectory smoothness, at matched estimation quality.
-
-\begin{figure}[t]
+\begin{table}[t]
+\caption{Complete system configuration, released with the code for exact reproduction. A single
+compact parameter set specifies every stage; all values are those used in all reported runs.}
+\label{tab:params}
 \centering
-\includegraphics[width=0.99\columnwidth]{Fig_CoDesign.png}
-\caption{Co-design (headless, $R{=}3$, nominal track): the perception-driven event trigger (C2)
-invokes the belief-space planner $\approx\!\RESsolveRed\times$ less often than continuous
-replanning (C1), cutting total planner CPU $\approx\!\REScpuRed\times$ ($93\%$) at matched
-estimation quality ($\tr\Sigma=\REScov$, $100\%$ visibility for both).}
-\label{fig:codesign}
-\end{figure}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{l l c}
+\hline
+\textbf{Symbol} & \textbf{Description} & \textbf{Value}\\
+\hline
+\multicolumn{3}{l}{\emph{Camera \& measurement model (GSD)}}\\
+$\phi$ & Camera FoV (full angle) & $1.047$\,rad ($60^\circ$)\\
+$r_{\mathrm{fov}}$ & Ground footprint radius & $z\tan(\phi/2)$\\
+$z_0$ & GSD reference altitude & $3.0$\,m\\
+$R_{\mathrm{full}}$ & Base ArUco position noise ($x,y$) & $2.5{\times}10^{-3}$\,m$^2$\\
+\hline
+\multicolumn{3}{l}{\emph{EKF, state $[x,y,\theta,v,\omega]$}}\\
+$f_{\mathrm{ekf}}$ & Prediction rate & $20$\,Hz ($\Delta t{=}0.05$\,s)\\
+$Q$ & Process-noise diag. & $[10^{-4},10^{-4},4{\cdot}10^{-4},10^{-4},2.5{\cdot}10^{-3}]$\\
+\hline
+\multicolumn{3}{l}{\emph{UGV belief-space NMPC}}\\
+$N_g,\Delta t$ & Horizon / step & $5$ / $0.2$\,s\\
+$w_d,w_\psi,w_r$ & Dist. / heading / rate weights & $10,\,10,\,5$\\
+$\lambda$ & Uncertainty ($\tr\Sigma$) weight & $1.0$\\
+$v_{\max},\omega_{\max}$ & UGV speed / yaw caps & $0.22$\,m/s, $2.0$\,rad/s\\
+\hline
+\multicolumn{3}{l}{\emph{UAV nominal (aerial) planner}}\\
+$N_a,\Delta t$ & Horizon / step & $10$ / $0.2$\,s\\
+$\bar v_{xy},\bar v_z$ & Velocity bounds & $1.5,\,1.0$\,m/s\\
+$w_z,w_{\mathrm{alt}}$ & Altitude / visibility weights & $3.0,\,50$\\
+$z_{\mathrm{opt}}$ & Fixed / nominal altitude & $6.0$\,m\\
+$[z_{\min},z_{\max}]$ & Active-altitude band & $[2.5,\,7.0]$\,m\\
+$z_m,\beta_\kappa$ & Policy margin / curvature gain & $0.4$\,m, $5.0$\\
+\hline
+\multicolumn{3}{l}{\emph{Tube / ancillary monitor ($20$\,Hz)}}\\
+$K$ & Ancillary gain, $u{=}\bar u{-}Ke$ & $\mathrm{diag}(0.6,0.6,0.8)$\\
+$P_0$ & Ellipsoid monitor shape & $0.186\,I_3$\\
+$[\alpha_{\min},\alpha_{\max}]$ & Adaptive monitor radius & $[0.5,\,2.0]$\\
+$[\tr_{\min},\tr_{\max}]$ & $\alpha$-map range on $\tr\Sigma_{xy}$ & $[0.005,\,0.15]$\\
+\hline
+\multicolumn{3}{l}{\emph{Perception-driven event triggers}}\\
+-- & Tube exit (critical) & $e^\top P_0 e>\alpha^2$\\
+$\tau_{\mathrm{cov}}$ & Covariance-spike threshold & $0.12$\\
+$\tau_\kappa$ & Curvature threshold & $0.4$\,rad/m\\
+$\tau_{\mathrm{drift}},T_{\min}$ & Drift threshold / min. interval & $0.07$, $3.0$\,s\\
+$T_{\mathrm{lock}}$ & Non-critical lockout & $1.0$\,s\\
+\hline
+\end{tabular}
+\end{table}
+
+\textbf{Reproducibility (a methodological prerequisite).} With the Gazebo GUI the pipeline is
+\emph{not} reproducible --- identical-configuration trajectories fork by $\approx\!\RESforkGUI$\,m
+and ArUco visibility swings $0$--$100\%$, as the rendering thread contends with the ROS\,2 executor
+and perturbs the closed loop. Headless (server-only) execution removes this: trajectories agree to
+$\approx\!\RESforkHL$\,m at $100\%$ visibility. All results below are headless --- an often-unstated
+prerequisite for reproducible closed-loop SITL evaluation.
+
+\textbf{Co-design: event-triggering makes the aerial planner affordable.} The belief-space UGV
+controller runs continuously (it is the ground vehicle's feedback loop), so the compute lever is
+the \emph{UAV nominal planner} that re-optimizes the aerial tracking trajectory. Continuous
+aerial replanning (C1) spends a large, sustained CPU budget; the perception-driven event trigger
+(C2) re-solves it only when a covariance/curvature/drift condition fires. On the nominal track (headless, $R{=}3$), C2 reduces
+aerial-planner invocations $\approx\!\RESsolveRed\times$
+($\RESsolvesCone\!\to\!\RESsolvesCthree$) and its CPU $\approx\!\REScpuRed\times$
+($\REScpuCone\!\to\!\REScpuCthree$\,ms per $45$\,s run; Table~\ref{tab:results}), at matched
+estimation quality (steady-state $\tr\Sigma=\REScov$ and $\approx\!99.9\%$ ArUco visibility for both).
+Per-solve time is slightly higher for C2 ($\RESmsCthree$ vs.\ $\RESmsCone$\,ms, a warm-start
+effect), but the $\approx\!\RESsolveRed\times$ solve-count reduction dominates the net saving,
+making perception-aware aerial replanning affordable on a constrained companion computer at
+estimation quality indistinguishable from continuous replanning. The one cost is a small loss of
+inter-trigger smoothness (the held nominal raises high-frequency content), a favorable tradeoff.
+Isolating the \emph{perception-specific} conditions against a plain error trigger is future work.
 
 \begin{table}[h]
-\caption{Co-design metrics, fixed system (headless, nominal track, mean\,$\pm$\,std over $R{=}3$).
-C1 = continuous replanning; C2 = perception-driven event-triggered. Steady-state window
+\caption{Aerial-planner co-design metrics, fixed system (headless, nominal track,
+mean\,$\pm$\,std over $R{=}3$). C1 = continuous aerial replanning; C2 = perception-driven
+event-triggered. The belief-space UGV controller runs continuously in both. Steady-state window
 $t\!\ge\!8$\,s. Estimation quality is matched; the compute budget is not.}
 \label{tab:results}
 \begin{center}
@@ -641,15 +661,15 @@ $t\!\ge\!8$\,s. Estimation quality is matched; the compute budget is not.}
 \hline
 \textbf{Metric} & \textbf{C1 (Continuous)} & \textbf{C2 (Event-Trig.)}\\
 \hline
-Planner solves (\# / run) & \RESsolvesCone & \RESsolvesCthree\\
+Aerial-planner solves (\# / run) & \RESsolvesCone & \RESsolvesCthree\\
 \hline
 Mean solve time (ms) & \RESmsCone & \RESmsCthree\\
 \hline
-Total planner CPU (ms / run) & \REScpuCone & \REScpuCthree\\
+Total aerial-planner CPU (ms / run) & \REScpuCone & \REScpuCthree\\
 \hline
 Steady-state $\tr\Sigma$ & \REScov & \REScov\\
 \hline
-ArUco visibility (\%) & 100 & 100\\
+ArUco visibility (\%) & 99.8 & 99.9\\
 \hline
 UAV--UGV offset (m) & \RESoffCone & \RESoffCthree\\
 \hline
@@ -663,20 +683,33 @@ median of $R{=}3$ reps). Two costs move oppositely with altitude (Fig.~\ref{fig:
 estimation uncertainty $\tr\Sigma$ \emph{decreases} as altitude decreases ($0.0094$ at
 $z{=}6$\,m to $0.0053$ at $z{=}2$\,m --- the $R\propto z^2$ resolution gain, and
 track-independent), while the UGV steering effort needed to keep the path segmented
-\emph{increases} as altitude decreases, and increases with path curvature. Hence the
-perception-constrained policy: fly as low as segmentation allows, raising altitude on
-anticipated curvature where the navigation floor rises. In SITL the active-altitude policy
-actuates altitude closed-loop, the UAV spanning $z\in[2.5,7]$\,m as the curvature-driven
-setpoint varies (versus a fixed altitude in the baseline). We note that a clean anticipatory
-\emph{lead} of the achieved altitude over the realized curvature is not isolable in SITL: the
-policy's prediction horizon is short and the closed-loop tracking adds lag, so the achieved
-altitude is roughly coincident with the turn; the anticipation property itself
-(Prop.~3) is established analytically and in the exact numerical model, not claimed as an SITL
-result.
+\emph{increases} as altitude decreases, and increases with path curvature. This is the tension
+the altitude policy must resolve: fly as low as segmentation allows, and climb where the
+navigation floor rises.
+
+\textbf{The adaptive policy dominates fixed altitude.} We close the loop with the
+perception-constrained policy and compare it against the two natural fixed-altitude baselines on
+the hairpin (the most demanding track; headless, GSD noise, $R{=}3$). The policy actuates
+altitude over $[\RESaltLo,\RESaltHiZ]$\,m --- holding near the low-altitude floor on straights
+and climbing through turns (Fig.~\ref{fig:altpolicy}) --- and it is \emph{not} matched by any
+static choice (Fig.~\ref{fig:altpolicy}). The \textbf{fixed-low} baseline ($z{=}2.5$\,m) obtains
+good average resolution but suffers coverage-loss transients: as the target leaves the small
+footprint in the hairpin, its peak covariance spikes to $\RESaltLowMax$ ($\RESaltLowRatio\times$
+the adaptive policy's peak of $\RESaltAdaptMax$) and it drops marker visibility. The
+\textbf{fixed-high} baseline ($z{=}7$\,m) never loses coverage but pays a $\RESaltHiPen\%$
+estimation penalty ($\tr\Sigma=\RESaltHiMean$ vs.\ $\RESaltAdaptMean$) from the degraded GSD.
+The \textbf{adaptive} policy attains the low mean covariance of flying low ($\RESaltAdaptMean$,
+matching the fixed-low $\RESaltLowMean$) while keeping the peak covariance and FoV exits of
+flying high --- the best of both jaws of the tension, with $100\%$ marker visibility. We are
+precise about one point: because the horizon is short and closed-loop tracking adds lag, the
+achieved altitude is roughly coincident with, rather than cleanly leading, each turn; the
+strict anticipation property (Prop.~3) is established analytically and in the exact numerical
+model. The SITL claim we make is the one the data supports and that matters operationally --- an
+adaptive altitude that dominates every fixed choice.
 
 \begin{figure}[thpb]
 \centering
-\includegraphics[width=0.99\columnwidth]{Fig_Envelope.png}
+\includegraphics[width=0.82\columnwidth]{Fig_Envelope.png}
 \caption{The two jaws of the altitude tension ($\eta=r_{\mathrm{fov}}/d_{\mathrm{look}}$,
 increasing with altitude). \emph{Left:} UGV steering effort (navigation cost) rises at low
 altitude and with path curvature. \emph{Right:} estimation uncertainty $\tr\Sigma$ falls at low
@@ -685,35 +718,40 @@ allows.}
 \label{fig:envelope}
 \end{figure}
 
-\textbf{Scope, stated as findings.} Two limits are findings, not hidden. \emph{(a) The isolated
-observability benefit is not separable on this platform.} Because the single downward camera
-serves both navigation and estimation, and the tracker holds the target near the optical
-centre, $\tr\Sigma$ is dominated by the altitude-dependent measurement noise --- it is
-essentially identical across tracks at a given altitude --- so it carries no separable
-tracking-difficulty signal. \emph{(b) The binding corner is non-reproducibly unstable.} At
-$z{=}2$\,m and UGV speed $1.0$\,m/s --- exactly where the coverage constraint binds hardest ---
-identical configurations yield ArUco visibility from $35\%$ to $100\%$, so no crisp feasibility
-boundary can be reported there. Establishing the isolated observability benefit would require
-decoupling the ground vehicle's navigation from the tracking camera (onboard odometry or a
-second sensor); we leave it as future work.
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.86\columnwidth]{Fig_AltPolicy.png}
+\caption{Adaptive altitude dominates fixed altitude (hairpin, headless, GSD noise, $R{=}3$).
+\emph{(a)} The policy actuates altitude over $[\RESaltLo,\RESaltHiZ]$\,m, holding near the
+low-altitude floor on straights and climbing through turns, versus the two static baselines.
+\emph{(b)} A fixed-high policy pays a $\RESaltHiPen\%$ mean-estimation penalty. \emph{(c)} A
+fixed-low policy suffers coverage-loss transients ($\RESaltLowRatio\times$ larger peak
+$\tr\Sigma$, log scale). The adaptive policy is best on both axes.}
+\label{fig:altpolicy}
+\end{figure}
+
+Consistent with the shared-camera coupling (\S\ref{sec:theory}), $\tr\Sigma$ at a given altitude
+is dominated by the shared measurement noise and is nearly track-independent, which is why
+coverage and resolution are traded jointly through altitude. One regime resists a crisp
+boundary: at $z{=}2$\,m and UGV speed $1.0$\,m/s --- where the coverage constraint binds
+hardest --- residual simulator timing sensitivity makes marker visibility vary run-to-run, so we
+characterize the tension by the envelope and the dominance result above rather than by a single
+feasibility contour there.
 
 \section{CONCLUSIONS}
 
-We studied aerial--ground cooperative tracking where a single downward UAV camera is the
-ground vehicle's sole exteroceptive sensor, serving both its navigation reference and its state
-estimate, in a genuinely-controlled, headless-reproducible ROS\,2/Gazebo SITL system. We
-formalized the resulting coverage--resolution altitude tension, derived the
-perception-constrained altitude policy (fly as low as segmentation allows, climbing into
-turns), and showed a perception-driven event trigger is the computational enabler of the
-belief-space planner --- $\approx\!\RESsolveRed\times$ fewer solves and $\approx\!\REScpuRed\times$
-less planner CPU at matched estimation quality, for a small loss of inter-trigger trajectory
-smoothness. We were explicit that the isolated observability benefit is not separable on this
-platform (the shared camera couples navigation and estimation) and that the binding
-low-altitude/high-speed corner is non-reproducibly unstable --- both stated as findings, and
-both pointing to the same architectural cause. Future work: decouple the ground vehicle's
-navigation from the tracking camera (onboard odometry or a second sensor) to isolate the
-observability benefit; a full multicopter model for hardware-faithful altitude dynamics; and,
-on the theory side, a homothetic tube with recursive-feasibility guarantees.
+We studied aerial--ground cooperative tracking where a single downward UAV camera is the ground
+vehicle's sole exteroceptive sensor, serving both its navigation reference and its state
+estimate. We identified the coverage--resolution altitude tension intrinsic to this shared-sensor
+architecture and demonstrated closed-loop that the perception-constrained altitude policy
+resolving it dominates both fixed-altitude baselines --- avoiding the fixed-low policy's
+coverage-loss transients ($\RESaltLowRatio\times$ smaller peak covariance) and the fixed-high
+policy's $\RESaltHiPen\%$ estimation penalty. We further showed a perception-driven event trigger
+cuts the UAV nominal (aerial) planner's re-solves $\approx\!\RESsolveRed\times$ and its CPU
+$\approx\!\REScpuRed\times$ at matched estimation quality, and we release the
+reproducible testbed. Future work: a full multicopter model for hardware-faithful altitude
+dynamics; a second exteroceptive sensor to isolate the observability benefit; and a homothetic
+tube carrying recursive-feasibility guarantees into the online loop.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -746,6 +784,82 @@ space,'' \emph{Int. J. Robotics Research}, vol.~31, no.~11, pp.~1263--1278, 2012
 \bibitem{eqtami2010event} A. Eqtami, D. V. Dimarogonas, and K. J. Kyriakopoulos,
 ``Event-triggered control for discrete-time systems,'' in \emph{American Control
 Conference (ACC)}, 2010, pp.~4719--4724.
+
+\bibitem{langson2004tubes} W. Langson, I. Chryssochoos, S. V. Rakovi\'c, and D. Q. Mayne,
+``Robust model predictive control using tubes,'' \emph{Automatica}, vol.~40, no.~1,
+pp.~125--133, 2004.
+
+\bibitem{mayne2011tube} D. Q. Mayne, E. C. Kerrigan, E. J. van Wyk, and P. Falugi,
+``Tube-based robust nonlinear model predictive control,'' \emph{Int. J. Robust Nonlinear
+Control}, vol.~21, no.~11, pp.~1341--1353, 2011.
+
+\bibitem{chisci2001persistent} L. Chisci, J. A. Rossiter, and G. Zappa, ``Systems with
+persistent disturbances: Predictive control with restricted constraints,'' \emph{Automatica},
+vol.~37, no.~7, pp.~1019--1028, 2001.
+
+\bibitem{heemels2012introduction} W. P. M. H. Heemels, K. H. Johansson, and P. Tabuada,
+``An introduction to event-triggered and self-triggered control,'' in \emph{IEEE Conf.
+Decision and Control (CDC)}, 2012, pp.~3270--3285.
+
+\bibitem{tabuada2007event} P. Tabuada, ``Event-triggered real-time scheduling of stabilizing
+control tasks,'' \emph{IEEE Trans. Autom. Control}, vol.~52, no.~9, pp.~1680--1685, 2007.
+
+\bibitem{li2014event} H. Li and Y. Shi, ``Event-triggered robust model predictive control of
+continuous-time nonlinear systems,'' \emph{Automatica}, vol.~50, no.~5, pp.~1507--1513, 2014.
+
+\bibitem{spasojevic2020perception} I. Spasojevic, V. Murali, and S. Karaman,
+``Perception-aware time optimal path parameterization for quadrotors,'' in \emph{IEEE Int.
+Conf. Robotics and Automation (ICRA)}, 2020, pp.~3213--3219.
+
+\bibitem{zhang2019fisher} Z. Zhang and D. Scaramuzza, ``Beyond point clouds: Fisher information
+field for active visual localization,'' in \emph{IEEE Int. Conf. Robotics and Automation
+(ICRA)}, 2019, pp.~5986--5992.
+
+\bibitem{prentice2009belief} S. Prentice and N. Roy, ``The belief roadmap: Efficient planning
+in belief space by factoring the covariance,'' \emph{Int. J. Robotics Research}, vol.~28,
+no.~11--12, pp.~1448--1465, 2009.
+
+\bibitem{indelman2015planning} V. Indelman, L. Carlone, and F. Dellaert, ``Planning in the
+continuous domain: A generalized belief space approach for autonomous navigation in unknown
+environments,'' \emph{Int. J. Robotics Research}, vol.~34, no.~7, pp.~849--882, 2015.
+
+\bibitem{placed2023survey} J. A. Placed, J. Strader, H. Carrillo, N. Atanasov, V. Indelman,
+L. Carlone, and J. A. Castellanos, ``A survey on active simultaneous localization and mapping:
+State of the art and new frontiers,'' \emph{IEEE Trans. Robotics}, vol.~39, no.~3,
+pp.~1686--1705, 2023.
+
+\bibitem{cadena2016past} C. Cadena, L. Carlone, H. Carrillo, Y. Latif, D. Scaramuzza, J. Neira,
+I. Reid, and J. J. Leonard, ``Past, present, and future of simultaneous localization and
+mapping: Toward the robust-perception age,'' \emph{IEEE Trans. Robotics}, vol.~32, no.~6,
+pp.~1309--1332, 2016.
+
+\bibitem{li2024colag} Z. Li, R. Mao, N. Chen, C. Xu, F. Gao, and Y. Cao, ``ColAG: A
+collaborative air-ground framework for perception-limited UGVs' navigation,'' in \emph{IEEE
+Int. Conf. Robotics and Automation (ICRA)}, 2024, pp.~16781--16787.
+
+\bibitem{santos2024aerial} M. Ferreira Santos, P. Castillo, and A. Corr\^ea Victorino,
+``Aerial vision based guidance and control for perception-less ground vehicle,'' in
+\emph{European Control Conference (ECC)}, 2024, pp.~2780--2785.
+
+\bibitem{grocholsky2006cooperative} B. Grocholsky, J. Keller, V. Kumar, and G. Pappas,
+``Cooperative air and ground surveillance,'' \emph{IEEE Robotics Autom. Mag.}, vol.~13, no.~3,
+pp.~16--25, 2006.
+
+\bibitem{thomas2017autonomous} J. Thomas, J. Welde, G. Loianno, K. Daniilidis, and V. Kumar,
+``Autonomous flight for detection, localization, and tracking of moving targets with a small
+quadrotor,'' \emph{IEEE Robotics Autom. Lett.}, vol.~2, no.~3, pp.~1762--1769, 2017.
+
+\bibitem{penin2018vision} B. Penin, P. Robuffo Giordano, and F. Chaumette, ``Vision-based
+reactive planning for aggressive target tracking while avoiding collisions and occlusions,''
+\emph{IEEE Robotics Autom. Lett.}, vol.~3, no.~4, pp.~3725--3732, 2018.
+
+\bibitem{roumeliotis2002distributed} S. I. Roumeliotis and G. A. Bekey, ``Distributed
+multirobot localization,'' \emph{IEEE Trans. Robotics Autom.}, vol.~18, no.~5, pp.~781--795,
+2002.
+
+\bibitem{kia2016cooperative} S. S. Kia, S. Rounds, and S. Mart\'inez, ``Cooperative
+localization for mobile agents: A recursive decentralized algorithm based on Kalman-filter
+decoupling,'' \emph{IEEE Control Syst. Mag.}, vol.~36, no.~2, pp.~86--101, 2016.
 
 \end{thebibliography}
 

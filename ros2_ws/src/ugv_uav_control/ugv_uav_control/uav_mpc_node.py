@@ -73,6 +73,9 @@ class UAVMPCNode(Node):
         self.create_subscription(Pose, '/uav_gps_pose', self.uav_callback, 10)
         self.create_subscription(PoseWithCovarianceStamped, '/belief_state', self.belief_callback, 10)
         self.create_subscription(Path, '/ugv_predicted_traj', self.traj_callback, 10)
+        # This aerial nominal planner is the event-triggered planner in the co-design: it
+        # re-solves only when the ancillary fires /uav_replan_trigger (vs. every cycle in the
+        # continuous baseline). The belief-space UGV controller is separate and runs continuously.
         self.create_subscription(Bool, '/uav_replan_trigger', self.replan_trigger_callback, 10)
         
         # === PUBLISHERS ===

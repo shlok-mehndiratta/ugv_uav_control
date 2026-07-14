@@ -1,0 +1,36 @@
+experiment: cga_fixedhi_r3
+total_samples: 386
+total_replans: 32
+ugv_dist_traveled: 10.0555
+uav_dist_traveled: 8.1706
+mean_ugv_solve_ms: 26.8855
+mean_uav_solve_ms: 6.0448
+mean_tracking_error: 0.0546
+max_tracking_error: 0.1954
+control_smoothness: 0.0199
+mean_cov_trace: 0.0105
+max_cov_trace: 0.0246
+mean_uav_z: 7.0000
+min_uav_z: 7.0000
+max_uav_z: 7.0000
+fov_exit_pct: 0.0000
+aruco_visible_pct: 100.0000
+aruco_dropouts: 1
+max_dropout_s: 6.3385
+
+--- Trigger Breakdown ---
+Curvature (0.41): 3
+Curvature (0.42): 2
+Curvature (0.45): 2
+Curvature (0.46): 2
+Curvature (0.55): 1
+Curvature (0.59): 2
+Curvature (0.62): 2
+Curvature (0.65): 1
+Curvature (0.66): 2
+Curvature (0.72): 1
+Curvature (0.73): 1
+Curvature (0.80): 1
+Curvature (0.90): 1
+Curvature (1.02): 1
+Plan Expiry: 8

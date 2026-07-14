@@ -70,20 +70,15 @@ class UAVAncillaryNode(Node):
         else:
             self.c1_baseline = bool(c1_val)
         
-        # === TUBE PARAMS ===
-        # Load from scratch directory where we computed them
-        params_path = "/home/shlok-mehndiratta/.gemini/antigravity/scratch/tube_params.npz"
-        if os.path.exists(params_path):
-            data = np.load(params_path)
-            self.K = data['K']
-            self.P_0 = data['P_0']
-            self.get_logger().info(f"Loaded tube params: K={self.K.diagonal()}, P_0_eig={np.linalg.eigvals(self.P_0)[0]:.2f}")
-        else:
-            self.get_logger().warn(f"Tube params NOT FOUND at {params_path}! Using tuned fallback.")
-            # Tuned fallback gains (reduced to prevent chattering)
-            self.K = np.diag([0.6, 0.6, 0.8])
-            self.P_0 = np.eye(3) * 0.186
-            
+        # === TUBE PARAMS (ancillary feedback gain K + ellipsoidal monitor shape P_0) ===
+        # These are the values used in ALL reported runs. P_0 is an isotropic run-time
+        # monitor for the tube-exit trigger (e^T P_0 e <= alpha^2); the offline mRPI is a
+        # design-time robustness budget (see paper Sec. VI) and is NOT wired into the online
+        # loop. K is tuned to keep the ancillary velocity correction from chattering.
+        # To use an offline-fitted shape matrix, load it here and assign self.P_0 / self.K.
+        self.K = np.diag([0.6, 0.6, 0.8])   # u_anc = u_bar - K e  (velocity correction)
+        self.P_0 = np.eye(3) * 0.186        # isotropic ellipsoid monitor
+
         # === STATE VARIABLES ===
         self.uav_pos = None      # Actual state
         self.nominal_traj = None # Path (N+1 poses)
@@ -103,6 +98,10 @@ class UAVAncillaryNode(Node):
         
         # === PUBLISHERS ===
         self.cmd_pub = self.create_publisher(Twist, '/model/uav/cmd_vel', 10)
+        # Perception-driven event trigger. NOTE: this gates the UAV NOMINAL (aerial) planner
+        # (uav_mpc_node) only. The belief-space UGV controller (belief_mpc_node) publishes the
+        # UGV /cmd_vel and runs continuously (it is the ground vehicle's feedback loop); it is
+        # not gated by this trigger. The co-design compute saving is on the aerial planner.
         self.replan_pub = self.create_publisher(Bool, '/uav_replan_trigger', 10)
         self.reason_pub = self.create_publisher(String, '/uav_replan_reason', 10)
         # === TIMER (20Hz) ===

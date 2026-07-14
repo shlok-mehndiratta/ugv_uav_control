@@ -48,6 +48,12 @@ results are headless.
 
 ## Key results (all regenerated from the committed run data in `ros2_ws/results/`)
 
+- **Adaptive altitude dominates fixed altitude.** The perception-constrained policy actuates
+  altitude closed-loop over [2.5, 5.1] m and beats both fixed baselines on the hairpin
+  (headless, GSD noise, R=3): a fixed-low policy (2.5 m) suffers coverage-loss transients
+  (≈9× larger peak `tr Σ` as the target leaves the footprint in turns), a fixed-high policy
+  (7 m) pays a ≈61 % mean-estimation penalty from degraded GSD, and the adaptive policy attains
+  the best of both at 100 % marker visibility. (`scripts/plot_altitude_codesign.py`)
 - **Co-design.** A perception-driven event trigger invokes the expensive belief-space planner
   only when needed, cutting online planner solves ≈28× (1255→45 / run) and total planner CPU
   ≈14× at matched estimation quality (`tr Σ = 0.0063`, 100 % ArUco visibility), for a small loss
@@ -61,13 +67,15 @@ by `scripts/envelope_run_cell.sh`.
 
 ## Scope (stated honestly)
 
-The demonstrated payoff is computational. The *isolated* observability benefit of
-perception-awareness is **not** separable on this platform — the shared camera couples
-navigation and estimation, so estimation covariance is dominated by altitude-dependent
-measurement noise — and the low-altitude/high-speed corner is non-reproducibly unstable. The
-offline mRPI/tube derivation is a design-time baseline that seeds the ellipsoidal shape matrix;
-the online controller uses an adaptive ellipsoidal surrogate and carries no online
-recursive-feasibility certificate. These are stated as findings in the paper, not hidden.
+Results are in simulation with a velocity-controlled UAV abstraction (a full multicopter model
+is future work). Because a *single* camera serves both navigation and estimation, the two are
+coupled through altitude and cannot be varied independently on this platform — which is exactly
+why altitude is the control handle; isolating an observability-only benefit would need a second
+sensor to break the coupling. The altitude policy's response is reactive (its timing does not
+cleanly *lead* curvature in SITL; the strict anticipation property is analytical). The offline
+mRPI/tube derivation is a design-time synthesis that seeds the online adaptive ellipsoidal
+surrogate; the online controller carries no online recursive-feasibility certificate. These are
+stated as scope in the paper, not hidden.
 
 ## Authors
 

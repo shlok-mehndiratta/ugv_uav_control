@@ -1,0 +1,39 @@
+experiment: cga_adaptive
+total_samples: 389
+total_replans: 30
+ugv_dist_traveled: 9.1790
+uav_dist_traveled: 8.5572
+mean_ugv_solve_ms: 26.8066
+mean_uav_solve_ms: 11.3386
+mean_tracking_error: 0.0555
+max_tracking_error: 0.5710
+control_smoothness: 0.0215
+mean_cov_trace: 0.0065
+max_cov_trace: 0.0134
+mean_uav_z: 3.1204
+min_uav_z: 2.4939
+max_uav_z: 5.0805
+fov_exit_pct: 0.0000
+aruco_visible_pct: 100.0000
+aruco_dropouts: 1
+max_dropout_s: 6.0885
+
+--- Trigger Breakdown ---
+Curvature (0.40): 2
+Curvature (0.41): 2
+Curvature (0.42): 1
+Curvature (0.43): 2
+Curvature (0.44): 1
+Curvature (0.45): 2
+Curvature (0.49): 1
+Curvature (0.52): 2
+Curvature (0.53): 1
+Curvature (0.57): 1
+Curvature (0.60): 1
+Curvature (0.63): 1
+Curvature (0.75): 1
+Curvature (0.79): 1
+Curvature (0.90): 1
+Curvature (1.09): 1
+Curvature (1.35): 1
+Plan Expiry: 7

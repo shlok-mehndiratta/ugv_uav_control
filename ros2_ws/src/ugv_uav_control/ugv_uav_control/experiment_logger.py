@@ -303,6 +303,12 @@ class ExperimentLogger(Node):
                 'uav_dist_traveled': uav_dist_traveled,
                 'mean_ugv_solve_ms': np.mean(self.ugv_solve_times) * 1000 if self.ugv_solve_times else 0,
                 'mean_uav_solve_ms': np.mean(self.uav_solve_times) * 1000 if self.uav_solve_times else 0,
+                # Reproducible co-design metric (measurement-only; no control-law change):
+                # #optimizer calls and summed wall-time for each planner.
+                'ugv_solve_count': len(self.ugv_solve_times),
+                'uav_solve_count': len(self.uav_solve_times),
+                'total_ugv_cpu_ms': float(np.sum(self.ugv_solve_times)) * 1000 if self.ugv_solve_times else 0,
+                'total_uav_cpu_ms': float(np.sum(self.uav_solve_times)) * 1000 if self.uav_solve_times else 0,
                 'mean_tracking_error': np.mean(tracking_errors),
                 'max_tracking_error': np.max(tracking_errors),
                 'control_smoothness': (
