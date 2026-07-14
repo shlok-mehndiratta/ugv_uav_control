@@ -575,56 +575,57 @@ by a common logger identical across configurations. Table~\ref{tab:params} lists
 specifies the perception, estimation, planning, tube-monitor, and event-trigger stages; every
 value is the one used in all reported runs and is released with the code.
 
-\begin{table}[t]
-\caption{Complete system configuration, released with the code for exact reproduction. A single
+\begin{table*}[t]
+\caption{Complete system configuration, released with the code for exact reproduction. One
 compact parameter set specifies every stage; all values are those used in all reported runs.}
 \label{tab:params}
 \centering
 \footnotesize
 \setlength{\tabcolsep}{4pt}
-\begin{tabular}{l l c}
+\begin{tabular}[t]{@{}l l c@{}}
 \hline
 \textbf{Symbol} & \textbf{Description} & \textbf{Value}\\
 \hline
-\multicolumn{3}{l}{\emph{Camera \& measurement model (GSD)}}\\
+\multicolumn{3}{@{}l}{\emph{Camera \& measurement model (GSD)}}\\
 $\phi$ & Camera FoV (full angle) & $1.047$\,rad ($60^\circ$)\\
 $r_{\mathrm{fov}}$ & Ground footprint radius & $z\tan(\phi/2)$\\
 $z_0$ & GSD reference altitude & $3.0$\,m\\
-$R_{\mathrm{full}}$ & Base ArUco position noise ($x,y$) & $2.5{\times}10^{-3}$\,m$^2$\\
+$R_{\mathrm{full}}$ & Base ArUco pos.\ noise ($x,y$) & $2.5{\times}10^{-3}$\,m$^2$\\
 \hline
-\multicolumn{3}{l}{\emph{EKF, state $[x,y,\theta,v,\omega]$}}\\
-$f_{\mathrm{ekf}}$ & Prediction rate & $20$\,Hz ($\Delta t{=}0.05$\,s)\\
-$Q$ & Process-noise diag. & $[10^{-4},10^{-4},4{\cdot}10^{-4},10^{-4},2.5{\cdot}10^{-3}]$\\
+\multicolumn{3}{@{}l}{\emph{EKF, state $[x,y,\theta,v,\omega]$}}\\
+$f_{\mathrm{ekf}}$ & Prediction rate & $20$\,Hz ($\Delta t{=}0.05$)\\
+$Q$ & Process-noise diag. & $\mathrm{diag}(1,1,4,1,25){\times}10^{-4}$\\
 \hline
-\multicolumn{3}{l}{\emph{UGV belief-space NMPC}}\\
+\multicolumn{3}{@{}l}{\emph{UGV belief-space NMPC}}\\
 $N_g,\Delta t$ & Horizon / step & $5$ / $0.2$\,s\\
-$w_d,w_\psi,w_r$ & Dist. / heading / rate weights & $10,\,10,\,5$\\
-$\lambda$ & Uncertainty ($\tr\Sigma$) weight & $1.0$\\
-$v_{\max},\omega_{\max}$ & UGV speed / yaw caps & $0.22$\,m/s, $2.0$\,rad/s\\
-\hline
-\multicolumn{3}{l}{\emph{UAV nominal (aerial) planner}}\\
-$N_a,\Delta t$ & Horizon / step & $10$ / $0.2$\,s\\
-$\bar v_{xy},\bar v_z$ & Velocity bounds & $1.5,\,1.0$\,m/s\\
-$w_z,w_{\mathrm{alt}}$ & Altitude / visibility weights & $3.0,\,50$\\
-$z_{\mathrm{opt}}$ & Fixed / nominal altitude & $6.0$\,m\\
-$[z_{\min},z_{\max}]$ & Active-altitude band & $[2.5,\,7.0]$\,m\\
-$z_m,\beta_\kappa$ & Policy margin / curvature gain & $0.4$\,m, $5.0$\\
-\hline
-\multicolumn{3}{l}{\emph{Tube / ancillary monitor ($20$\,Hz)}}\\
-$K$ & Ancillary gain, $u{=}\bar u{-}Ke$ & $\mathrm{diag}(0.6,0.6,0.8)$\\
-$P_0$ & Ellipsoid monitor shape & $0.186\,I_3$\\
-$[\alpha_{\min},\alpha_{\max}]$ & Adaptive monitor radius & $[0.5,\,2.0]$\\
-$[\tr_{\min},\tr_{\max}]$ & $\alpha$-map range on $\tr\Sigma_{xy}$ & $[0.005,\,0.15]$\\
-\hline
-\multicolumn{3}{l}{\emph{Perception-driven event triggers}}\\
--- & Tube exit (critical) & $e^\top P_0 e>\alpha^2$\\
-$\tau_{\mathrm{cov}}$ & Covariance-spike threshold & $0.12$\\
-$\tau_\kappa$ & Curvature threshold & $0.4$\,rad/m\\
-$\tau_{\mathrm{drift}},T_{\min}$ & Drift threshold / min. interval & $0.07$, $3.0$\,s\\
-$T_{\mathrm{lock}}$ & Non-critical lockout & $1.0$\,s\\
+$w_d,w_\psi,w_r$ & Dist.\ / head.\ / rate wts & $10,10,5$\\
+$\lambda$ & Uncertainty weight & $1.0$\\
+$v_{\max},\omega_{\max}$ & UGV speed / yaw caps & $0.22$\,m/s, $2.0$\\
 \hline
 \end{tabular}
-\end{table}
+\hfill
+\begin{tabular}[t]{@{}l l c@{}}
+\hline
+\textbf{Symbol} & \textbf{Description} & \textbf{Value}\\
+\hline
+\multicolumn{3}{@{}l}{\emph{UAV nominal (aerial) planner}}\\
+$N_a,\Delta t$ & Horizon / step & $10$ / $0.2$\,s\\
+$\bar v_{xy},\bar v_z$ & Velocity bounds & $1.5,1.0$\,m/s\\
+$w_z,w_{\mathrm{alt}}$ & Altitude / visibility wts & $3.0,50$\\
+$z_{\mathrm{opt}}$ & Fixed / nominal altitude & $6.0$\,m\\
+$[z_{\min},z_{\max}]$ & Active-altitude band & $[2.5,7.0]$\,m\\
+$z_m,\beta_\kappa$ & Margin / curvature gain & $0.4$\,m, $5.0$\\
+\hline
+\multicolumn{3}{@{}l}{\emph{Tube / ancillary monitor \& triggers ($20$\,Hz)}}\\
+$K$ & Ancillary gain $u{=}\bar u{-}Ke$ & $\mathrm{diag}(.6,.6,.8)$\\
+$P_0$ & Ellipsoid monitor shape & $0.186\,I_3$\\
+$[\alpha_{\min},\alpha_{\max}]$ & Adaptive monitor radius & $[0.5,2.0]$\\
+$[\tr_{\min},\tr_{\max}]$ & $\alpha$-map range ($\tr\Sigma_{xy}$) & $[0.005,0.15]$\\
+$\tau_{\mathrm{cov}},\tau_\kappa$ & Cov.\ / curvature thresh.\ & $0.12$, $0.4$\\
+$\tau_{\mathrm{drift}},T_{\min}$ & Drift thr.\ / min.\ interval & $0.07$, $3.0$\,s\\
+\hline
+\end{tabular}
+\end{table*}
 
 \begin{figure}[t]
 \centering
