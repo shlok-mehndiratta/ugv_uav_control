@@ -565,8 +565,8 @@ coverage and resolution through altitude is the correct formulation.
 \section{Simulation Study}
 \label{sec:results}
 
-\textbf{Setup.} The system runs in Gazebo with ROS\,2: a TurtleBot3-class UGV with
-an ArUco marker, an X500-class UAV with a downward camera, an OpenCV lane/marker
+\textbf{Setup.} The system runs in Gazebo with ROS\,2 (Fig.~\ref{fig:testbed}): a TurtleBot3-class
+UGV with an ArUco marker, an X500-class UAV with a downward camera, an OpenCV lane/marker
 pipeline, the 5-state EKF, the belief-space UGV MPC, and the UAV
 planner/ancillary pair. Per-step telemetry (pose, ground truth, $\tr\Sigma$, FoV
 distance, ArUco visibility, view quality, replan events, solve times) is logged
@@ -625,6 +625,17 @@ $T_{\mathrm{lock}}$ & Non-critical lockout & $1.0$\,s\\
 \hline
 \end{tabular}
 \end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.99\columnwidth]{Fig_Testbed.png}
+\caption{The single downward camera in operation (real frame from the headless SITL system).
+\emph{(a)} A raw UAV camera image: the curved lane with the UGV's ArUco marker. \emph{(b)} The
+\emph{same} frame drives both roles --- the segmented-lane distance-transform heatmap yields the
+navigation waypoint (yellow), while the detected ArUco (green) feeds the EKF pose. This is the
+shared-sensor coupling the paper studies: one image, two jobs.}
+\label{fig:testbed}
+\end{figure}
 
 \textbf{Reproducibility (a methodological prerequisite).} With the Gazebo GUI the pipeline is
 \emph{not} reproducible --- identical-configuration trajectories fork by $\approx\!\RESforkGUI$\,m
