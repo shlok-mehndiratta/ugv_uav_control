@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """Build the 'single-camera dual-role' figure from a real captured frame:
 (a) raw UAV downward view, (b) same frame -> lane segmentation (navigation) + ArUco (estimation)."""
-import cv2, numpy as np, matplotlib
+import os, cv2, numpy as np, matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from matplotlib.patches import FancyArrowPatch
 
-SP="/tmp/claude-1000/-home-omen-CRAZYFLY-SITL-ugv-uav-control/a35db6a5-7828-43aa-a1f3-f7f81b0184ca/scratchpad"
-FR=f"{SP}/frames/live_251.png"
-OUT=f"{SP}/Fig_Testbed.png"
+# Repo-relative paths (reproducible): raw captured frame in results/, figure into paper/media/.
+HERE=os.path.dirname(os.path.abspath(__file__))
+FR=os.path.join(HERE, '..', 'results', 'testbed_frame.png')          # real captured camera frame
+OUT=os.path.join(HERE, '..', '..', 'paper', 'media', 'Fig_Testbed.png')
 
 img=cv2.imread(FR)
 crop=img[:, 95:545]           # trim the peripheral edge geometry, keep curve+marker
