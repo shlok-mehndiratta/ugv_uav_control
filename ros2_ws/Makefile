@@ -1,25 +1,21 @@
-# Reproduce the entire simulation study from scratch: build -> run sweep -> figures/table.
-# Usage:  make reproduce            (full: build, run all sims, plot)
-#         make plots                (regenerate figures/table from existing logs)
-#         make determinism          (probe simulator determinism)
-DUR ?= 45.0
+# Common reproduction tasks (run from ros2_ws/). See ../README.md for the full guide.
+#   make build      -- colcon build the workspace
+#   make figures    -- regenerate the paper figures from the committed data in results/
+#   make codesign   -- re-run the event-triggered co-design study (headless, GSD noise, R=3)
+#   make clean-logs -- remove raw console logs
+DUR ?= 60.0
 
-.PHONY: reproduce build run plots determinism clean-logs
-
-reproduce: build run plots
+.PHONY: build figures codesign clean-logs
 
 build:
 	. /opt/ros/jazzy/setup.bash && colcon build --packages-select ugv_uav_control --symlink-install
 
-run:
-	bash scripts/run_batch.sh $(DUR)
+figures:
+	python3 scripts/make_testbed_figure.py
+	python3 scripts/plot_altitude_codesign.py
 
-plots:
-	python3 scripts/plot_final_figures.py
-
-determinism:
-	bash scripts/det_test.sh
-	python3 scripts/check_determinism.py
+codesign:
+	bash scripts/run_compare.sh track2.png gcod 3 $(DUR)
 
 clean-logs:
-	rm -f results/det_run_* results/det_smoke_* results/log_det_* results/log_C*.txt
+	rm -f results/log_*.txt results/*.log

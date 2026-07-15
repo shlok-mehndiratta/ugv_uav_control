@@ -1,100 +1,67 @@
-# ROS 2 Workspace — UGV/UAV Cooperative Tracking (SITL)
+# ROS 2 Workspace — UAV–UGV Cooperative Tracking (SITL)
 
-This folder contains the complete ROS 2 and Gazebo integration for the UAV-UGV tracking mission. This is the ROS 2 / Gazebo software-in-the-loop implementation of the cooperative tracking system.
+The ROS 2 / Gazebo software-in-the-loop implementation behind the paper. For the problem
+statement, headline results, and the full reproduction guide, see the top-level
+[`README.md`](../README.md) and `paper/ICC12.pdf`.
 
-## System Architecture
+## System architecture
+
 ```mermaid
 graph TD
-    Sensors["Overhead Camera (UAV)"] --> Perception["ArUco & Lane Detection"]
-    Perception --> EKF["5-State EKF (Belief State)"]
-    EKF --> MPC["Belief-Space MPC (UGV)"]
-    EKF --> Ancillary["Ancillary Control (UAV)"]
-    MPC --> Bridge["ROS-GZ Bridge"]
+    Sensors["Overhead camera (UAV, downward)"] --> Perception["Lane segmentation + ArUco (ID 55)"]
+    Perception --> EKF["5-state EKF (belief Σ)"]
+    EKF --> MPC["Belief-space MPC (UGV /cmd_vel)"]
+    EKF --> AerialPlan["Event-triggered aerial planner (UAV)"]
+    EKF --> Ancillary["Ancillary law + altitude policy (UAV)"]
+    MPC --> Bridge["ros_gz_bridge"]
     Ancillary --> Bridge
-    Bridge --> Sim["Gazebo (TurtleBot3 + x500)"]
+    AerialPlan --> Bridge
+    Bridge --> Sim["Gazebo (TurtleBot3 UGV + x500 UAV)"]
     Sim --> Sensors
 ```
 
-## Key Implementation Details
-*   **Perception**: OpenCV-based lane centerline extraction and ArUco ID 55 tracking.
-*   **Estimation**: 5-state Extended Kalman Filter (EKF) with dynamic measurement noise ($R_k$).
-*   **Control**: 
-    *   **Belief-Space MPC**: UGV path following with observability constraints.
-    *   **Ancillary Tube-MPC**: UAV altitude and pose adaptation for FoV maintenance.
+## Nodes (`src/ugv_uav_control/ugv_uav_control/`)
 
-## Codebase Overview
-The core logic is implemented in the following nodes within `src/ugv_uav_control/ugv_uav_control/`:
-*   **`belief_mpc_node.py`**: Implements the UGV's Nonlinear MPC. It incorporates the EKF covariance trace into the cost function to moderate ground velocity based on observability quality.
-*   **`middle_path_follower.py`**: Handles the vision pipeline. It uses OpenCV to extract the lane centerline heatmap and transforms pixel coordinates to world-frame waypoints.
-*   **`uav_ancillary_node.py`**: Manages the UAV's pose and altitude adaptation. It triggers altitude increases based on UGV curvature to expand the Field-of-View.
-*   **`ekf_node.py`**: A 5-state Extended Kalman Filter that fuses ArUco detections with odometry, providing the real-time "belief state" ($\Sigma$) to the controllers.
-*   **`middle_path_follower.launch.py`**: The primary entry point. It launches the Gazebo simulation, spawns the UGV and UAV, and sets up all core control, EKF, and vision nodes.
+- **`middle_path_follower.py`** — vision pipeline: OpenCV lane-centerline extraction → world-frame
+  waypoints, plus ArUco detection (ID 55, `DICT_6X6_250`) that feeds the EKF.
+- **`ekf_node.py`** — 5-state Extended Kalman Filter fusing ArUco pose with odometry; publishes the
+  belief covariance Σ used by the controllers.
+- **`belief_mpc_node.py`** — the UGV's belief-space NMPC and its continuous `/cmd_vel` controller;
+  penalizes predicted covariance trace and field-of-view exit to moderate ground speed by
+  observability quality.
+- **`uav_mpc_node.py`** — the aerial nominal planner, invoked by the perception-driven event trigger
+  (the planner solves and CPU time reported in the co-design study, Table I).
+- **`uav_ancillary_node.py`** — the UAV ancillary law and the perception-constrained altitude policy
+  (fly as low as segmentation allows, climb into turns to preserve coverage).
+- **`middle_path_follower.launch.py`** — entry point: brings up Gazebo, spawns both vehicles, and
+  starts perception, EKF, and the controllers. Every experimental knob is a launch argument.
 
-## Comparative Evaluation Metrics
-The table below compares the continuous baseline (C1), the event-triggered Tube-MPC without the
-perception/belief trigger terms (C2), and the proposed belief-coupled, perception-triggered system (C3).
-**All numbers are regenerated from fresh logs** by `scripts/run_batch.py` + `scripts/plot_final_figures.py`
-into `results/`; the table is auto-filled by the plotting script (`results/Table_1_Summary.csv`) and should
-never be hand-edited. Run `make reproduce` (or the two scripts) to regenerate.
+Alternative UGV controllers (`pure_pursuit_node`, `stanley_node`, `mpc_node`) are included for
+comparison and selected with `controller:=`.
 
-<!-- From fresh logs: R=4 repeats x {nominal, occlusion} = 8 runs/method, 40s each.
-     err & mean-cov on t>=8s (skip takeoff transient); peak cov over injected [20,28]s window.
-     A passive-UGV "C2" is omitted: the UAV planner needs belief_mpc's /ugv_predicted_traj,
-     so a passive UGV leaves it idle -> not a valid comparison (see AUDIT_REPORT.md). -->
-Windows (shared with the paper): † = steady-state `t ≥ 8 s` (excludes takeoff/EKF-convergence transient);
-‡ = full-run peak, dominated by that initial transient — the occlusion-window peak isolates the injected occlusion.
+## Prerequisites
 
-| Metric | C1 (Continuous) | C3 (Event-Triggered) |
-| :--- | :--- | :--- |
-| Planner solves per 40 s run (#) | 331 ± 3 | **29 ± 1  (−91 %)** |
-| Mean tracking error (m) † | 0.065 ± 0.001 | 0.064 ± 0.001 |
-| Mean covariance trace tr(Σ) † | 0.0148 ± 0.0084 | 0.0148 ± 0.0084 |
-| Peak tr(Σ) (full run) ‡ | 0.245 ± 0.161 | 0.197 ± 0.166 |
-| Peak tr(Σ) (occlusion window) | 0.168 ± 0.001 | 0.170 ± 0.001 |
-| Mean UAV solve time (ms) | 6.2 ± 0.2 | 9.0 ± 0.2 |
+- Ubuntu 24.04, **ROS 2 Jazzy**, **Gazebo Harmonic** (`gz-sim` 8) with `ros_gz`.
+- Python packages in `requirements.txt` (`pip install -r requirements.txt`).
 
-## Scientific Inferences
-*   **Compute savings (robustly supported):** the event-triggered formulations reduce the number of online
-    planner solves by roughly an order of magnitude versus continuous replanning, at statistically comparable
-    tracking error. This is the headline, reproducible result.
-*   **Belief coupling (mechanism, effect scenario-dependent):** the UGV cost penalizes predicted covariance
-    trace and FoV exit, and the UAV tube radius scales with the EKF covariance. Under a benign track with no
-    FoV risk these mechanisms are largely dormant; their effect is exercised only under the adversarial
-    scenarios (injected occlusion, high curvature) — see the simulation study.
-*   **Honesty note:** the online tube is an ellipsoidal surrogate with an adaptive *trigger* radius; the
-    certified mRPI set is computed offline only and is not wired into the online loop. Do not read the adaptive
-    radius as an online recursive-feasibility guarantee.
+## Build & run
 
-## Prerequisites and Dependencies
-Ensure your environment meets the following requirements before building:
-*   **Operating System**: Linux (Ubuntu 22.04 or 24.04 recommended)
-*   **ROS 2 Distribution**: Humble or Iron
-*   **Simulator**: Gazebo Harmonic
-*   **Python Dependencies**:
-    ```bash
-    pip install numpy scipy opencv-python pandas matplotlib
-    ```
-
-## Build Instructions
-Standard ROS 2 workspace initialization:
 ```bash
-# From the ros2_ws directory
-rosdep install -i --from-path src --rosdistro $ROS_DISTRO -y
-colcon build --symlink-install --packages-select ugv_uav_control
+rosdep install -i --from-path src --rosdistro jazzy -y   # first time only
+colcon build --packages-select ugv_uav_control --symlink-install
 source install/setup.bash
+
+# Headless is required for reproducible closed-loop runs (see ../README.md):
+GZ_HEADLESS=1 ros2 launch ugv_uav_control middle_path_follower.launch.py \
+    duration:=60.0 controller:=belief_mpc use_ancillary:=true
 ```
 
-## Execution and Verification
-To launch the full tracking mission and verify the results:
-```bash
-# Launch the integrated mission
-ros2 launch ugv_uav_control middle_path_follower.launch.py \
-    duration:=60.0 \
-    controller:=belief_mpc \
-    use_ancillary:=true
-```
+Each run logs a per-step CSV and a `_summary.txt` into `results/`. The `Makefile` wraps the common
+tasks (`make build`, `make figures`, `make codesign`).
 
-The system automatically logs telemetry to the `results` directory in the workspace. Upon mission completion, a summary CSV is generated which can be used to verify the metrics reported in the Master README and the Final Project Report.
+## Note on the tube / mRPI
 
----
-*Course: LCS 334 - Linear Control Systems*
+The online tube is an ellipsoidal surrogate with an adaptive, perception-gated *trigger* radius; the
+certified mRPI set is computed offline as a design-time synthesis and is not wired into the online
+loop. The adaptive radius should not be read as an online recursive-feasibility guarantee. This is
+stated as scope in the paper.

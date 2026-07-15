@@ -10,7 +10,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 RES = os.path.join(os.path.dirname(__file__), '..', 'results')
-OUT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'paper'))
+OUT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'paper', 'media'))
 C = {'adaptive': '#1b7837', 'fixedlow': '#d6604d', 'fixedhi': '#4393c3'}
 LAB = {'adaptive': 'Adaptive', 'fixedlow': 'Fixed low (2.5 m)', 'fixedhi': 'Fixed high (7 m)'}
 

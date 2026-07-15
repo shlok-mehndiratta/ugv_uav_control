@@ -1,9 +1,10 @@
 #!/bin/bash
-# Envelope-sweep cell runner with per-track on-lane spawn. Usage: run_cell.sh <track> <z> <v> <tag>
+# Coverage-resolution envelope sweep: one (track, altitude, speed) cell with per-track on-lane spawn.
+# Fixed altitude (z_opt=z_min=Z), GSD noise model. Usage: envelope_run_cell.sh <track.png> <z> <v> <tag>
 source /opt/ros/jazzy/setup.bash >/dev/null 2>&1
-cd /home/omen/CRAZYFLY_SITL/ugv_uav_control/ros2_ws
+cd "$(dirname "$0")/.."
 source install/setup.bash >/dev/null 2>&1
-SP=/tmp/claude-1000/-home-omen-CRAZYFLY-SITL-ugv-uav-control/a35db6a5-7828-43aa-a1f3-f7f81b0184ca/scratchpad
+SP="results"                       # per-run console log lives alongside the CSV output
 export GZ_HEADLESS=1
 TRACK=$1; Z=$2; V=$3; TAG=$4
 # per-track on-lane spawn (x y yaw) from find_spawn.py

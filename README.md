@@ -5,23 +5,25 @@ downward UAV camera is the ground vehicle's only exteroceptive sensor** — serv
 navigation reference (path segmentation) *and* its state estimate (ArUco/EKF). This dual role
 induces a **coverage–resolution altitude tension**: low altitude sharpens estimation
 (ground-sampling noise `R ∝ z²`) but starves navigation coverage (the path lookahead leaves the
-camera footprint); high altitude does the reverse. We formalize this tension, derive the
-altitude policy that resolves it (fly as low as segmentation allows, climb into turns), and
-evaluate it in a genuinely-controlled, reproducible ROS 2 / Gazebo stack.
+camera footprint); high altitude does the reverse. We formalize this tension, derive the altitude
+policy that resolves it (fly as low as segmentation allows, climb into turns), and evaluate it in
+a genuinely-controlled, reproducible ROS 2 / Gazebo stack.
+
+This repository is the companion code and data for the paper (`paper/ICC12.pdf`). Everything
+reported in the paper is regenerable from the committed run data and scripts below.
 
 ## Repository layout
 
 ```
 ugv_uav_control/
-├── paper/          Manuscript (self-contained; compiles standalone / on Overleaf)
-│   ├── ICC12.tex / .pdf                 — the paper
-│   ├── theory_active_altitude.tex/.pdf  — companion theory note (Props A/B/C)
-│   ├── ieeeconf.cls                     — IEEE conference class
-│   └── Fig_*.png                        — figures used by the manuscripts
-└── ros2_ws/        ROS 2 workspace (colcon)
+├── paper/                     Manuscript (self-contained; compiles standalone / on Overleaf)
+│   ├── ICC12.tex / .pdf       — the paper
+│   ├── ieeeconf.cls           — IEEE conference class
+│   └── media/Fig_*.png        — the three figures used by the paper
+└── ros2_ws/                   ROS 2 workspace (colcon)
     ├── src/ugv_uav_control/   nodes, launch, models (UAV/UGV/ground plane), tracks
-    ├── scripts/               analysis + figure generation (spawn finder, sweep runner, …)
-    ├── results/               experiment data (per-run CSVs + summaries)
+    ├── scripts/               run + analysis + figure generation (see "Reproducing" below)
+    ├── results/               committed per-run data (CSVs + summaries) behind every claim
     ├── requirements.txt
     └── Makefile
 ```
@@ -29,53 +31,87 @@ ugv_uav_control/
 
 ## Build & run
 
-Requires ROS 2 Jazzy and Gazebo (Harmonic / `gz-sim` 8). From the workspace:
+Requires **ROS 2 Jazzy** and **Gazebo (Harmonic / `gz-sim` 8)**, plus the Python packages in
+`ros2_ws/requirements.txt`. From the workspace:
 
 ```bash
 cd ros2_ws
 colcon build --symlink-install
 source install/setup.bash
 
-# Run a mission (headless is required for reproducible closed-loop runs — see below):
+# One mission (headless is required for reproducible closed-loop runs — see note below):
 GZ_HEADLESS=1 ros2 launch ugv_uav_control middle_path_follower.launch.py \
     experiment_name:=demo duration:=45
 ```
 
-**Reproducibility (important).** Run **headless** (`GZ_HEADLESS=1`). With the Gazebo GUI, the
-rendering thread contends with the ROS 2 executor and forks identical-configuration trajectories
-by ≈2.7 m (and randomly starves the camera); headless runs agree to ≈0.03 m. All reported
-results are headless.
+Each run writes a per-step CSV and a `_summary.txt` into `ros2_ws/results/`. The launch file
+exposes every experimental knob as an argument (`track_name`, `active_altitude`, `z_opt`/`z_min`,
+`use_gsd_noise`, the trigger thresholds, spawn pose, …); defaults reproduce the reported regime.
 
-## Key results (all regenerated from the committed run data in `ros2_ws/results/`)
+> **Reproducibility note.** Always run **headless** (`GZ_HEADLESS=1`). With the Gazebo GUI the
+> rendering thread contends with the ROS 2 executor and forks identical-configuration
+> trajectories by ≈2.7 m (and can starve the camera); headless runs agree to ≈0.03 m. **All
+> reported results are headless.**
 
-- **Adaptive altitude dominates fixed altitude.** The perception-constrained policy actuates
-  altitude closed-loop over [2.5, 5.1] m and beats both fixed baselines on the hairpin
-  (headless, GSD noise, R=3): a fixed-low policy (2.5 m) suffers coverage-loss transients
-  (≈9× larger peak `tr Σ` as the target leaves the footprint in turns), a fixed-high policy
-  (7 m) pays a ≈61 % mean-estimation penalty from degraded GSD, and the adaptive policy attains
-  the best of both at 100 % marker visibility. (`scripts/plot_altitude_codesign.py`)
-- **Co-design.** A perception-driven event trigger invokes the expensive belief-space planner
-  only when needed, cutting online planner solves ≈28× (1255→45 / run) and total planner CPU
-  ≈14× at matched estimation quality (`tr Σ = 0.0063`, 100 % ArUco visibility), for a small loss
-  of inter-trigger trajectory smoothness.
-- **Coverage–resolution envelope.** Estimation cost falls with altitude (GSD, `R ∝ z²`) while
-  the segmentation/navigation cost rises and worsens with path curvature — the two jaws of the
-  altitude tension.
+## Reproducing the paper's results
 
-Per-track on-lane spawns are computed by `scripts/find_spawn.py`; the envelope sweep is driven
-by `scripts/envelope_run_cell.sh`.
+All three figures and the co-design table regenerate from the committed data in
+`ros2_ws/results/` (run from `ros2_ws/`, after `source install/setup.bash`):
+
+| Paper element | Data (`results/`) | Regenerate the figure |
+|---|---|---|
+| **Fig. 1** — single camera, dual role | `testbed_frame.png` | `python3 scripts/make_testbed_figure.py` → `paper/media/Fig_Testbed.png` |
+| **Fig. 2** — coverage–resolution envelope | `env_track{1,4,slalom}_z*` | plotted from the altitude/curvature sweep (fixed `z`, GSD noise) |
+| **Fig. 3** — adaptive vs. fixed altitude | `cga_{adaptive,fixedlow,fixedhi}` | `python3 scripts/plot_altitude_codesign.py` → `paper/media/Fig_AltPolicy.png` |
+| **Table I** — event-triggered co-design | `gcod_C1` (cont.), `gcod_C2` (event) | `python3 scripts/fill_paper_numbers.py gcod_C1` / `gcod_C2` |
+
+To re-run the closed-loop experiments from scratch (all headless, GSD noise model, R=3):
+
+```bash
+# Co-design (Table I): continuous baseline (C1), error-only ablation (B), full event-trigger (C2)
+scripts/run_compare.sh track2.png gcod 3 60
+
+# Altitude policy (Fig. 3) on the hairpin — adaptive vs. two fixed baselines:
+GZ_HEADLESS=1 ros2 launch ugv_uav_control middle_path_follower.launch.py \
+    experiment_name:=cga_adaptive track_name:=track_hairpin.png duration:=60 \
+    use_gsd_noise:=true active_altitude:=true                       # adaptive
+#   ... active_altitude:=false z_opt:=2.5 z_min:=2.5   → cga_fixedlow
+#   ... active_altitude:=false z_opt:=7.0 z_min:=7.0   → cga_fixedhi
+
+# Coverage-resolution envelope (Fig. 2): one (track, altitude, speed) cell at a time
+scripts/envelope_run_cell.sh track4.png 4.0 0.22 env_track4_z4.0
+```
+
+Per-track on-lane spawn poses are computed by `scripts/find_spawn.py`; track textures are
+generated by `scripts/make_tracks.py`.
+
+## Key results
+
+- **Adaptive altitude dominates fixed altitude** (hairpin, headless, GSD noise, R=3). The
+  perception-constrained policy actuates altitude closed-loop over **[2.5, 5.1] m** at **100 %
+  marker visibility**, beating both fixed baselines: a fixed-low policy (2.5 m) suffers
+  coverage-loss transients (**≈9× larger peak `tr Σ`** as the target leaves the footprint in
+  turns); a fixed-high policy pays a **≈61 % mean-estimation penalty** from degraded ground
+  sampling. (`scripts/plot_altitude_codesign.py`)
+- **Event-triggered co-design.** A perception-driven trigger invokes the expensive belief-space
+  aerial planner only when needed, cutting online planner solves **≈25× (797→32 / run)** and total
+  planner CPU **≈12×**, at **matched** estimation quality (`tr Σ = 0.0095`, 100 % ArUco
+  visibility), for a small loss of inter-trigger trajectory smoothness.
+- **Coverage–resolution envelope.** Estimation cost falls with altitude (GSD, `R ∝ z²`) while the
+  segmentation/navigation cost rises and worsens with path curvature — the two jaws of the
+  altitude tension that the policy trades off.
 
 ## Scope (stated honestly)
 
-Results are in simulation with a velocity-controlled UAV abstraction (a full multicopter model
-is future work). Because a *single* camera serves both navigation and estimation, the two are
-coupled through altitude and cannot be varied independently on this platform — which is exactly
-why altitude is the control handle; isolating an observability-only benefit would need a second
-sensor to break the coupling. The altitude policy's response is reactive (its timing does not
-cleanly *lead* curvature in SITL; the strict anticipation property is analytical). The offline
-mRPI/tube derivation is a design-time synthesis that seeds the online adaptive ellipsoidal
-surrogate; the online controller carries no online recursive-feasibility certificate. These are
-stated as scope in the paper, not hidden.
+Results are in simulation with a velocity-controlled UAV abstraction (a full multicopter model is
+future work). Because a *single* camera serves both navigation and estimation, the two are coupled
+through altitude and cannot be varied independently on this platform — which is exactly why
+altitude is the control handle; isolating an observability-only benefit would need a second sensor
+to break the coupling. The altitude policy's response is reactive (its timing does not cleanly
+*lead* curvature in SITL; the strict anticipation property is analytical). The offline mRPI/tube
+derivation is a design-time synthesis that seeds the online adaptive ellipsoidal surrogate; the
+online controller carries no online recursive-feasibility certificate. These are stated as scope
+in the paper, not hidden.
 
 ## Authors
 
