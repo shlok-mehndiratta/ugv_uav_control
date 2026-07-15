@@ -14,6 +14,7 @@
 \usepackage{comment}
 \usepackage{multirow}
 \usepackage{booktabs}
+\usepackage{url}
 % Figures live beside this .tex (self-contained); resolve locally and on Overleaf
 % when the figure files are uploaded flat to the project root (bare filenames).
 \graphicspath{{./}}
@@ -126,7 +127,8 @@ flies as low as segmentation allows and climbs into turns.
 
 \item  {A reproducible SITL realization} in ROS\,2/Gazebo
 (vision/ArUco pipeline, view-quality-coupled EKF, belief-space UGV MPC, and the UAV
-planner/ancillary pair \cite{mayne2005robust,eqtami2010event}).
+planner/ancillary pair \cite{mayne2005robust,eqtami2010event}). Code and data are openly
+available.\footnote{\url{https://github.com/shlok-mehndiratta/ugv_uav_control}}
 \end{itemize}
 The remainder of the paper is organized as follows. Section~\ref{sec:related} reviews related
 work; Section~\ref{sec:problem} states the problem; Section~\ref{sec:arch} gives
