@@ -1,0 +1,26 @@
+experiment: gcod_C1_r3
+total_samples: 389
+total_replans: 388
+ugv_dist_traveled: 8.9780
+uav_dist_traveled: 9.0051
+mean_ugv_solve_ms: 26.1947
+mean_uav_solve_ms: 3.8571
+ugv_solve_count: 779
+uav_solve_count: 817
+total_ugv_cpu_ms: 20405.6909
+total_uav_cpu_ms: 3151.2620
+mean_tracking_error: 0.0701
+max_tracking_error: 0.4484
+control_smoothness: 0.0215
+mean_cov_trace: 0.0095
+max_cov_trace: 0.0420
+mean_uav_z: 6.0000
+min_uav_z: 6.0000
+max_uav_z: 6.0000
+fov_exit_pct: 0.0000
+aruco_visible_pct: 100.0000
+aruco_dropouts: 1
+max_dropout_s: 6.0673
+
+--- Trigger Breakdown ---
+C1 Baseline Continuous: 777

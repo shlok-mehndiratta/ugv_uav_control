@@ -1,0 +1,44 @@
+experiment: env_track4_z2.0
+total_samples: 388
+total_replans: 33
+ugv_dist_traveled: 18.4128
+uav_dist_traveled: 19.2638
+mean_ugv_solve_ms: 29.6957
+mean_uav_solve_ms: 14.1814
+mean_tracking_error: 0.2432
+max_tracking_error: 0.6019
+control_smoothness: 0.1407
+mean_cov_trace: 0.0053
+max_cov_trace: 0.0093
+mean_uav_z: 2.0205
+min_uav_z: 1.9945
+max_uav_z: 2.1965
+fov_exit_pct: 0.0000
+aruco_visible_pct: 100.0000
+aruco_dropouts: 1
+max_dropout_s: 6.1247
+
+--- Trigger Breakdown ---
+Curvature (0.40): 2
+Curvature (0.41): 2
+Curvature (0.42): 5
+Curvature (0.43): 1
+Curvature (0.44): 2
+Curvature (0.45): 1
+Curvature (0.46): 1
+Curvature (0.80): 1
+Curvature (0.85): 1
+Curvature (0.87): 2
+Curvature (1.28): 1
+Curvature (1.35): 1
+Curvature (1.53): 1
+Curvature (1.61): 1
+Curvature (1.80): 1
+Curvature (1.93): 1
+Curvature (1.95): 1
+Curvature (2.02): 1
+Curvature (2.31): 1
+Curvature (2.43): 1
+Curvature (2.54): 1
+Curvature (3.13): 1
+Curvature (3.99): 1
