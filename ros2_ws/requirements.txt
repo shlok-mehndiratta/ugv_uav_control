@@ -1,0 +1,12 @@
+# Python dependencies for the ugv_uav_control nodes and the analysis/figure scripts.
+#
+# ROS 2 Jazzy provides rclpy, cv_bridge, ament_index_python, and the *_msgs packages
+# (installed via apt with the ROS distribution, not via pip). The packages below are the
+# additional third-party Python dependencies actually imported by the code in this workspace.
+
+numpy>=1.24
+scipy>=1.10
+pandas>=1.5
+matplotlib>=3.6
+opencv-python>=4.7        # cv2.aruco.ArucoDetector API (make_testbed_figure.py)
+Pillow>=9.0               # track-texture generation (make_tracks.py)
