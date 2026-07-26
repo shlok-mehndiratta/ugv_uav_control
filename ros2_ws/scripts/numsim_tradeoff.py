@@ -177,4 +177,4 @@ def E2_E3():
 if __name__ == '__main__':
     a = E1()
     E2_E3()
-    print("\nplots: /tmp/E1.png /tmp/E2.png")
+    print(f"\nplots written to {RESULTS}/ (Fig_PropA.png, Fig_PropBC.png)")

@@ -69,7 +69,7 @@ Figure/section map: Fig.1→§Intro, Fig.2→§System, Fig.3(a,b)→§C1+§Sim, 
 **Common:** headless (`GZ_HEADLESS=1`, `MPF_SHOW_WINDOW` unset), `use_gsd_noise:=true` for closed-loop runs
 (E0 uses the raw sensor, no injection), common spawn per track (from `make_standard_tracks`/mapping),
 3 reps unless noted, `/usr/bin/python3.12` for any standalone rclpy node, one sim at a time, cleanup
-between (see the validated `scratchpad/*.sh` harnesses).
+between.
 
 | Batch | Track(s) | Conditions | Reps | Runs | Metrics logged |
 |---|---|---|---|---|---|

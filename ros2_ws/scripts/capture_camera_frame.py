@@ -6,7 +6,12 @@ from rclpy.node import Node
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 
-OUT = "/tmp/claude-1000/-home-omen-CRAZYFLY-SITL-ugv-uav-control/a35db6a5-7828-43aa-a1f3-f7f81b0184ca/scratchpad/frames"
+# Output directory for captured frames. Defaults to a folder next to this script;
+# override with the FRAME_CAPTURE_DIR environment variable.
+OUT = os.environ.get(
+    "FRAME_CAPTURE_DIR",
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "captured_frames"),
+)
 os.makedirs(OUT, exist_ok=True)
 
 class Cap(Node):

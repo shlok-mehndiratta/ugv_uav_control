@@ -194,45 +194,10 @@ def plot_cov_bars():
     _save("fig_cov_bars.png", top=0.95)
 
 
-# ------------------------------------------------- Fig 6: event-triggered co-design (Prop 3)
-def _codesign_events(cond):
-    f = sorted(glob.glob(os.path.join(DATA, "table2_codesign", "gcod_%s_r1_*.csv" % cond)))[0]
-    rows = _read(f)
-    t0 = float(rows[0]["timestamp"])
-    return [float(r["timestamp"]) - t0 for r in rows
-            if r["replan_trigger"] not in ("", "nan") and abs(float(r["replan_trigger"]) - 1.0) < 1e-6]
-
-
-def plot_codesign():
-    c1, c2 = sorted(_codesign_events("C1")), sorted(_codesign_events("C2"))
-    # (a) cumulative aerial re-plans over time: C1 dense vs C2 sparse
-    plt.figure(figsize=(4, 3))
-    plt.step(c1, range(1, len(c1) + 1), where="post", linewidth=LW, color="#d62728", label="C1 (Continuous)")
-    plt.step(c2, range(1, len(c2) + 1), where="post", linewidth=LW, color="#1f4e9c", label="C2 (Event-Triggered)")
-    plt.xlabel("Time (s)", fontsize=LABEL_FS, fontweight="bold")
-    plt.ylabel("Cumulative Re-plans", fontsize=LABEL_FS, fontweight="bold")
-    _style()
-    _legend_inside("upper left")
-    _save("fig_codesign_solves.png", top=0.95)
-    # (b) C2 inter-event times: bounded away from 0 (no Zeno)
-    iet = np.diff(c2)
-    plt.figure(figsize=(4, 3))
-    plt.hist(iet, bins=np.arange(0.9, iet.max() + 0.25, 0.15), color=BLUE, edgecolor="black", linewidth=0.8)
-    plt.axvline(iet.min(), color="darkorange", linestyle="--", linewidth=2.6, dashes=(6, 4),
-                label="MIET = %.1f s" % iet.min())
-    plt.xlim(left=0)
-    plt.xlabel("Inter-event Time (s)", fontsize=LABEL_FS, fontweight="bold")
-    plt.ylabel("Count", fontsize=LABEL_FS, fontweight="bold")
-    _style()
-    _legend_inside("upper right")
-    _save("fig_codesign_miet.png", top=0.95)
-
-
 if __name__ == "__main__":
     plot_e0()
     plot_env_nav()
     plot_env_cov()
     plot_alt_trace()
     plot_cov_bars()
-    plot_codesign()
     print("done ->", MEDIA)

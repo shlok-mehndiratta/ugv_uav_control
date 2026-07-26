@@ -198,7 +198,7 @@ venue/year, (b) surface any 2024–2025 shared-sensor / altitude-active-percepti
 - **Fig. 1** Testbed — single camera, dual role (existing `Fig_Testbed1/2`).
 - **Fig. 2** System overview — TikZ (existing).
 - **Fig. 3 (NEW, the theory's evidence).** (a) **E0**: measured ArUco error vs altitude, linear fit,
-  r = 0.996 → "R ∝ z²" (already generated: `scratchpad/E0_error_vs_altitude.png`). (b) the two jaws:
+  r = 0.996 → "R ∝ z²". (b) the two jaws:
   meanCov ↓ and steering-effort ↑ vs altitude, **with error bars from reps**. This is the paper's
   empirical backbone for Prop A + the trade-off.
 - **Fig. 4 (REVISED).** Adaptive vs fixed altitude, dominance shown on **reproducible** meanCov +
@@ -214,7 +214,7 @@ venue/year, (b) surface any 2024–2025 shared-sensor / altitude-active-percepti
 **A. Data (headless, reps, error bars):**
 1. **Fig. 3b two-jaw sweep with reps** — altitude z ∈ {2,3,4,5,6,7} at a fixed elevated speed on one
    representative track (hairpin or slalom), N=3 reps, log meanCov + steering effort → error-barred
-   curves. (Harness ready: `scratchpad/pillar2_*` scripts + `envelope_run_cell.sh`.)
+   curves.
 2. **Fig. 4 revision** — re-plot adaptive vs fixed from existing `fig4_altitude` data using
    meanCov/steering, add reps if needed; drop peak panel.
 3. **(Optional, strengthens C2) perception-trigger ablation** — `error_only:=true` "B" condition vs full
