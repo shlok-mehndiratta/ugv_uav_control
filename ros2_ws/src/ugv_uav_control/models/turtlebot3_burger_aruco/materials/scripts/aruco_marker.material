@@ -6,7 +6,7 @@ material ArucoMarker/Marker
     {
       texture_unit
       {
-        texture /home/shlok-mehndiratta/turtlebot3_ws/src/ugv_uav_control/models/turtlebot3_burger_aruco/materials/textures/aruco_marker_0.png
+        texture aruco_marker_0.png
       }
     }
   }

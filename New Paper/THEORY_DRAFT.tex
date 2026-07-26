@@ -1,0 +1,283 @@
+% ============================================================================
+% THEORY_DRAFT.tex  —  Formal theory spine for the ACODS paper (REVIEW COPY).
+% Self-contained section to be reviewed, then dropped into ACODS.tex (Sec. after
+% the models / before or within the controller section). Uses the amsthm
+% environments already declared in ACODS.tex (proposition, corollary, lemma,
+% assumption, remark). Notation matches ACODS.tex:
+%   z = UAV altitude, phi = camera FoV, r_fov(z)=z tan(phi/2),
+%   d = horizontal UAV-UGV offset, R(z) = measurement covariance (eq. Rgsd),
+%   A_K = A_d - B_d K = I - dt K  (eq. error_dynamics), w_k in W bounded.
+% NOTHING here depends on the running simulations. E0 (measured R ~ z^2,
+% r=0.994, N=894) is already complete and is cited as the empirical anchor.
+% ============================================================================
+
+\section{Theoretical Analysis}
+\label{sec:theory-formal}
+
+This section formalizes the two questions a shared-camera co-design must answer:
+\emph{where to fly} (Prop.~\ref{prop:alt}, the estimation-optimal altitude) and
+\emph{when to re-plan} (Prop.~\ref{prop:iss}, inter-trigger boundedness without
+Zeno behavior). The analysis makes the coupling of Sec.~\ref{sec:coverage}
+precise and states exactly what is—and is not—guaranteed by the deployed controller.
+
+% ---------------------------------------------------------------------------
+\subsection{Standing assumptions}
+
+\begin{assumption}[Resolution model]\label{as:R}
+The position-measurement covariance follows the ground-sampling-distance law
+\eqref{eq:Rgsd}, $R(z)=\tfrac{R_0}{z_0^2}\big(z^2+\tfrac{d^2}{\tan^2(\phi/2)}\big)$,
+so for fixed offset $d$ the map $z\mapsto R(z)$ is continuous and
+\emph{strictly increasing} on $z>0$.
+\end{assumption}
+
+\begin{remark}[Empirical grounding]\label{rem:e0}
+Assumption~\ref{as:R} is not postulated but \emph{measured}. In static-hover
+trials over $z\in[2,7]$\,m (target centred, $d\!\approx\!0$; raw ArUco detections,
+no injected model), the median localization error grows linearly with altitude,
+$\mathrm{err}\approx 1.03+2.24\,z$\,mm with $\mathrm{corr}=0.997$ and
+$R^2=0.994$ ($N=894$). Since the covariance scales as the squared error,
+$R(z)\propto z^2$, confirming Assumption~\ref{as:R}; see Fig.~\ref{fig:envelope}(a).
+\end{remark}
+
+\begin{assumption}[Coverage floor]\label{as:cov}
+Lane segmentation succeeds iff the required lookahead point lies within the
+footprint, i.e.\ the coverage factor \eqref{eq:eta}
+$\eta(z,\kappa)=z\tan(\phi/2)/d_{\mathrm{look}}(\kappa)\ge 1$, where
+$d_{\mathrm{look}}(\kappa)$ is nondecreasing in the local path curvature $\kappa$.
+Equivalently, feasibility requires
+$z\ge z_{\mathrm{floor}}(\kappa):=d_{\mathrm{look}}(\kappa)/\tan(\phi/2)$,
+a curvature-nondecreasing altitude floor.
+\end{assumption}
+
+\begin{assumption}[Estimator regularity]\label{as:kf}
+The linearized UGV error model $(A,H)$ is detectable and $(A,Q^{1/2})$
+stabilizable, so the filtering discrete algebraic Riccati equation (DARE)
+\begin{equation}
+P = A P A^{\!\top}\! + Q - A P H^{\!\top}(H P H^{\!\top}\!+R)^{-1} H P A^{\!\top}
+\label{eq:dare}
+\end{equation}
+admits a unique stabilizing solution $P_\infty(R)\succeq 0$ for every $R\succ 0$.
+\end{assumption}
+
+\begin{assumption}[Bounded ancillary disturbance]\label{as:w}
+The inter-trigger disturbance in \eqref{eq:error_dynamics} is bounded,
+$w_k\in\mathbb{W}$ with $\|w_k\|_\infty\le \bar w$, and over the operating tube
+the ancillary command is unsaturated, $\|\bar u_k - K e_k\|_\infty\le u_{\max}$
+(the saturated case is addressed in Remark~\ref{rem:sat}).
+\end{assumption}
+
+% ---------------------------------------------------------------------------
+\subsection{Where to fly: estimation-optimal altitude}
+
+The key analytical lever is that the steady-state estimation error is monotone in
+the measurement noise, which lets a strictly increasing $R(z)$ be pushed through
+the Riccati solution.
+
+\begin{lemma}[DARE monotonicity in $R$]\label{lem:mono}
+Under Assumption~\ref{as:kf}, the stabilizing solution of \eqref{eq:dare} is
+monotone nondecreasing in the measurement-noise covariance: if
+$0\prec R_1\preceq R_2$ then $P_\infty(R_1)\preceq P_\infty(R_2)$; consequently
+$\operatorname{tr}P_\infty(R_1)\le\operatorname{tr}P_\infty(R_2)$.
+\end{lemma}
+
+\begin{proof}
+Write the Riccati recursion $P_{k+1}=\rho_R(P_k)$ with
+$\rho_R(P)=A P A^{\!\top}+Q-APH^{\!\top}(HPH^{\!\top}+R)^{-1}HPA^{\!\top}$ and
+$P_0=0$. Two standard facts: (i) for fixed $R$, $\rho_R$ is monotone,
+$P\preceq P'\Rightarrow\rho_R(P)\preceq\rho_R(P')$; and (ii) $\rho_R$ is monotone
+\emph{nonincreasing} in $R^{-1}$, hence monotone nondecreasing in $R$, because the
+information-form update subtracts $H^{\!\top}R^{-1}H$ and a larger $R$ subtracts
+less. Both are the comparison theorem for the discrete-time algebraic Riccati
+equation of Ran and Vreugdenhil~\cite{ranvreugdenhil1988}. Starting both
+recursions from $P_0=0$ and applying (i)–(ii) inductively gives
+$P_k(R_1)\preceq P_k(R_2)$ for all $k$; under Assumption~\ref{as:kf} both
+sequences converge to their stabilizing fixed points~\cite{andersonmoore1979},
+so $P_\infty(R_1)\preceq P_\infty(R_2)$. The trace inequality follows since
+$M\succeq0\Rightarrow\operatorname{tr}M\ge0$ applied to
+$P_\infty(R_2)-P_\infty(R_1)$.
+\end{proof}
+
+\begin{proposition}[Estimation-optimal altitude is the coverage floor]\label{prop:alt}
+Let the steady-state estimation cost be $J_{\mathrm{est}}(z)=\operatorname{tr}
+P_\infty\!\big(R(z)\big)$. Under Assumptions~\ref{as:R}--\ref{as:kf}, $J_{\mathrm{est}}$
+is nondecreasing in $z$, and the altitude that minimizes it subject to the coverage
+constraint,
+\begin{equation}
+z^\star(\kappa)=\arg\min_{z\in[z_{\min},z_{\max}]} J_{\mathrm{est}}(z)
+\quad\text{s.t.}\quad z\ge z_{\mathrm{floor}}(\kappa),
+\label{eq:altopt}
+\end{equation}
+is attained at the constraint boundary,
+$z^\star(\kappa)=\max\{z_{\min},\,z_{\mathrm{floor}}(\kappa)\}
+=\max\{z_{\min},\,d_{\mathrm{look}}(\kappa)/\tan(\phi/2)\}$.
+\end{proposition}
+
+\begin{proof}
+By Assumption~\ref{as:R}, $z\mapsto R(z)$ is strictly increasing (in the p.s.d.\
+order, since it scales a fixed positive matrix by a strictly increasing scalar).
+By Lemma~\ref{lem:mono}, $z\mapsto\operatorname{tr}P_\infty(R(z))=J_{\mathrm{est}}(z)$
+is therefore nondecreasing. Minimizing a nondecreasing function over the feasible
+interval $[\,\max\{z_{\min},z_{\mathrm{floor}}(\kappa)\},\,z_{\max}]$ attains its
+minimum at the left endpoint, which is the stated $z^\star(\kappa)$.
+\end{proof}
+
+\begin{corollary}[Climb into turns]\label{cor:climb}
+$z^\star(\kappa)$ is nondecreasing in the local curvature $\kappa$: the
+estimation-optimal altitude rises exactly where the path curves.
+\end{corollary}
+
+\begin{proof}
+By Assumption~\ref{as:cov}, $z_{\mathrm{floor}}(\kappa)=d_{\mathrm{look}}(\kappa)/
+\tan(\phi/2)$ is nondecreasing in $\kappa$; the pointwise maximum with the
+constant $z_{\min}$ in Prop.~\ref{prop:alt} preserves monotonicity.
+\end{proof}
+
+\begin{remark}[A boundary optimum, stated honestly]\label{rem:boundary}
+Prop.~\ref{prop:alt} is a \emph{boundary} optimum: because $J_{\mathrm{est}}$ has
+no interior stationary point (it is monotone, not bowl-shaped), the optimum sits
+where the coverage constraint binds. The contribution is not the monotonicity
+lemma---which is classical---but its \emph{connection} to a shared-sensor
+altitude: the measured law $R(z)\propto z^2$ (Rem.~\ref{rem:e0}) turns
+``fly as low as segmentation allows'' into the closed-form,
+curvature-scheduled setpoint \eqref{eq:altpol} that the aerial planner realizes.
+The deployed policy \eqref{eq:altpol} adds a small margin $z_{\mathrm m}$ and an
+optional anticipatory term $\beta_\kappa\hat\kappa_k$ that implements
+Cor.~\ref{cor:climb} as a feed-forward rather than waiting for the offset to grow.
+\end{remark}
+
+% ---------------------------------------------------------------------------
+\subsubsection*{When adaptation helps: dominance over fixed altitude, and its regime}
+
+Prop.~\ref{prop:alt} gives the pointwise optimum at a single curvature. The operational
+question is whether adapting altitude along a track beats the best \emph{fixed} altitude,
+and if so, when. The answer is decidable in closed form.
+
+\begin{proposition}[Adaptive dominance and its regime]\label{prop:adapt}
+Let $\kappa(t)$, $t\in[0,T]$, be the curvature profile of a traversal and let
+$J[z(\cdot)]=\tfrac1T\int_0^T g(z(t))\,dt$ be the time-averaged estimation cost, where
+$g(z):=\operatorname{tr}P_\infty(R(z))$ is nondecreasing (Lemma~\ref{lem:mono}). Over feasible
+policies $z(t)\ge z_{\mathrm{fl}}(\kappa(t)):=d_{\mathrm{look}}(\kappa(t))/\tan(\phi/2)$,
+$z(t)\in[z_{\min},z_{\max}]$:
+\begin{enumerate}\itemsep2pt
+\item[(i)] the curvature-scheduled floor
+  $z^\circ(t)=\mathrm{clip}\!\big(z_{\mathrm{fl}}(\kappa(t)),z_{\min},z_{\max}\big)$ uniquely minimizes $J$;
+\item[(ii)] any feasible \emph{constant} altitude $z_c$ obeys $z_c\ge\bar z:=\max\{z_{\min},z_{\mathrm{fl}}(\kappa_{\max})\}$, whence
+  \[
+  J[z_c]-J[z^\circ]\ \ge\ J[\bar z]-J[z^\circ]=\tfrac1T\!\int_0^T\!\big[g(\bar z)-g(z^\circ(t))\big]\,dt\ \ge 0 ;
+  \]
+\item[(iii)] the dominance is \emph{strict} --- $z^\circ$ beats every fixed altitude --- \emph{iff} the coverage
+  floor is \emph{binding}, $z_{\mathrm{fl}}(\kappa_{\max})>z_{\min}$, and \emph{non-degenerate},
+  $\kappa(t)<\kappa_{\max}$ on a set of positive measure. To first order,
+  $J[\bar z]-J[z^\circ]\approx g'(\bar z)\big(\bar z-\overline{z^\circ}\big)$, increasing with the curvature spread.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(i) The integrand $g(z(t))$ is minimized pointwise by the smallest feasible value $z^\circ(t)$; since $g$ is
+nondecreasing this minimizes $J$, uniquely where $g$ is strictly increasing. (ii) A constant is feasible only if
+$z_c\ge\sup_t z_{\mathrm{fl}}(\kappa(t))=z_{\mathrm{fl}}(\kappa_{\max})$ and $z_c\ge z_{\min}$, i.e.\ $z_c\ge\bar z$;
+monotonicity gives $g(z_c)\ge g(\bar z)\ge g(z^\circ(t))$ pointwise, and integration yields the chain. (iii) The
+integral is positive iff $z^\circ(t)<\bar z$ on positive measure, i.e.\
+$\mathrm{clip}(z_{\mathrm{fl}}(\kappa(t)),z_{\min},\cdot)<\mathrm{clip}(z_{\mathrm{fl}}(\kappa_{\max}),z_{\min},\cdot)$, which
+requires both $z_{\mathrm{fl}}(\kappa_{\max})>z_{\min}$ (else $\bar z=z_{\min}=z^\circ$ a.e.) and $\kappa(t)<\kappa_{\max}$
+on positive measure. The first-order term is Taylor's theorem for $g$ about $\bar z$.
+\end{proof}
+
+\begin{corollary}[Regime boundary]\label{cor:regime}
+With $d_{\mathrm{look}}$ nondecreasing in $\kappa$, altitude adaptation strictly outperforms every fixed altitude
+iff $d_{\mathrm{look}}(\kappa_{\max})>z_{\min}\tan(\phi/2)$; the separating boundary is
+$d_{\mathrm{look}}(\kappa_{\max})=z_{\min}\tan(\phi/2)$.
+\end{corollary}
+
+\begin{remark}[The theorem predicts the SITL outcome]\label{rem:regime}
+Prop.~\ref{prop:adapt} renders the adaptive-vs-fixed question decidable \emph{a priori}, and in particular
+explains our closed-loop measurements. In the deployed configuration the required lookahead is short,
+$d_{\mathrm{look}}\!\approx\!0.5$\,m, giving $z_{\mathrm{fl}}(\kappa_{\max})\!\approx\!0.87$\,m $<z_{\min}=2.5$\,m: the
+floor does \emph{not} bind, so Prop.~\ref{prop:adapt}(iii) predicts $\Delta=0$ --- adaptive altitude can only tie
+the fixed low-altitude baseline. The SITL study confirms exactly this across the tested speeds
+(Sec.~\ref{sec:results}). The experiments therefore \emph{verify the non-binding branch} of the theorem rather
+than refute the coupling; the binding branch ($\Delta>0$) is entered precisely when $d_{\mathrm{look}}$ exceeds
+$z_{\min}\tan(\phi/2)$ (Cor.~\ref{cor:regime}) --- e.g.\ under a speed-scaled lookahead --- with the gain set by the
+curvature spread. This is the honest scope of the altitude contribution: a closed-form characterization of
+\emph{when} shared-camera altitude adaptation helps, its optimum, and its magnitude.
+\end{remark}
+
+% ---------------------------------------------------------------------------
+\subsection{When to re-plan: inter-trigger boundedness without Zeno}
+
+Between triggers the nominal plan is held and the ancillary law regulates the
+error $e_k=p_k-\bar p_k$ through the Schur-stable map
+$A_K=A_d-B_dK=I-\Delta t\,K$ \eqref{eq:error_dynamics}. With the deployed
+$K=\operatorname{diag}(0.6,0.6,0.8)$ at $\Delta t=0.05$\,s,
+$A_K=\operatorname{diag}(0.97,0.97,0.96)$, so $\rho(A_K)=\|A_K\|_\infty=0.97<1$.
+
+\begin{proposition}[Ultimate boundedness and no Zeno]\label{prop:iss}
+Under Assumption~\ref{as:w} with $A_K$ Schur:
+\emph{(i)} the inter-trigger error is input-to-state stable with respect to $w$,
+\begin{equation}
+\|e_k\|_\infty\le \|A_K\|_\infty^{\,k}\,\|e_0\|_\infty
++\frac{\bar w}{1-\|A_K\|_\infty},
+\label{eq:issbound}
+\end{equation}
+hence $\limsup_{k\to\infty}\|e_k\|_\infty\le \bar w/(1-0.97)=\tfrac{100}{3}\bar w=:\beta$;
+\emph{(ii)} evaluating the trigger on the periodic $\Delta t=0.05$\,s clock,
+every two successive re-plans are separated by at least $\Delta t$, so the
+minimum inter-event time (MIET) satisfies $\mathrm{MIET}\ge\Delta t>0$ and no
+Zeno behavior can occur.
+\end{proposition}
+
+\begin{proof}
+\emph{(i)} Iterating $e_{k+1}=A_Ke_k+w_k$ gives
+$e_k=A_K^k e_0+\sum_{j=0}^{k-1}A_K^{\,k-1-j}w_j$. Since $A_K$ is diagonal,
+$\|A_K^m\|_\infty=\|A_K\|_\infty^{\,m}=0.97^{\,m}$; taking $\infty$-norms and using
+$\|w_j\|_\infty\le\bar w$,
+$\|e_k\|_\infty\le 0.97^{k}\|e_0\|_\infty+\bar w\sum_{j=0}^{k-1}0.97^{\,j}
+\le 0.97^{k}\|e_0\|_\infty+\bar w/(1-0.97)$,
+which is \eqref{eq:issbound}; letting $k\to\infty$ yields the ultimate bound
+$\beta$. This is the discrete-time ISS estimate of Jiang and
+Wang~\cite{jiangwang2001} specialized to the linear Schur case.
+\emph{(ii)} The ancillary node evaluates all trigger conditions only at the
+periodic sampling instants $t_k=k\Delta t$; consequently any two firing times
+differ by an integer multiple of $\Delta t$, giving $\mathrm{MIET}\ge\Delta t$.
+This is the periodic-event-triggered construction of Heemels, Donkers and
+Teel~\cite{heemelsdonkersteel2013}, for which Zeno freedom is automatic; the
+non-critical conditions additionally carry a $1$\,s lockout.
+\end{proof}
+
+\begin{remark}[Well-posedness of the ellipsoidal trigger]\label{rem:trig}
+The ultimate bound $\beta$ certifies that the critical tube-exit test
+$e_k^{\!\top}P_0 e_k\le\alpha_k^2$ \eqref{eq:surrogate} is well posed: whenever the
+adaptive radius satisfies $\alpha_k^2\ge\beta^2\lambda_{\max}(P_0)$, a bounded
+disturbance cannot force a persistent exit, so re-plans are triggered by genuine
+perception/curvature excursions rather than by chattering about the boundary.
+\end{remark}
+
+\begin{remark}[Scope: the unsaturated tube]\label{rem:sat}
+The exact map $A_K=I-\Delta tK$ holds while $\|\bar u_k-Ke_k\|_\infty\le u_{\max}$
+(Assumption~\ref{as:w}). Under saturation the applied correction has smaller
+magnitude; writing $u_k=\mathrm{sat}(\bar u_k-Ke_k)$ and folding the deficit
+$\delta_k:=(\bar u_k-Ke_k)-u_k$ (bounded, since both arguments are bounded) into
+an enlarged disturbance $w_k'=w_k+\Delta t\,\delta_k\in\mathbb{W}'$ preserves the
+form $e_{k+1}=A_Ke_k+w_k'$; Prop.~\ref{prop:iss}(i) then gives a (larger) ultimate
+bound with the same $\rho=0.97$. Thus saturation only inflates $\beta$—it never
+destabilizes the inter-trigger error—so Prop.~\ref{prop:iss} is stated for the
+unsaturated tube without loss of the boundedness conclusion.
+\end{remark}
+
+% ---------------------------------------------------------------------------
+% NEW \bibitem entries required in ICC_kisan.bib (verified in LIT_SURVEY.md):
+%   ranvreugdenhil1988  A.C.M. Ran, R. Vreugdenhil, "Existence and comparison
+%     theorems for algebraic Riccati equations for continuous- and discrete-time
+%     systems," Linear Algebra Appl., 99:63-83, 1988.
+%   andersonmoore1979   B.D.O. Anderson, J.B. Moore, "Optimal Filtering,"
+%     Prentice-Hall, 1979.
+%   jiangwang2001       Z.-P. Jiang, Y. Wang, "Input-to-state stability for
+%     discrete-time nonlinear systems," Automatica, 37(6):857-869, 2001.
+%   heemelsdonkersteel2013  W.P.M.H. Heemels, M.C.F. Donkers, A.R. Teel,
+%     "Periodic event-triggered control for linear systems," IEEE TAC,
+%     58(4):847-861, 2013.
+%   (Prop. E should also cite, in Related Work, the nearest covariance-triggering
+%    precedent: Trimpe & D'Andrea, "Event-based state estimation with
+%    variance-based triggering," IEEE TAC 59(12):3266-3281, 2014, and position
+%    against it: ours is geometry(altitude)-coupled and fires a control re-plan.)
+% ============================================================================

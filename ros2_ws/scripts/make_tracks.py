@@ -6,12 +6,13 @@ overshoot, where C3's curvature-anticipation can reduce peak tracking error).
 
 Shapes: circuit (rounded rect), hairpin (paperclip: long straights + 180deg ends),
 slalom (straight bottom + wavy top = several alternating sharp turns)."""
-import glob
+import glob, os
 import numpy as np
 import pandas as pd
 from PIL import Image, ImageDraw
 
-ROOT = '/home/omen/CRAZYFLY_SITL/ugv_uav_control/ros2_ws/'
+# Repo-relative: this script lives in ros2_ws/scripts/, so ROOT = ros2_ws/
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..')) + '/'
 TEX = ROOT + 'src/ugv_uav_control/models/path_ground_plane_v2/materials/textures/'
 INST = ROOT + 'install/ugv_uav_control/share/ugv_uav_control/models/path_ground_plane_v2/materials/textures/'
 RES = 1332; S = RES / 12.0; C = RES / 2.0

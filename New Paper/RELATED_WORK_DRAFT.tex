@@ -1,0 +1,130 @@
+% ============================================================================
+% RELATED_WORK_DRAFT.tex — rewritten Related Work (REVIEW COPY, data-independent).
+% Flowing four-movement narrative grounded in the verified LIT_SURVEY.md. Each
+% movement closes on the precise gap our shared-camera coupling occupies. Reuses the
+% bib keys already in ACODS.tex where they match; NEW keys needed are listed at the
+% bottom (all verified in LIT_SURVEY.md). Framing-insensitive: leads with the field,
+% not with our contribution ordering, so it stands regardless of the deferred
+% lead-identity decision.
+% ============================================================================
+
+\section{Related Work}
+\label{sec:related}
+
+\paragraph*{Perception-aware and active-perception control.}
+A growing body of work rejects the classical separation of perception from control,
+observing that a robot's motion determines what it can sense and should therefore be
+chosen to serve estimation, not only the task. Perception-aware model-predictive
+control couples visibility of a point of interest to the quadrotor dynamics through the
+cost~\cite{falanga2018pampc}, differential-flatness formulations keep a target in the
+field of view during aggressive flight~\cite{spasojevic2020perception}, and active
+visual localization shapes motion to minimize pose uncertainty, e.g.\ by querying a
+precomputed Fisher-information field~\cite{zhang2019fisher}. This line inherits the
+active-perception thesis that sensing, motion, and estimation form a single
+loop~\cite{cadena2016past,placed2023survey}. In every case, however, the perceiving
+agent and the acting agent are the \emph{same} robot, perception quality is
+\emph{monotone} in the chosen viewpoint---a better viewpoint simply lowers the robot's
+own covariance---and the decision variable is the ego-robot's trajectory or gaze. We
+retain the co-optimization principle but change its structure: a \emph{single shared
+sensor} carried by one agent supplies both the navigation reference and the state
+estimate of a \emph{second} agent, and a single scalar---altitude---moves the two
+perception products in \emph{opposite} directions.
+
+\paragraph*{Belief-space planning under estimation uncertainty.}
+Our UGV controller belongs to the belief-space family, which augments the planning
+state with the estimator covariance so that motion is planned under partial
+observability. Representative formulations factor the covariance for efficient
+roadmap planning~\cite{prentice2009belief}, optimize locally in Gaussian belief
+space~\cite{vandenberg2012motion}, and exploit maximum-likelihood observations for
+tractability~\cite{platt2010belief}, with generalized-belief-space extensions to
+unknown environments~\cite{indelman2015planning} and roots in planning under
+uncertainty~\cite{kaelbling1998planning}. The defining move of this literature is that
+the robot shapes its \emph{own} future observations---the canonical ``move into the
+light'' detour to localize before committing to a goal. Our setting differs
+structurally: the informativeness of the UGV's observations is not set by its own
+motion but by an \emph{external teammate's} altitude, which the UGV does not control,
+and that same altitude simultaneously fixes the navigation reference the planner must
+track. We thus inherit the belief-space machinery but relocate the information-design
+decision from the ego-robot's trajectory to a cooperating agent's sensor geometry.
+
+\paragraph*{Cooperative aerial--ground teams.}
+Using an aerial vehicle as an ``eye in the sky'' for a perception-limited ground robot
+is well established~\cite{grocholsky2006cooperative}, with recent systems guiding a
+perception-limited~\cite{li2024colag} or perception-less~\cite{santos2024aerial} ground
+vehicle from the air, alongside quadrotor target tracking under field-of-view and
+occlusion constraints~\cite{thomas2017autonomous,penin2018vision} and EKF-based
+cooperative localization~\cite{roumeliotis2002distributed,kia2016cooperative}. A
+recurring theme is a coverage--accuracy synergy---the aerial platform provides wide
+coverage while the ground platform provides accurate, close-range
+sensing~\cite{grocholsky2006cooperative}. Crucially, that trade-off is resolved by
+assigning coverage and accuracy to \emph{different} robots or \emph{different} sensors,
+and the aerial altitude is fixed and treated as a passive relay parameter. We show
+instead that when a \emph{single} downward camera serves both roles, altitude becomes
+an active perception control input whose optimal value is dictated---in closed form and
+as a function of path curvature (Prop.~\ref{prop:alt}, Cor.~\ref{cor:climb})---by the
+shared-camera coupling itself.
+
+\paragraph*{Event-triggered control and inter-execution guarantees.}
+Event- and self-triggered control re-solve only when a state-dependent condition
+fires, curbing the computation and communication of periodic
+execution~\cite{tabuada2007event,heemels2012introduction}, with dynamic triggering that
+enlarges inter-event intervals~\cite{girard2015dynamic} and extensions to robust MPC of
+nonlinear systems~\cite{eqtami2010event,li2014event}. Boundedness of the inter-execution
+error rests on input-to-state stability; the discrete-time theory we invoke is due to
+Jiang and Wang~\cite{jiangwang2001}, and evaluating the trigger on a periodic clock
+yields a minimum inter-event time by construction, precluding Zeno
+behavior~\cite{heemelsdonkersteel2013}. Triggers in this literature are almost always
+functions of the \emph{state} error; the closest precedent to a perception-driven
+trigger is variance-based event-triggered \emph{estimation}, which fires when a
+predicted error covariance exceeds a threshold~\cite{trimpe2014event}. Our trigger
+shares the idea of firing on an estimation quantity but differs in three respects: it
+is a \emph{geometric} function of altitude (footprint/GSD), it fires a control
+\emph{re-plan} rather than an estimator transmission, and it operates over a
+disturbance whose covariance $R(z)\propto z^{2}$ is itself \emph{set by the altitude
+being chosen}---so the trigger is one half of a control-and-altitude co-design rather
+than a fixed-plant monitor.
+
+\paragraph*{Robust tube-based control.}
+The ancillary tracker draws on tube MPC, which splits control into a nominal plan and
+an ancillary law confining the true state to a robust positively invariant
+tube~\cite{mayne2005robust,langson2004tubes,chisci2001persistent}; the standard outer
+approximation of the minimal invariant set~\cite{mRPI} and the nonlinear
+case~\cite{mayne2011tube} are computed offline for a fixed disturbance set. We use this
+design only to fix the ancillary gain and an ellipsoidal shape matrix; the online stage
+replaces the polyhedral tube with a lightweight adaptive ellipsoidal surrogate
+(Sec.~\ref{sec:method}), trading formal recursive feasibility for a real-time
+perception-driven monitor whose inter-trigger boundedness is nonetheless certified by
+Prop.~\ref{prop:iss}.
+
+\medskip\noindent\emph{Gap.} Across these literatures, perception is optimized by a
+single robot for its own estimate, belief-space information is gathered by the
+ego-robot's own motion, aerial--ground coverage and accuracy are split across separate
+robots or sensors, and event triggers monitor a fixed plant. None treats a single
+shared camera's altitude as one control variable that antagonistically sets both
+localization resolution and navigation coverage, with a closed-form curvature-scheduled
+optimum realized by a perception-triggered altitude/gain co-design carrying
+discrete-time boundedness and no-Zeno guarantees. That is the space this paper occupies.
+
+% ---------------------------------------------------------------------------
+% NEW bib keys required (verified in LIT_SURVEY.md); add to ICC_kisan.bib:
+%   girard2015dynamic       A. Girard, "Dynamic triggering mechanisms for
+%       event-triggered control," IEEE TAC 60(7):1992-1997, 2015.
+%   jiangwang2001           Z.-P. Jiang, Y. Wang, "Input-to-state stability for
+%       discrete-time nonlinear systems," Automatica 37(6):857-869, 2001.
+%   heemelsdonkersteel2013  W.P.M.H. Heemels, M.C.F. Donkers, A.R. Teel, "Periodic
+%       event-triggered control for linear systems," IEEE TAC 58(4):847-861, 2013.
+%   trimpe2014event         S. Trimpe, R. D'Andrea, "Event-based state estimation with
+%       variance-based triggering," IEEE TAC 59(12):3266-3281, 2014.
+%   ranvreugdenhil1988      A.C.M. Ran, R. Vreugdenhil, "Existence and comparison
+%       theorems for algebraic Riccati equations...," Lin. Alg. Appl. 99:63-83, 1988.
+%   andersonmoore1979       B.D.O. Anderson, J.B. Moore, "Optimal Filtering,"
+%       Prentice-Hall, 1979.
+% Existing ACODS.tex keys reused above (verify they resolve in ICC_kisan.bib):
+%   falanga2018pampc, spasojevic2020perception, zhang2019fisher, cadena2016past,
+%   placed2023survey, prentice2009belief, vandenberg2012motion, platt2010belief,
+%   indelman2015planning, kaelbling1998planning, grocholsky2006cooperative,
+%   li2024colag, santos2024aerial, thomas2017autonomous, penin2018vision,
+%   roumeliotis2002distributed, kia2016cooperative, tabuada2007event,
+%   heemels2012introduction, eqtami2010event, li2014event, mayne2005robust,
+%   langson2004tubes, chisci2001persistent, mRPI, mayne2011tube
+% ============================================================================

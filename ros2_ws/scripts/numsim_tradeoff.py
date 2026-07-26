@@ -61,7 +61,7 @@ def E1():
     T = 120; t = np.arange(T / DT)
     true_xy = np.stack([1.0 * DT * t, np.zeros_like(t)], 1)   # straight, v=1 m/s
     zs = np.linspace(0.6, 8.0, 60)
-    fig, ax = plt.subplots(figsize=(5, 3.4))
+    fig, ax = plt.subplots(figsize=(4, 3))
     rows = []
     for d in [0.5, 1.0, 2.0, 3.0]:
         ss = []
@@ -74,10 +74,13 @@ def E1():
         rows.append((d, zstar_pred, zstar_emp, ss.min()))
         ax.semilogy(zs, np.clip(ss, 1e-4, 5), label=f"d={d}m ($z^*$={zstar_pred:.2f})")
         ax.axvline(zstar_pred, ls=':', color='gray', lw=0.8)
-    ax.set_xlabel('UAV altitude z (m)'); ax.set_ylabel(r'steady-state tr($\Sigma$) [log]')
-    ax.set_title('Prop A: steady-state cov vs altitude', fontsize=10)
-    ax.legend(fontsize=7); ax.set_ylim(1e-4, 5)
-    plt.tight_layout(); plt.savefig(RESULTS + '/Fig_PropA.png', dpi=200); plt.close()
+    ax.set_xlabel('UAV altitude z (m)', fontsize=12, fontweight="bold")
+    ax.set_ylabel(r'steady-state tr($\Sigma$) [log]', fontsize=12, fontweight="bold")
+    ax.legend(fontsize=11, prop={"weight": "bold"})
+    ax.set_ylim(1e-4, 5)
+    plt.tight_layout()
+    plt.savefig(RESULTS + '/Fig_PropA.png', dpi=200)
+    plt.close()
     print(f"  {'d':>5}{'z*_pred=d/tanh':>15}{'z*_empirical':>14}{'minTrS':>10}")
     ok = True
     for d, zp, ze, mn in rows:
@@ -159,12 +162,16 @@ def E2_E3():
     print(f"  PROP C {'HOLDS' if pc else 'INCONCLUSIVE'}: anticip peak={res['active_anticip']['cov_peak']:.3f}/drop={res['active_anticip']['dropouts']} "
           f"vs reactive peak={res['active_reactive']['cov_peak']:.3f}/drop={res['active_reactive']['dropouts']}")
     # plot cov traces
-    fig, ax = plt.subplots(figsize=(6, 3.2)); t = np.arange(len(d))*DT
+    fig, ax = plt.subplots(figsize=(4, 3)); t = np.arange(len(d))*DT
     for name in ['fixed_2', 'fixed_6', 'active_anticip']:
         trS, _, _ = kf_run(path, d, P[name]); ax.semilogy(t, np.clip(trS, 1e-4, 5), label=name, lw=1.2)
-    ax.set_xlabel('time (s)'); ax.set_ylabel(r'tr($\Sigma$) [log]'); ax.legend(fontsize=8); ax.set_ylim(1e-4, 5)
-    ax.set_title('Prop B/C: covariance over the hairpin', fontsize=10)
-    plt.tight_layout(); plt.savefig(RESULTS + '/Fig_PropBC.png', dpi=200); plt.close()
+    ax.set_xlabel('time (s)', fontsize=12, fontweight="bold")
+    ax.set_ylabel(r'tr($\Sigma$) [log]', fontsize=12, fontweight="bold")
+    ax.legend(fontsize=11, prop={"weight": "bold"})
+    ax.set_ylim(1e-4, 5)
+    plt.tight_layout()
+    plt.savefig(RESULTS + '/Fig_PropBC.png', dpi=200)
+    plt.close()
 
 
 if __name__ == '__main__':

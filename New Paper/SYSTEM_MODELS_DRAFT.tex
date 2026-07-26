@@ -1,0 +1,114 @@
+% ============================================================================
+% SYSTEM_MODELS_DRAFT.tex — polished "System Architecture and Models" (REVIEW COPY).
+% Flowing rewrite organized around the shared-camera coupling. Data-independent.
+% Keeps the existing TikZ system figure (fig:system) from ACODS.tex (referenced, not
+% redrawn here). Notation consistent with THEORY_DRAFT.tex / RELATED_WORK_DRAFT.tex.
+% Folds in: (i) the E0 empirical grounding of R(z) ~ z^2, (ii) the A_K = I - dt K
+% reconciliation, (iii) forward references into the theory (Prop. A/E, Cor. 1).
+% ============================================================================
+
+\section{System Architecture and Models}
+\label{sec:arch}
+
+A UAV tracks a UGV in a common world frame $\mathcal{F}_W$. The UAV carries the
+system's \emph{only} exteroceptive sensor---a single downward-facing monocular
+camera---and the UGV is otherwise perception-limited, equipped only with wheel
+odometry. From each camera frame the system extracts two products: the lane ahead of
+the vehicle, segmented to yield a navigation waypoint, and an ArUco marker on the UGV,
+detected to yield a noisy pose measurement. The pose measurement is fused with odometry
+in an extended Kalman filter (EKF), producing a belief $(\mu,\Sigma)$ over the UGV
+state. The single camera therefore plays a \emph{dual role}: it is at once the UGV's
+navigation reference and the sole input to its state estimator (Fig.~\ref{fig:system}).
+
+This shared-sensor design is the source of the coupling studied in this paper. Because
+both products are read from the same image, they share the same imaging geometry, and
+in particular the same altitude. Raising the UAV enlarges the ground footprint and so
+improves navigation coverage, but it also coarsens the ground sampling distance and so
+degrades localization; lowering the UAV does the reverse. A single scalar---UAV
+altitude---thus governs estimation quality and navigation coverage \emph{simultaneously
+and in opposite directions}. The remainder of this section makes the two sides of this
+tension precise: the UGV and UAV motion models, the altitude-dependent measurement
+model (the resolution side), and the coverage model (the navigation side). The control
+objective that ties them together is threefold: keep the UGV within the footprint so
+that $\Sigma$ stays bounded, track it robustly under bounded disturbances, and do so
+while limiting the frequency of online re-optimization.
+
+\subsection{Ground vehicle dynamics}
+The UGV follows unicycle kinematics with first-order actuator lag. With state
+$\mathbf{x}_g=[x_g,y_g,\theta,v,\omega]^{\!\top}$---planar position $(x_g,y_g)$,
+heading $\theta$, and linear/angular rates $(v,\omega)$---and commanded velocities
+$\mathbf{u}_g=[v_c,\omega_c]^{\!\top}$, the discrete-time model is
+\begin{equation}
+\mathbf{x}_{g,k+1}=\mathbf{f}_g(\mathbf{x}_{g,k},\mathbf{u}_{g,k})+\mathbf{w}_g,
+\label{eq:ugv}
+\end{equation}
+where the actuator lag is set by time constants $\tau_v,\tau_\omega$ and
+$\mathbf{w}_g$ is bounded process noise. The heading and rate states are retained in
+the estimator because the marker yields a full planar pose, not merely a position.
+
+\subsection{Aerial vehicle model}
+Although the platform is a quadrotor, the planning and tracking layers treat it as a
+velocity-controlled point mass; an inner-loop attitude/thrust controller (the Gazebo
+velocity-control plugin in our study) is assumed to realize commanded velocities. With
+position $\mathbf{p}=[p_x,p_y,p_z]^{\!\top}$, altitude $z:=p_z$, and velocity command
+$\mathbf{u}=[v_x,v_y,v_z]^{\!\top}$, the single-integrator model is
+\begin{equation}
+\mathbf{p}_{k+1}=\mathbf{p}_k+\Delta t\,\mathbf{u}_k+\mathbf{w}_k,
+\qquad A_d=I_3,\quad B_d=\Delta t\,I_3,
+\label{eq:uav_disc}
+\end{equation}
+with bounded disturbance $\mathbf{w}_k\in\mathbb{W}$. All three axes are actuated, so
+$v_z$ is a genuine decision variable and the altitude policy is realized in closed
+loop. The linear form \eqref{eq:uav_disc} is what later makes the ancillary error
+dynamics exact: with the tracking law $\mathbf{u}=\bar{\mathbf{u}}-K\mathbf{e}$ the
+closed-loop error map is $A_K=A_d-B_dK=I_3-\Delta t\,K$, contractive for the deployed
+gain (Sec.~\ref{sec:theory-formal}, Prop.~\ref{prop:iss}).
+
+\subsection{Resolution model: altitude-dependent measurement noise}
+\label{sec:gsd}
+The accuracy of marker-based localization is governed by the camera's ground sampling
+distance (GSD), the metric size of one pixel on the ground, which grows linearly with
+altitude. If the image-plane detection error is approximately constant in pixels, the
+metric position error grows in proportion to the GSD, and the position-measurement
+covariance therefore grows quadratically with altitude. Let $z_0$ be a reference
+altitude, $d=\lVert\mathbf{p}^{xy}-\mathbf{p}_g\rVert$ the horizontal UAV--UGV
+separation, and $r_{\mathrm{fov}}(z)=z\tan(\phi/2)$ the footprint radius for camera
+field of view $\phi$. We model the measurement covariance as
+\begin{equation}
+R(z)=R_0\!\left(\frac{z}{z_0}\right)^{\!2}
+\!\left(1+\left(\frac{d}{r_{\mathrm{fov}}}\right)^{\!2}\right),
+\label{eq:Rgsd}
+\end{equation}
+where $R_0$ is the baseline covariance at $z_0$ and the second factor mildly inflates
+the noise as the target approaches the footprint edge. Equation~\eqref{eq:Rgsd} is
+strictly increasing in $z$; this monotonicity is the resolution side of the coupling
+and the hypothesis of the optimal-altitude result (Prop.~\ref{prop:alt}). Importantly,
+the law is not merely postulated: in static-hover trials the measured localization
+error grows linearly with altitude (median error $\approx 1.03+2.24\,z$\,mm,
+$R^2=0.994$), confirming $R\propto z^2$ (Sec.~\ref{sec:results}, Fig.~\ref{fig:envelope}).
+The \emph{same} model \eqref{eq:Rgsd} is used by both the EKF and the belief-space
+planner in all reported experiments, so the planner propagates exactly the uncertainty
+the estimator experiences.
+
+\subsection{Coverage model: the segmentation floor}
+\label{sec:coverage}
+Lane segmentation seeds a waypoint a lookahead distance ahead of the vehicle, and that
+waypoint must fall inside the footprint or the reference is lost. Writing the required
+lookahead as $d_{\mathrm{look}}(\kappa)$---which grows with local path curvature
+$\kappa$, since a curving lane leaves the footprint sooner---we summarize navigability
+by the non-dimensional \emph{coverage factor}
+\begin{equation}
+\eta(z,\kappa)=\frac{r_{\mathrm{fov}}(z)}{d_{\mathrm{look}}(\kappa)}
+             =\frac{z\tan(\phi/2)}{d_{\mathrm{look}}(\kappa)},
+\label{eq:eta}
+\end{equation}
+with segmentation feasible for $\eta\gtrsim1$, i.e.\ $z\ge
+z_{\mathrm{floor}}(\kappa)=d_{\mathrm{look}}(\kappa)/\tan(\phi/2)$. This is the
+navigation side of the coupling, and it opposes the resolution side directly: the
+estimator prefers \emph{low} altitude for resolution \eqref{eq:Rgsd}, while
+\eqref{eq:eta} demands \emph{sufficient} altitude for coverage, and the floor
+$z_{\mathrm{floor}}(\kappa)$ rises exactly where the path curves. The two models
+\eqref{eq:Rgsd} and \eqref{eq:eta} therefore frame a single question---how low may the
+UAV fly without losing the lane---whose answer is the estimation-optimal, curvature-
+scheduled altitude derived next (Prop.~\ref{prop:alt}, Cor.~\ref{cor:climb}) and
+realized by the aerial planner of Sec.~\ref{sec:method}.

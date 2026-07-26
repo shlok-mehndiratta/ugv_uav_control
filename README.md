@@ -23,11 +23,14 @@ ugv_uav_control/
 └── ros2_ws/                   ROS 2 workspace (colcon)
     ├── src/ugv_uav_control/   nodes, launch, models (UAV/UGV/ground plane), tracks
     ├── scripts/               run + analysis + figure generation (see "Reproducing" below)
-    ├── results/               committed per-run data (CSVs + summaries) behind every claim
+    ├── paper_data/            the exact curated data behind each figure/table (see its README)
+    ├── results/               scratch output dir for new runs (git-ignored contents)
     ├── requirements.txt
     └── Makefile
 ```
 `build/`, `install/`, `log/`, and raw console logs are generated artifacts and are git-ignored.
+The data actually used by the paper lives in `ros2_ws/paper_data/` (one subfolder per figure/table);
+`ros2_ws/results/` is only scratch space for freshly generated runs.
 
 ## Build & run
 
@@ -55,30 +58,37 @@ exposes every experimental knob as an argument (`track_name`, `active_altitude`,
 
 ## Reproducing the paper's results
 
-All three figures and the co-design table regenerate from the committed data in
-`ros2_ws/results/` (run from `ros2_ws/`, after `source install/setup.bash`):
+Every figure and the co-design table regenerate from the curated data in
+`ros2_ws/paper_data/` (one subfolder per figure — see `ros2_ws/paper_data/README.md`). Run from
+`ros2_ws/`:
 
-| Paper element | Data (`results/`) | Regenerate the figure |
+| Paper element | Data (`paper_data/`) | Regenerate |
 |---|---|---|
-| **Fig. 1** — single camera, dual role | `testbed_frame.png` | `python3 scripts/make_testbed_figure.py` → `paper/media/Fig_Testbed.png` |
-| **Fig. 2** — coverage–resolution envelope | `env_track{1,4,slalom}_z*` | plotted from the altitude/curvature sweep (fixed `z`, GSD noise) |
-| **Fig. 3** — adaptive vs. fixed altitude | `cga_{adaptive,fixedlow,fixedhi}` | `python3 scripts/plot_altitude_codesign.py` → `paper/media/Fig_AltPolicy.png` |
-| **Table I** — event-triggered co-design | `gcod_C1` (cont.), `gcod_C2` (event) | `python3 scripts/fill_paper_numbers.py gcod_C1` / `gcod_C2` |
+| Testbed — single camera, dual role | `fig1_testbed/testbed_frame.png` | `python3 scripts/make_testbed_figure.py` → `paper/media/Fig_Testbed.png` |
+| Coverage–resolution envelope | `fig3_envelope/env_{track1,track4,track_slalom}_z*` | `python3 scripts/plot_envelope.py` → `paper/media/Fig_Envelope.png` |
+| Adaptive vs. fixed altitude | `fig4_altitude/cga_{adaptive,fixedlow,fixedhi}_20260706*` | `python3 scripts/plot_altitude_codesign.py` → `paper/media/Fig_AltPolicy.png` |
+| Event-triggered co-design table | `table2_codesign/gcod_{C1,C2}_*` | `python3 scripts/fill_paper_numbers.py` (prints C1 vs C2) |
 
-To re-run the closed-loop experiments from scratch (all headless, GSD noise model, R=3):
+The testbed and altitude figures regenerate **byte-identically**; the table reproduces exactly. The
+envelope figure's canonical PNG is committed (`paper/media/Fig_Envelope.png`); `plot_envelope.py`
+regenerates it from data (right panel exact; left panel matches up to the exact std window — see
+`paper_data/README.md`).
+
+To re-run the closed-loop experiments from scratch (all headless, GSD noise model, R=3) — output
+lands in `results/`, then promote the validated runs into `paper_data/`:
 
 ```bash
-# Co-design (Table I): continuous baseline (C1), error-only ablation (B), full event-trigger (C2)
+# Co-design: continuous baseline (C1), error-only ablation (B), full event-trigger (C2)
 scripts/run_compare.sh track2.png gcod 3 60
 
-# Altitude policy (Fig. 3) on the hairpin — adaptive vs. two fixed baselines:
+# Altitude policy on the hairpin — adaptive vs. two fixed baselines:
 GZ_HEADLESS=1 ros2 launch ugv_uav_control middle_path_follower.launch.py \
     experiment_name:=cga_adaptive track_name:=track_hairpin.png duration:=60 \
     use_gsd_noise:=true active_altitude:=true                       # adaptive
 #   ... active_altitude:=false z_opt:=2.5 z_min:=2.5   → cga_fixedlow
 #   ... active_altitude:=false z_opt:=7.0 z_min:=7.0   → cga_fixedhi
 
-# Coverage-resolution envelope (Fig. 2): one (track, altitude, speed) cell at a time
+# Coverage-resolution envelope: one (track, altitude, speed) cell at a time
 scripts/envelope_run_cell.sh track4.png 4.0 0.22 env_track4_z4.0
 ```
 

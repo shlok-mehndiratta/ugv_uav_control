@@ -1,17 +1,22 @@
 #!/usr/bin/env python3
-"""Compute the exact numbers for the ICC12.tex results table from fresh logs and
-print ready-to-paste \\renewcommand lines. Honest windowing:
-  - tracking error / mean cov: computed on t>=8s (skip takeoff transient), all runs
-  - peak cov (occlusion): max cov_trace in the injected window [20,28]s, occ runs
-  - planner solves / UAV solve time: from per-run summaries
-"""
-import glob
-import os
-import numpy as np
-import pandas as pd
+"""Compute the co-design Table II numbers from the curated runs in
+paper_data/table2_codesign/ (gcod_C1 = continuous baseline, gcod_C2 = event-triggered).
 
-R = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', 'results'))
-T0, OCC = 8.0, (20.0, 28.0)
+Reports, as mean +/- std over the R=3 repeats:
+  - Aerial solves per run   : uav_solve_count            (summary)
+  - Mean aerial solve time   : mean_uav_solve_ms          (summary)
+  - Aerial CPU per run (ms)  : total_uav_cpu_ms           (summary)
+  - Steady-state tr(Sigma)   : mean cov_trace for t>=8 s  (CSV, skips takeoff)
+  - ArUco visibility (%)     : aruco_visible_pct          (summary)
+  - UAV-UGV offset (m)       : mean horizontal ||uav - UGV_est|| for t>=8 s (CSV; uses the
+                               EKF-estimated UGV position (x,y), matching the paper's Table II)
+"""
+import csv, glob, math, os
+import numpy as np
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+R = os.path.normpath(os.path.join(HERE, '..', 'paper_data', 'table2_codesign'))
+T0 = 8.0
 
 
 def summ(path):
@@ -26,37 +31,40 @@ def summ(path):
     return d
 
 
-def runs(method):
-    out = []
-    for c in sorted(glob.glob(os.path.join(R, f'{method}_*.csv'))):
-        s = c[:-4] + '_summary.txt'
-        if os.path.exists(s):
-            out.append((os.path.basename(c), pd.read_csv(c), summ(s)))
-    return out
+def steady(csv_path):
+    rows = list(csv.DictReader(open(csv_path)))
+    t0 = float(rows[0]['timestamp'])
+    cov, off = [], []
+    for r in rows:
+        if float(r['timestamp']) - t0 < T0:
+            continue
+        cov.append(float(r['cov_trace']))
+        off.append(math.hypot(float(r['uav_x']) - float(r['x']),
+                              float(r['uav_y']) - float(r['y'])))   # x,y = EKF-estimated UGV pose
+    return (np.mean(cov) if cov else np.nan, np.mean(off) if off else np.nan)
 
 
-def ms(vals):
-    vals = [v for v in vals if v is not None and not np.isnan(v)]
-    return (np.mean(vals), np.std(vals)) if vals else (float('nan'), float('nan'))
+def ms(v):
+    v = [x for x in v if x is not None and not (isinstance(x, float) and math.isnan(x))]
+    return (np.mean(v), np.std(v)) if v else (float('nan'), float('nan'))
 
 
-def fmt(m, s, nd=2):
-    return f'{m:.{nd}f}$\\pm${s:.{nd}f}'
-
-
-for M in ['C1', 'C3']:
-    rs = runs(M)
-    occ = [r for r in rs if '_occ_' in r[0]]
-    solves = ms([r[2].get('total_replans') for r in rs])
-    usolve = ms([r[2].get('mean_uav_solve_ms') for r in rs])
-    err = ms([r[1][r[1].timestamp >= T0]['target_y'].abs().mean() for r in rs])
-    covm = ms([r[1][r[1].timestamp >= T0]['cov_trace'].mean() for r in rs])
-    peak = ms([r[1][(r[1].timestamp >= OCC[0]) & (r[1].timestamp <= OCC[1])]['cov_trace'].max()
-               for r in occ]) if occ else (float('nan'), float('nan'))
-    tag = 'Cone' if M == 'C1' else 'Cthree'
-    print(f'% {M}: n={len(rs)} runs ({len(occ)} occ)')
-    print(f'\\renewcommand{{\\RESsolves{tag}}}{{{fmt(*solves,0)}}}')
-    print(f'\\renewcommand{{\\RESerr{tag}}}{{{fmt(*err,3)}}}')
-    print(f'\\renewcommand{{\\REScov{tag}}}{{{fmt(*covm,4)}}}')
-    print(f'\\renewcommand{{\\RESpeak{tag}}}{{{fmt(*peak,3)}}}')
-    print(f'\\renewcommand{{\\RESaru{tag}}}{{{fmt(*usolve,1)}}}')
+print(f'{"metric":24s} {"C1 (cont.)":>18s} {"C2 (event)":>18s}')
+agg = {}
+for M in ('C1', 'C2'):
+    csvs = sorted(glob.glob(os.path.join(R, f'gcod_{M}_*.csv')))
+    S = [summ(c[:-4] + '_summary.txt') for c in csvs]
+    steadies = [steady(c) for c in csvs]
+    agg[M] = {
+        'Aerial solves (#/run)':  ms([s.get('uav_solve_count') for s in S]),
+        'Mean solve (ms)':        ms([s.get('mean_uav_solve_ms') for s in S]),
+        'Aerial CPU (ms/run)':    ms([s.get('total_uav_cpu_ms') for s in S]),
+        'Steady tr(Sigma)':       ms([c for c, _ in steadies]),
+        'ArUco vis (%)':          ms([s.get('aruco_visible_pct') for s in S]),
+        'UAV-UGV offset (m)':     ms([o for _, o in steadies]),
+    }
+for k in ['Aerial solves (#/run)', 'Mean solve (ms)', 'Aerial CPU (ms/run)',
+          'Steady tr(Sigma)', 'ArUco vis (%)', 'UAV-UGV offset (m)']:
+    nd = 0 if 'solves' in k else (1 if ('ms' in k or '%' in k) else 4)
+    c1 = agg['C1'][k]; c2 = agg['C2'][k]
+    print(f'{k:24s} {f"{c1[0]:.{nd}f}+/-{c1[1]:.{nd}f}":>18s} {f"{c2[0]:.{nd}f}+/-{c2[1]:.{nd}f}":>18s}')

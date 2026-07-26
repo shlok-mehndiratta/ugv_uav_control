@@ -5,9 +5,9 @@ import os, cv2, numpy as np, matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-# Repo-relative paths (reproducible): raw captured frame in results/, figure into paper/media/.
+# Repo-relative paths (reproducible): curated frame in paper_data/, figure into paper/media/.
 HERE=os.path.dirname(os.path.abspath(__file__))
-FR=os.path.join(HERE, '..', 'results', 'testbed_frame.png')          # real captured camera frame
+FR=os.path.join(HERE, '..', 'paper_data', 'fig1_testbed', 'testbed_frame.png')   # real captured camera frame
 OUT=os.path.join(HERE, '..', '..', 'paper', 'media', 'Fig_Testbed.png')
 
 img=cv2.imread(FR)
@@ -69,10 +69,17 @@ cv2.circle(ann,peak,8,(0,255,255),-1); cv2.circle(ann,peak,8,(0,0,0),2)
 ann=cv2.cvtColor(ann, cv2.COLOR_BGR2RGB)
 print("aruco:", ids is not None, "center:", (cx,cy), "waypoint peak:", peak)
 
-fig,ax=plt.subplots(1,2,figsize=(7.0,2.9))
-ax[0].imshow(raw); ax[0].set_title("(a) UAV downward camera (the sole sensor)", fontsize=9)
-ax[1].imshow(ann); ax[1].set_title("(b) one frame, dual role", fontsize=9)
+fig,ax=plt.subplots(1,2,figsize=(8,3))
+ax[0].imshow(raw)
+ax[1].imshow(ann)
 for a in ax: a.set_xticks([]); a.set_yticks([])
+# subplot labels as in-axes annotations (LaTeX caption handles the description)
+ax[0].text(0.02, 0.97, "(a)", transform=ax[0].transAxes,
+           fontsize=12, fontweight="bold", va="top", color="white",
+           bbox=dict(boxstyle="round,pad=0.15", fc="black", alpha=0.5, ec="none"))
+ax[1].text(0.02, 0.97, "(b)", transform=ax[1].transAxes,
+           fontsize=12, fontweight="bold", va="top", color="white",
+           bbox=dict(boxstyle="round,pad=0.15", fc="black", alpha=0.5, ec="none"))
 # annotate dual role on panel b
 if cx is not None:
     ax[1].annotate("ArUco  →  EKF (pose)", xy=(cx,cy-46), xytext=(W*0.30,H*0.10),

@@ -53,3 +53,14 @@ ros2_ws/results/log_*.txt
 ros2_ws/results/study_run_*
 ros2_ws/logs/
 ros2_ws/temp/
+
+# LaTeX bibliography intermediates
+*.bbl
+*.blg
+
+# Raw SITL run data: kept locally for reference; the curated subset ships in ros2_ws/paper_data/
+ros2_ws/results/
+
+# SITL video recordings: kept locally; only the curated set ships, as a single zip
+viz_check/*
+!viz_check/sitl_recordings.zip

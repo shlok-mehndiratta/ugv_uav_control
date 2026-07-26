@@ -4,8 +4,12 @@ Corridor = the white RING enclosed between the two dark boundary lines. Spawn = 
 centerline point; heading = along the corridor (perpendicular to the dist-transform gradient)."""
 import sys, numpy as np, cv2, os
 
-TEX="/home/omen/CRAZYFLY_SITL/ugv_uav_control/ros2_ws/src/ugv_uav_control/models/path_ground_plane_v2/materials/textures"
-OUT="/tmp/claude-1000/-home-omen-CRAZYFLY-SITL-ugv-uav-control/a35db6a5-7828-43aa-a1f3-f7f81b0184ca/scratchpad"
+# Repo-relative: this script lives in ros2_ws/scripts/, textures live under ros2_ws/src/...
+_HERE = os.path.dirname(os.path.abspath(__file__))
+TEX = os.path.abspath(os.path.join(
+    _HERE, "..", "src", "ugv_uav_control", "models",
+    "path_ground_plane_v2", "materials", "textures"))
+OUT=os.environ.get("SPAWN_OUT", "/tmp")
 PLANE=12.0
 
 def find_spawn(track):
@@ -23,8 +27,10 @@ def find_spawn(track):
         if area < 0.002*H*W: continue           # drop tiny holes
         ys,xs=np.where(comp); cy,cx=int(ys.mean()),int(xs.mean())
         is_ring = not comp[cy,cx]                # ring: centroid not inside -> corridor
-        # score: prefer ring, larger area
-        score=area*(2 if is_ring else 1)
+        # The drivable LANE is always the corridor RING (white annulus between the two
+        # boundary lines); the big filled region is the enclosed hole -> skip non-rings.
+        if not is_ring: continue
+        score=area
         if best is None or score>best[0]: best=(score,comp,is_ring,area)
     comp=best[1]; is_ring=best[2]
     # distance transform within corridor -> widest centerline point = spawn

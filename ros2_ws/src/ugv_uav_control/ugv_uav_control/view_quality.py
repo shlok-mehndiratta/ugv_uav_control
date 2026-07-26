@@ -1,17 +1,27 @@
 """
-View Quality Module
-===================
-Computes a scalar view quality score q ∈ [0, 1] given UAV (x, y, z) and
-UGV (x, y) positions.
+View Quality Module (geometric visibility heuristic)
+====================================================
+Computes a smooth, differentiable scalar q ∈ (0, 1] from UAV (x, y, z) and
+UGV (x, y) positions, used as a **FoV visibility / centering gate** and for
+diagnostic logging.
 
-q is maximized when:
-1. UGV is directly below the UAV (centered in FoV)
-2. UAV altitude is near z_opt (optimal resolution/precision)
+IMPORTANT — this is NOT the estimation-noise model.
+The reported measurement covariance is the physically-correct, monotone
+ground-sampling-distance model  R(z) ∝ z²  in
+``ugv_model.get_dynamic_R(..., use_gsd=True)``. That model has NO interior
+altitude optimum (it strictly increases with z); the optimum altitude is a
+coverage-floor boundary optimum set by geometry, not a resolution peak.
 
-The function is **fully differentiable** and suitable for gradient-based 
-optimization (SLSQP, etc.).
+The altitude term ``s_z`` below (a Gaussian bowl centred at ``z_opt``) is a
+LEGACY component of the pre-GSD quality model (``use_gsd=False``) retained
+only for backward compatibility. Do NOT treat ``q`` — or its ``z_opt`` peak —
+as the perception/estimation-quality metric in any reported figure.
+
+``z_opt`` here is effectively the nominal cruise/takeoff altitude, not an
+"optimal resolution" altitude.
 """
 
+import os
 import numpy as np
 
 
@@ -69,8 +79,11 @@ def compute_view_quality(
     sigma_xy = r_fov / 2.0
     q_center = np.exp(-(d * d) / (2.0 * sigma_xy * sigma_xy))
 
-    # 4. Altitude precision scale s(z)
-    # Gaussian penalty centered at z_opt
+    # 4. Altitude precision scale s(z)  [LEGACY — see module docstring]
+    # Gaussian bowl centred at z_opt. This encodes an INTERIOR altitude optimum
+    # and belongs to the pre-GSD model (use_gsd=False). The reported pipeline
+    # uses the monotone GSD model (ugv_model.get_dynamic_R, use_gsd=True) and
+    # does NOT depend on this term. Retained only for backward compatibility.
     s_z = np.exp(-(uav_z - z_opt)**2 / (2.0 * sigma_z * sigma_z))
 
     return float(q_radial * q_center * s_z)
@@ -158,5 +171,8 @@ if __name__ == '__main__':
     print(f'q at z_low (2.0m): {q_low:.4f}')
     print(f'q at z_high (10.0m): {q_high:.4f}')
     
-    assert q_opt > q_low and q_opt > q_high, "Altitude peak not at z_opt"
-    print("\n✅ Step 1 Verification Complete: Altitude peaks correctly and decays smoothly.")
+    # NOTE: this self-test exercises the LEGACY z_opt bowl only (see module
+    # docstring). The reported estimation-noise model (get_dynamic_R, use_gsd=True)
+    # is monotone in z and has no such interior peak.
+    assert q_opt > q_low and q_opt > q_high, "Legacy z_opt bowl: peak not at z_opt"
+    print("\n[legacy self-test] z_opt bowl peaks at z_opt and decays smoothly.")

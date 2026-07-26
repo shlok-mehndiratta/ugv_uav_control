@@ -15,6 +15,7 @@ from cv_bridge import CvBridge
 import cv2
 import numpy as np
 import math
+import os
 def quaternion_from_euler(roll, pitch, yaw):
     cy = math.cos(yaw * 0.5)
     sy = math.sin(yaw * 0.5)
@@ -53,10 +54,25 @@ class MiddlePathFollower(Node):
         self.uav_x = 0.0
         self.uav_y = 0.0
         self.fov = 1.047 # 60 degrees
+        # Waypoint lookahead distance (m) ahead of the robot. Too long overshoots sharp
+        # turns (the waypoint leaves the corridor and the UGV cuts the corner); tune via
+        # MPF_LOOKAHEAD. Default 0.5 m.
+        self.lookahead_m = float(os.environ.get('MPF_LOOKAHEAD', '0.5'))
+        # Waypoint search-circle radius (m). Should be <= lane half-width (~0.55 m) so the
+        # search never reaches off-corridor pixels. Tune via MPF_SEARCH_RADIUS. Default 0.6.
+        self.search_radius_m = float(os.environ.get('MPF_SEARCH_RADIUS', '0.6'))
         self.image_width = None
         self.scale = None
         self.frame_count = 0
-        self.get_logger().info('Middle Path Follower Node Started')
+        # Headless by default. GZ_HEADLESS only makes *Gazebo* headless; this guards
+        # the cv2 debug GUI so reproducible/headless runs never pop (and jitter) a
+        # window. Set MPF_SHOW_WINDOW=1 to view the pipeline live.
+        self.show_window = os.environ.get('MPF_SHOW_WINDOW', '0') == '1'
+        # Publish the annotated overlay for headless RECORDING WITHOUT opening a cv2 GUI
+        # window (a cv2/Qt window steals keyboard focus and can interrupt host input).
+        # Recording sets MPF_PUBLISH_DEBUG=1; the live window still needs MPF_SHOW_WINDOW=1.
+        self.publish_debug = self.show_window or os.environ.get('MPF_PUBLISH_DEBUG', '0') == '1'
+        self.get_logger().info(f'Middle Path Follower Node Started (show_window={self.show_window}, publish_debug={self.publish_debug})')
         
     def uav_pose_cb(self, msg):
         # Dynamically update camera height, position, and pixel scale
@@ -123,11 +139,12 @@ class MiddlePathFollower(Node):
             self.aruco_pose_pub.publish(aruco_msg)
         
         if robot_pos is None:
-            # CRITICAL: Must pump OpenCV events even when ArUco is lost,
-            # otherwise the window manager marks the window as unresponsive.
-            try:
-                cv2.waitKey(1)
-            except: pass
+            # Pump the OpenCV event loop only when the debug window is shown,
+            # otherwise the window manager marks it unresponsive. Headless: skip.
+            if self.show_window:
+                try:
+                    cv2.waitKey(1)
+                except: pass
             return
         gray = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY)
         _, thresh = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY)
@@ -142,7 +159,7 @@ class MiddlePathFollower(Node):
         if self.scale is not None and self.scale > 0:
             # Originally at z=6.0m (scale~0.01), 40px was ~0.4m. 
             search_dists = [int(d / self.scale) for d in [0.4, 0.5, 0.6, 0.3, 0.7]]
-            mask_radius = int(0.6 / self.scale)
+            mask_radius = int(self.search_radius_m / self.scale)
         else:
             search_dists = [40, 50, 60, 30, 70]
             mask_radius = 60
@@ -176,9 +193,9 @@ class MiddlePathFollower(Node):
         heatmap = cv2.applyColorMap((dist_norm * 255).astype(np.uint8), cv2.COLORMAP_JET)
         final_img = cv2.addWeighted(cv_image, 0.6, heatmap, 0.4, 0)
         
-        # Calculate Target (Target is always 0.5 meters ahead physically)
+        # Calculate Target (lookahead ahead physically; tune via MPF_LOOKAHEAD)
         if self.scale is not None and self.scale > 0:
-            lookahead_dist = int(0.5 / self.scale)
+            lookahead_dist = int(self.lookahead_m / self.scale)
         else:
             lookahead_dist = 50
 
@@ -197,8 +214,17 @@ class MiddlePathFollower(Node):
         cv2.circle(final_img, robot_pos, 8, (0, 0, 255), -1) 
         cv2.circle(final_img, target_point, 8, (0, 255, 255), -1) 
         cv2.line(final_img, robot_pos, target_point, (255, 0, 255), 2)
+
+        # Publish the annotated overlay so headless/remote runs can RECORD the viz to a
+        # file (display-independent) WITHOUT opening a focus-stealing cv2 window.
+        # Gated to viz/record runs; production runs never publish it, so they stay untouched.
+        if self.publish_debug:
+            try:
+                self.debug_pub.publish(self.bridge.cv2_to_imgmsg(final_img, 'bgr8'))
+            except Exception:
+                pass
         
-        if self.frame_count % 5 == 0:
+        if self.show_window and self.frame_count % 5 == 0:
             h, w = cv_image.shape[:2]
             half_h, half_w = h // 3, w // 3
             # 2x2 Grid

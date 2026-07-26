@@ -1,0 +1,44 @@
+% Standalone compile check for THEORY_DRAFT.tex.
+% Uses the standard `article` class (class-independent) because this machine has a
+% minimal TeX install and ifacconf.cls provides its own (conflicting) theorem/proof
+% machinery. This verifies the theory's math/proofs/cross-refs render correctly; the
+% final paper integrates THEORY_DRAFT.tex into ACODS.tex using ifacconf's theorem envs.
+\documentclass[10pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{bm}
+\DeclareMathOperator{\tr}{tr}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
+\newtheorem{corollary}{Corollary}
+\newtheorem{definition}{Definition}
+\newtheorem{assumption}{Assumption}
+\newtheorem{remark}{Remark}
+
+\title{Theory spine --- standalone compile check}
+\author{(ACODS paper)}
+\date{}
+
+\begin{document}
+\maketitle
+
+% ---- stub cross-references borrowed from ACODS.tex (labels only) ----
+\section{Coverage model (stub for \texttt{sec:coverage})}\label{sec:coverage}\label{sec:results}\label{sec:method}
+\begin{equation} R(z)=\tfrac{R_0}{z_0^2}\!\left(z^2+\tfrac{d^2}{\tan^2(\phi/2)}\right)\label{eq:Rgsd}\end{equation}
+\begin{equation} \eta=\frac{z\tan(\phi/2)}{d_{\mathrm{look}}(\kappa)}\label{eq:eta}\end{equation}
+\begin{equation} e_{k+1}=(A_d-B_dK)e_k+w_k=:A_Ke_k+w_k\label{eq:error_dynamics}\end{equation}
+\begin{equation} z_k=\hat d_k/\tan(\phi/2)+\beta_\kappa\hat\kappa_k+z_{\mathrm m}\label{eq:altpol}\end{equation}
+\begin{equation} \mathcal{E}(\alpha_k)=\{e:e^\top P_0 e\le\alpha_k^2\}\label{eq:surrogate}\end{equation}
+\begin{figure}[h]\centering\rule{3cm}{1.2cm}\caption{Envelope figure (stub).}\label{fig:envelope}\end{figure}
+
+\input{THEORY_DRAFT.tex}
+
+\begin{thebibliography}{9}
+\bibitem{ranvreugdenhil1988} A.C.M. Ran and R. Vreugdenhil, ``Existence and comparison theorems for algebraic Riccati equations for continuous- and discrete-time systems,'' \emph{Linear Algebra Appl.}, 99:63--83, 1988.
+\bibitem{andersonmoore1979} B.D.O. Anderson and J.B. Moore, \emph{Optimal Filtering}. Prentice-Hall, 1979.
+\bibitem{jiangwang2001} Z.-P. Jiang and Y. Wang, ``Input-to-state stability for discrete-time nonlinear systems,'' \emph{Automatica}, 37(6):857--869, 2001.
+\bibitem{heemelsdonkersteel2013} W.P.M.H. Heemels, M.C.F. Donkers, and A.R. Teel, ``Periodic event-triggered control for linear systems,'' \emph{IEEE Trans. Autom. Control}, 58(4):847--861, 2013.
+\end{thebibliography}
+
+\end{document}
