@@ -128,22 +128,25 @@
 \address[First]{Department of Electrical Engineering and Computer Science, IISER Bhopal, India. (e-mail: \{shlokm23, prashant23, divyam23, agniva24, ajsen\}@iiserb.ac.in).}
 
 \begin{abstract}
-In shared-camera aerial-ground tracking, a single downward-facing UAV camera is the ground vehicle's only
-exteroceptive sensor, serving at once as its navigation reference through lane segmentation and as its
-state estimator through marker detection and an extended Kalman filter. We observe that this shared sensor
-couples navigation and estimation through one scalar, the UAV altitude, which sets localization resolution
-(ground-sampling noise $R\propto z^2$) and navigation coverage (camera footprint) in opposite directions.
-Treating altitude as an active perception variable, we characterize the coupling in closed form: the
-estimation-optimal altitude is a curvature-scheduled coverage floor, and adapting altitude strictly
-improves estimation over any fixed altitude if and only if that floor binds and the path curvature varies.
-We deploy the resulting policy, COAST (Coupled-Altitude Shared-camera Tracking), with a belief-space
-ground controller and a perception-triggered aerial planner whose ancillary law is input-to-state stable
-between triggers and free of Zeno behavior. A
-reproducible ROS\,2/Gazebo study verifies each prediction: the measured sensor noise follows $R\propto z^2$,
-the steady-state estimation cost is monotone and track-independent in altitude, the curvature-scheduled
-policy matches the best feasible fixed altitude in the non-binding regime of our testbed, and the
-perception-driven event trigger reduces aerial-replanning computation by more than an order of magnitude at
-matched estimation quality. The code and data are publicly available.
+This paper considers a shared-camera aerial-ground tracking problem by a UAV and a UGV system. We assume
+that a single downward-facing UAV camera is the sole exteroceptive sensor of the UGV, which serves as its
+navigation reference through lane segmentation. This shared sensor couples navigation and estimation
+through the UAV altitude $z$, which sets localization resolution (the measurement-noise covariance $R$
+grows as $R\propto z^2$) and navigation coverage (the camera footprint) in opposite directions, since
+raising the altitude improves coverage but coarsens resolution while lowering it does the reverse. We treat
+altitude as a variable to be optimized and solve the coupling in closed form: the best altitude for
+estimation is the lowest one that still keeps the path inside the camera footprint, and because a sharper
+turn needs a longer look-ahead, this lowest admissible altitude increases with path curvature. Adapting
+altitude along the path improves estimation over any single fixed altitude only when this admissible
+altitude is active and the curvature changes; otherwise a fixed altitude performs equally well. We deploy
+the proposed policy, COAST (Coupled-Altitude Shared-camera Tracking), which commands the UAV to fly at this
+curvature-scheduled altitude, together with a belief-space ground controller and a perception-triggered
+aerial planner whose ancillary law is shown to keep the inter-trigger tracking error bounded and free of
+Zeno behavior. A reproducible ROS\,2/Gazebo study confirms each prediction: the measured sensor noise
+follows $R\propto z^2$; the steady-state estimation cost increases monotonically with altitude and does not
+depend on the track; the adaptive policy matches the best fixed altitude on our testbed; and
+event-triggering the aerial planner reduces its computation by more than an order of magnitude at the same
+estimation quality.
 \end{abstract}
 
 \begin{keyword}
@@ -158,15 +161,14 @@ Event-triggered control, Estimation and Kalman filtering
 \blfootnote{$^{\dagger}$~denotes equal contribution.}
 
 Unmanned ground vehicles (UGVs) operating in unstructured or GPS-denied environments are limited by short
-and occlusion-prone perception horizons: onboard LiDAR and stereo cameras have a narrow field of view and
-cannot see far enough ahead to anticipate the upcoming path \citep{frey2024roadrunner}.
+and occlusion-prone perception horizons, as onboard LiDAR and stereo cameras have a narrow field of view
+and cannot see far enough ahead to anticipate the upcoming path \citep{frey2024roadrunner}.
 A now-standard remedy is aerial-ground cooperation, in which an unmanned aerial vehicle (UAV) acts as an
 elevated eye for the perception-limited ground robot \citep{grocholsky2006cooperative,li2024colag,santos2024aerial}.
-Most such systems, however, hold the UAV at a fixed altitude and never treat that altitude as a decision
-variable: the aerial vehicle follows a distance-minimizing trajectory and returns the ground robot's state
-estimate as a downstream byproduct. This decoupling is fragile. When the ground robot maneuvers sharply
-or is briefly occluded, the estimation covariance grows and tracking degrades, precisely when reliable
-sensing matters most.
+However, most of such systems hold the UAV at a fixed altitude and never treat that altitude as a decision
+variable. The aerial vehicle follows a distance-minimizing trajectory and returns the state estimates of
+ground robot as a downstream byproduct. This decoupling is fragile. When the ground robot maneuvers sharply
+or is briefly occluded, the estimation covariance grows and tracking degrades, which is not desired.
 
 We begin instead from a structural observation about the shared sensor. When a single downward-facing
 camera on the UAV is the ground robot's only exteroceptive sensor, one image serves two roles at once: the
@@ -174,10 +176,11 @@ lane ahead is segmented into a navigation waypoint, and a marker on the robot is
 measurement for the estimator. Because both products are read from the same image, they share the same
 imaging geometry, and in particular the same altitude. Raising the camera enlarges the ground footprint and
 improves navigation coverage, but it coarsens the ground sampling distance and inflates the localization
-noise as $R\propto z^2$; lowering it does the reverse. A single scalar, the UAV altitude, therefore sets
-estimation resolution and navigation coverage simultaneously and in opposite directions. This antagonism
-turns altitude from a geometric parameter into an active perception variable, and characterizing how to use
-it is the subject of this paper.
+noise, whose covariance $R$ grows with the camera altitude $z$ as $R\propto z^2$; lowering it does the
+reverse. Therefore, a single scalar, the UAV altitude, sets estimation resolution and navigation coverage
+simultaneously but in competition, so that the altitude best for one is worst for the other. This
+antagonism turns altitude from a geometric parameter into an active perception variable, and characterizing
+how to use it is the subject of this paper.
 
 This viewpoint connects to two established lines of work, and departs from both in the same place.
 Perception-aware trajectory optimization shapes a robot's own motion to serve estimation, through the
@@ -185,21 +188,20 @@ sensor trajectory \citep{falanga2018pampc,spasojevic2020perception} and viewpoin
 \citep{zhang2019fisher}, while belief-space planning and active SLAM go further, augmenting the planning
 state with the estimator covariance to act deliberately under partial observability
 \citep{platt2010belief,vandenberg2012motion,placed2023survey}.
-Our ground-robot controller belongs to this belief-space family. What is new is where the information
-decision lives and what it trades: in these works a robot reshapes its own trajectory to see better, whereas
-here the decisive variable is a teammate's altitude, and it sets two perception products against each other
-rather than sharpening one. That altitude alone trades localization resolution against sensor coverage is
-itself known, and has been exploited to balance a coverage-quality criterion in multi-UAV area coverage
-\citep{papatheodorou2017coverage} and to meet resolution constraints in photogrammetric coverage planning
-\citep{difranco2016coverage}. What has not, to our knowledge, been formulated is the closed-loop
-\emph{shared-camera} instantiation, where one downward camera is the ground robot's only exteroceptive
-sensor and the same altitude sets both an EKF measurement (favoring low $z$) and lane-segmentation coverage
-(favoring higher $z$). For this coupling we give a closed-form, curvature-scheduled optimal altitude and
-characterize when adapting it beats any fixed altitude.
-
-Quadrotor target tracking under field-of-view and occlusion limits is likewise well studied
-\citep{thomas2017autonomous,penin2018vision}, but there too the coverage-versus-accuracy trade is split
-across separate robots or sensors and the altitude is held fixed rather than optimized.
+Our ground-robot controller belongs to this belief-space family. The novelty is that it allows to guarantee
+where the information decision lives and what it trades. In these aforementioned works a robot reshapes its
+own trajectory to see better. On contrary in our controller, the decisive variable is a teammate's
+altitude, and it sets two perception products against each other rather than sharpening one. That altitude
+alone trades localization resolution against sensor coverage is itself known, and has been exploited to
+balance a coverage-quality criterion in multi-UAV area coverage \citep{papatheodorou2017coverage} and to
+meet resolution constraints in photogrammetric coverage planning \citep{difranco2016coverage}. To our
+knowledge, the closed-loop \emph{shared-camera} instantiation has not yet been formulated, where one
+downward camera is the ground robot's only exteroceptive sensor and the same altitude is used as an EKF
+measurement (favoring low $z$) and in lane-segmentation coverage (favoring higher $z$). For this coupling,
+we give a closed-form solution of curvature-scheduled optimal altitude, which is characterized with
+adaptation. Quadrotor target-tracking under limited field-of-view and occlusion is likewise well studied
+\citep{thomas2017autonomous,penin2018vision}. However, the coverage-versus-accuracy trade is split across
+separate robots or sensors and the altitude is held fixed rather than optimized.
 
 Deploying the resulting policy in closed loop additionally demands robust tracking
 under bounded disturbances and a bounded compute budget. Tube MPC supplies the first, decomposing control
@@ -215,18 +217,19 @@ inter-trigger behavior.
 Building on these observations, we develop COAST, which treats altitude as a coupled perception variable,
 and make three contributions:
 \begin{itemize}
-\item \emph{The coupling and its regime (Section~\ref{sec:method}).} We formalize the shared-camera altitude
-coupling and characterize it in closed form: the estimation-optimal altitude is a curvature-scheduled
-coverage floor, and we give the exact regime in which adapting altitude helps and the one in which no fixed
-altitude can be beaten. The contribution is this map of \emph{when} adaptation helps, not a claim that it
-always does.
+\item \emph{The coupling and its regime (Section~\ref{sec:method}).} We formalize the shared-camera
+altitude coupling and solve it in closed form. The best altitude for estimation is the lowest one that
+keeps the path within the camera footprint, and it rises with path curvature; adapting altitude along the
+path beats every fixed altitude exactly when this lowest admissible altitude is active and the curvature
+varies, and otherwise a single fixed altitude is already optimal. The contribution is this characterization
+of \emph{when} adaptation helps, not a claim that it always helps.
 \item \emph{An event-triggered co-design.} We deploy the policy with a belief-space ground controller and a
-perception-triggered aerial planner whose ancillary law is shown to be input-to-state stable between
-triggers and free of Zeno behavior, which makes perception-aware replanning affordable on a constrained
-companion computer.
+perception-triggered aerial planner whose ancillary law is shown to be input-to-state stable between two
+consecutive triggers and free of Zeno behavior, which makes perception-aware replanning affordable on a
+constrained companion computer.
 \item \emph{A reproducible SITL study.} We build a complete ROS\,2/Gazebo testbed under one per-step
 logging protocol and use it to verify each analytical prediction; the code and data are publicly
-available.\footnote{\url{https://github.com/soododivyam/COAST}}
+available.\footnote{\url{https://github.com/soododivyam/COAST-public-release}}
 \end{itemize}
 Figure~\ref{fig:testbed} shows the testbed and the single camera in its dual role.
 
@@ -256,7 +259,8 @@ noisy pose measurement. The pose measurement is fused with odometry in an extend
 yielding a belief $(\mu,\Sigma)$, that is, a mean $\mu$ and covariance $\Sigma$ over the UGV state.
 
 Because both products are read from the same image, they share the same altitude, which therefore sets
-estimation quality and navigation coverage together and in opposite directions. The remainder of this
+estimation quality and navigation coverage together but in competition: a higher altitude improves
+coverage while coarsening resolution, and a lower altitude does the reverse. The remainder of this
 section formalizes the two sides of this coupling through the vehicle motion, resolution, and coverage
 models, and states the constrained estimation problem they induce, which Section~\ref{sec:method} solves.
 
@@ -871,37 +875,24 @@ UAV--UGV offset (m) & \RESoffCone & \RESoffCthree\\
 We studied aerial-ground cooperative tracking in which a single downward UAV camera is the ground
 vehicle's only exteroceptive sensor, serving at once as its navigation reference and as the input to its
 state estimator. The central observation is that this shared-sensor design couples navigation and
-estimation through one scalar, the UAV altitude, which sets footprint coverage and localization
-resolution in opposite directions. Treating altitude as an active perception variable, we characterized
-in closed form the estimation-optimal altitude as the curvature-scheduled coverage floor
-(Proposition~\ref{prop:alt}) and the exact regime in which adapting it is worthwhile
-(Proposition~\ref{prop:adapt}): adaptation strictly dominates every fixed altitude if and only if the
-coverage floor binds and the curvature varies. A perception-triggered co-design deploys this policy with a
-bounded, Zeno-free inter-trigger error (Remark~\ref{rem:iss}). The SITL study confirms each prediction: the sensor follows $R\propto z^2$,
-the estimation cost is monotone and track-independent in altitude, the curvature-scheduled policy matches
-the best feasible fixed altitude in our non-binding configuration while avoiding the estimation penalty
-of flying higher, and the event trigger reduces aerial-replanning compute by more than an order of
-magnitude at unchanged estimation quality (Table~\ref{tab:results}). The characterization of when
-altitude adaptation helps, not any single altitude value, is the contribution.
+estimation through one scalar, the UAV altitude, which sets footprint coverage and localization resolution
+in competition: flying lower sharpens localization but shrinks the footprint, while flying higher does the
+reverse. We treated altitude as a variable to be optimized and solved this coupling in closed form. The
+altitude that is best for estimation is the lowest one that keeps the path within the camera footprint, and
+it rises with path curvature (Proposition~\ref{prop:alt}); adapting altitude beats every fixed altitude
+exactly when this lowest admissible altitude is active and the curvature varies (Proposition~\ref{prop:adapt}),
+and otherwise a fixed altitude is already optimal. We realized this as COAST, a perception-triggered
+co-design whose ancillary law keeps the inter-trigger error bounded and free of Zeno behavior
+(Remark~\ref{rem:iss}). A reproducible SITL study confirmed every prediction: the sensor noise follows
+$R\propto z^2$; the estimation cost is monotone and track-independent in altitude; the adaptive policy
+matches the best fixed altitude on our testbed while avoiding the penalty of flying higher; and
+event-triggering the aerial planner reduces its computation by more than an order of magnitude at matched
+estimation quality (Table~\ref{tab:results}). The contribution is the characterization of \emph{when}
+altitude adaptation helps, not any single altitude value.
 
-Several aspects of the present study bound its scope and set the agenda for future work.
-\begin{itemize}
-\item \emph{Binding regime.} Our testbed sits on the non-binding side of the Corollary~\ref{cor:regime}
-boundary, where the required lookahead keeps the coverage floor below $z_{\min}$, so the strict-dominance
-benefit ($\Delta>0$) is established analytically but not yet demonstrated in closed loop. A lookahead that
-scales with speed or curvature raises the floor above $z_{\min}$, and exhibiting the predicted $\Delta>0$
-under such a law is the natural next experiment.
-\item \emph{Higher fidelity.} The study is software-in-the-loop with a velocity-controlled UAV abstraction,
-so an inner-loop attitude and thrust controller is assumed to realize the commanded velocities; replacing
-this abstraction with a full multicopter model and moving to hardware is the next step.
-\item \emph{Stronger guarantees.} The controller monitors an adaptive ellipsoidal surrogate rather than
-propagating a full tube online, and the bound of Remark~\ref{rem:iss} is stated for the unsaturated
-command; strengthening the surrogate toward a formal recursive-feasibility argument, and benchmarking the
-perception-driven trigger against plain error-triggered and self-triggered baselines, would tighten the
-analysis.
-\item \emph{Harder perception.} Finally, we plan to evaluate the single-camera architecture under
-intermittent observations, latency, and occlusions.
-\end{itemize}
+Future work will demonstrate the predicted strict benefit in the binding regime, reached by a speed- or
+curvature-scaled look-ahead that lifts the coverage floor above $z_{\min}$, and will replace the
+velocity-controlled UAV abstraction with a full multicopter model on hardware.
 
 \bibliography{references}            % IFAC ifacconf.bst (author-year); see references.bib
 \end{document}
